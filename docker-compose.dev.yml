@@ -1,0 +1,9 @@
+services:
+  postgres:
+    container_name: ${DEV_DB_CONTAINER_NAME}
+    ports:
+      - "${DEV_DB_PORT}:5432"
+    environment:
+      POSTGRES_DB: ${DEV_DB}
+      POSTGRES_USER: ${DEV_DB_USER}
+      POSTGRES_PASSWORD: ${DEV_DB_PASSWORD}
