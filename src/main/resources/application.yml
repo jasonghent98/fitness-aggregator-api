@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/fitdata
+    url: jdbc:postgresql://localhost:5432/fitness-aggregator-store
     username: your_db_user
     password: your_db_password
   jpa:
@@ -9,4 +9,4 @@ spring:
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   application:
-    name: FitData
+    name: fitness-aggregator-store
