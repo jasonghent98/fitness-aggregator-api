@@ -5,7 +5,7 @@ FROM openjdk:21-jdk-slim
 WORKDIR /app
 
 # Copy the JAR file (replace this with your actual JAR name if known)
-COPY target/fitness-aggregator.jar app.jar
+COPY target/fitness-aggregator-api.jar app.jar
 
 # Expose the port your app runs on
 EXPOSE 8080

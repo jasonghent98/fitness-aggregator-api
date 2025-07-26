@@ -19,3 +19,10 @@ hs_err_pid*
 target
 .gradle
 build
+
+# IDE files
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
