@@ -1,28 +1,32 @@
 package com.jasonghent98.fitness_aggregator_api.model.strava;
 import jakarta.persistence.*;
 import java.util.UUID;
-
+import java.time.Instant;
 
 @Entity
-@Table(name = "users")
+@Table(name="strava_users")
 public class StravaUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Column(name = "access_token", nullable = false)
+    private String accessToken;
 
-    @Column
-    private String fullName;
+    @Column(name = "refresh_token", nullable = false)
+    private String refreshToken;
 
-    // Add any fields you expect to store for your base user
+    @Column(name = "expires_at", nullable = false)
+    private Instant expiresAt;
+
+    @Column(name = "strava_athlete_id", nullable = false, unique = true)
+    private Long stravaAthleteId;
 
     // Relationships
-    // Only exists in Java code to make it easier to navigate from User → StravaUser. Does NOT create a column
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private StravaUser stravaUser;
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private com.jasonghent98.fitness_aggregator_api.model.User user;
 
-    // Getters and setters
+
 }
