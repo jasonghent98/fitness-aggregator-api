@@ -20,6 +20,12 @@ public class StravaUser {
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;
 
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
     @Column(name = "strava_athlete_id", nullable = false, unique = true)
     private Long stravaAthleteId;
 

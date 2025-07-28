@@ -1,6 +1,8 @@
 package com.jasonghent98.fitness_aggregator_api.model;
 import com.jasonghent98.fitness_aggregator_api.model.strava.StravaUser;
 import jakarta.persistence.*;
+
+import java.time.Instant;
 import java.util.UUID;
 
 
@@ -18,7 +20,11 @@ public class User {
     @Column
     private String fullName;
 
-    // Add any fields you expect to store for your base user
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 
     // Relationships
     // Only exists in Java code to make it easier to navigate from User → StravaUser. Does NOT create a column
