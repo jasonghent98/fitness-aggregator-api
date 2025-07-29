@@ -4,7 +4,13 @@ import java.util.UUID;
 import java.time.Instant;
 
 @Entity
-@Table(name="strava_users")
+@Table(
+        name = "strava_users",
+        uniqueConstraints = {
+                @UniqueConstraint(name="uq_strava_users_user", columnNames = "user_id"),
+                @UniqueConstraint(name="uq_strava_users_athlete", columnNames = "strava_athlete_id")
+        }
+)
 public class StravaUser {
 
     @Id
