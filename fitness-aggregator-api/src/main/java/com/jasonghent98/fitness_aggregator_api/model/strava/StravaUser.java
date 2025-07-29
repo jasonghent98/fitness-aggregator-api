@@ -7,8 +7,8 @@ import java.time.Instant;
 @Table(
         name = "strava_users",
         uniqueConstraints = {
-                @UniqueConstraint(name="uq_strava_users_user", columnNames = "user_id"),
-                @UniqueConstraint(name="uq_strava_users_athlete", columnNames = "strava_athlete_id")
+                @UniqueConstraint(name = "uq_strava_users_user", columnNames = "user_id"),
+                @UniqueConstraint(name = "uq_strava_users_athlete", columnNames = "strava_athlete_id")
         }
 )
 public class StravaUser {
@@ -34,6 +34,19 @@ public class StravaUser {
 
     @Column(name = "strava_athlete_id", nullable = false, unique = true)
     private Long stravaAthleteId;
+
+    // handled before just before writes are persisted to DB vis JPA API
+    @PrePersist
+    void onCreate() {
+        Instant now = Instant.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        this.updatedAt = Instant.now();
+    }
 
     // Relationships
     @OneToOne
