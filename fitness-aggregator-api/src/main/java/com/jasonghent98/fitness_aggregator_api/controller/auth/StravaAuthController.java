@@ -1,6 +1,7 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
 import com.jasonghent98.fitness_aggregator_api.config.services.StravaConfig;
+import com.jasonghent98.fitness_aggregator_api.dto.strava.StravaAuthTokenResponse;
 import com.jasonghent98.fitness_aggregator_api.model.strava.StravaUser;
 import com.jasonghent98.fitness_aggregator_api.repository.UserRepository;
 import com.jasonghent98.fitness_aggregator_api.repository.strava.StravaUserRepository;
@@ -65,18 +66,21 @@ public class StravaAuthController {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(
+            ResponseEntity<StravaAuthTokenResponse> response = restTemplate.postForEntity(
                     "https://www.strava.com/oauth/token",
                     request,
-                    String.class
+                    StravaAuthTokenResponse.class
             );
 
-            System.out.println("From StravaAuthController.java => " + response);
+            ResponseEntity<StravaAuthTokenResponse> tokenData = response;
+            if (tokenData.getBody() != null) {
+                System.out.println(" FROM AUTH!! " + tokenData.getBody().athlete.id);
+            }
 
             // check if the user exists in the strava_users table
 
             // Normally you'd parse the response into an object and persist it.
-            return ResponseEntity.ok(response.getBody());
+            return ResponseEntity.ok(response.getBody().toString());
 
         } catch (Exception e) {
             e.printStackTrace();
