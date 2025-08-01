@@ -21,7 +21,7 @@ public class StravaAuthTokenResponse {
         public long id;
 
         @JsonProperty("username")
-        public String email;
+        public String username;
 
         @JsonProperty("firstname")
         public String firstName;
