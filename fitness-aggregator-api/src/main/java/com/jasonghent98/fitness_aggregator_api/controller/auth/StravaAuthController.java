@@ -1,6 +1,9 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
 import com.jasonghent98.fitness_aggregator_api.config.services.StravaConfig;
+import com.jasonghent98.fitness_aggregator_api.model.strava.StravaUser;
+import com.jasonghent98.fitness_aggregator_api.repository.UserRepository;
+import com.jasonghent98.fitness_aggregator_api.repository.strava.StravaUserRepository;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -11,15 +14,20 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/strava/auth")
 public class StravaAuthController {
     public final StravaConfig stravaConfig;
+    private final UserRepository userRepo;
+    private final StravaUserRepository stravaUserRepo;
 
     /*spring will recognize this is a bean and will handle instantiation and injection*/
-    StravaAuthController (StravaConfig stravaConfig) {
+    StravaAuthController (StravaConfig stravaConfig, UserRepository userRepo, StravaUserRepository stravaUserRepo) {
         this.stravaConfig = stravaConfig;
+        this.userRepo = userRepo;
+        this.stravaUserRepo = stravaUserRepo;
     }
 
     @GetMapping("/login")
@@ -62,6 +70,10 @@ public class StravaAuthController {
                     request,
                     String.class
             );
+
+            System.out.println("From StravaAuthController.java => " + response);
+
+            // check if the user exists in the strava_users table
 
             // Normally you'd parse the response into an object and persist it.
             return ResponseEntity.ok(response.getBody());
