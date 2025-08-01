@@ -15,7 +15,7 @@ public class User {
     private UUID id;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    private String username;
 
     @Column
     private String fullName;
@@ -46,4 +46,11 @@ public class User {
     private StravaUser stravaUser;
 
     // Getters and setters
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
 }
