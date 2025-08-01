@@ -4,7 +4,13 @@ import java.util.UUID;
 import java.time.Instant;
 
 @Entity
-@Table(name="strava_users")
+@Table(
+        name = "strava_users",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uq_strava_users_user", columnNames = "user_id"),
+                @UniqueConstraint(name = "uq_strava_users_athlete", columnNames = "strava_athlete_id")
+        }
+)
 public class StravaUser {
 
     @Id
@@ -29,10 +35,45 @@ public class StravaUser {
     @Column(name = "strava_athlete_id", nullable = false, unique = true)
     private Long stravaAthleteId;
 
+    // handled before just before writes are persisted to DB vis JPA API
+    @PrePersist
+    void onCreate() {
+        Instant now = Instant.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        this.updatedAt = Instant.now();
+    }
+
     // Relationships
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private com.jasonghent98.fitness_aggregator_api.model.User user;
+
+    // ✅ Add getters and setters below
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void setExpiresAt(Instant expiresAt) {
+        this.expiresAt = expiresAt;
+    }
+
+    public void setStravaAthleteId(Long stravaAthleteId) {
+        this.stravaAthleteId = stravaAthleteId;
+    }
+
+    public void setUser(com.jasonghent98.fitness_aggregator_api.model.User user) {
+        this.user = user;
+    }
 
 
 }

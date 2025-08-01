@@ -15,7 +15,7 @@ public class User {
     private UUID id;
 
     @Column(nullable = false, unique = true)
-    private String email;
+    private String username;
 
     @Column
     private String fullName;
@@ -26,6 +26,19 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    // handled before just before writes are persisted to DB vis JPA API
+    @PrePersist
+    void onCreate() {
+        Instant now = Instant.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        this.updatedAt = Instant.now();
+    }
+
     // Relationships
     // Only exists in Java code to make it easier to navigate from User → StravaUser. Does NOT create a column
     // The "user" field in the StravaUser class is managing the relationship
@@ -33,4 +46,11 @@ public class User {
     private StravaUser stravaUser;
 
     // Getters and setters
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
 }
