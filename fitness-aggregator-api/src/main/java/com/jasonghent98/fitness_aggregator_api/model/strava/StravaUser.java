@@ -67,14 +67,6 @@ public class StravaUser {
         this.expiresAt = expiresAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public void setStravaAthleteId(Long stravaAthleteId) {
         this.stravaAthleteId = stravaAthleteId;
     }
