@@ -9,7 +9,7 @@ import java.util.UUID;
 
 // methods that JPA will implement during build
 public interface StravaUserRepository extends JpaRepository<StravaUser, UUID> {
-    Optional<StravaUser> findByStravaAthleteId(UUID stravaAthleteId);
+    Optional<StravaUser> findByStravaAthleteId(Long stravaAthleteId);
     Optional<StravaUser> findByUser(User user);
     Optional<StravaUser> findByUserId(UUID userId);
 }
