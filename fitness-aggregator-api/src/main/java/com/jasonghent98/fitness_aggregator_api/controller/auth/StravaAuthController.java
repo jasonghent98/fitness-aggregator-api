@@ -1,6 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
-import com.jasonghent98.fitness_aggregator_api.config.services.StravaConfig;
+import com.jasonghent98.fitness_aggregator_api.config.provider.strava.StravaConfig;
 import com.jasonghent98.fitness_aggregator_api.dto.strava.StravaAuthTokenResponse;
 import com.jasonghent98.fitness_aggregator_api.model.User;
 import com.jasonghent98.fitness_aggregator_api.model.strava.StravaUser;
