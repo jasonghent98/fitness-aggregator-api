@@ -1,37 +1,52 @@
 package com.jasonghent98.fitness_aggregator_api.interceptor.strava;
 
+import com.jasonghent98.fitness_aggregator_api.auth.strava.StravaAuthService;
 import com.jasonghent98.fitness_aggregator_api.context.strava.StravaContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.io.IOException;
+import java.util.UUID;
+
 
 @Component
 public class StravaTokenInterceptor implements HandlerInterceptor {
 
+    StravaAuthService stravaAuthService;
 
-
-    public StravaTokenInterceptor() {
-
+    public StravaTokenInterceptor(StravaAuthService stravaAuthService) {
+        this.stravaAuthService = stravaAuthService;
     }
 
+    /*catches incoming requests and runs BEFORE the controller*/
     @Override
-    /*
-        should consider the following cases
-        - if the user has an expired token, should handle the token refresh process automatically for strava-related routes (excluding initial login)
-        - user has no token
-
-     */
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        String userIdHeader = request.getHeader("X-User-Id");
+
+        if (userIdHeader == null) {
+            try {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing user ID");
+            } catch (IOException e) {
+                System.err.println("Unable to throw user ID error from StravaTokenInterceptor " + e);
+            }
+
+            return false;
+        }
+
+
+        UUID userId = UUID.fromString(userIdHeader); // convert to UUID
+        String accessToken = stravaAuthService.getValidAccessToken(userId); // get or set the token if expired in DB
+        StravaContext.setAccessToken(accessToken); // set the token in memory for any other methods that need quick access within thread
+
         return true;
     }
 
+    /*catches incoming requests and runs AFTER the controller*/
+
     @Override
-    /*
-     * Consider any memory leaks or cleanup that may need to be handled after the controller executes
-     * */
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        StravaContext.clear(); // Clean up after the request
+        StravaContext.clear(); // Clean up thread memory after the request to avoid future users with memory leak issues
     }
 }
