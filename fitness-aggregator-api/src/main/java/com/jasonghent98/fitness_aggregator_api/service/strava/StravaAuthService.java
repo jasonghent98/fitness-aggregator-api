@@ -1,4 +1,4 @@
-package com.jasonghent98.fitness_aggregator_api.auth.strava;
+package com.jasonghent98.fitness_aggregator_api.service.strava;
 
 import com.jasonghent98.fitness_aggregator_api.dto.strava.StravaAuthTokenResponse;
 import com.jasonghent98.fitness_aggregator_api.model.strava.StravaUser;
