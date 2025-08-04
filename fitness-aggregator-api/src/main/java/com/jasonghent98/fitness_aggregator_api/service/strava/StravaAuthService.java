@@ -23,7 +23,9 @@ public class StravaAuthService {
                 .orElseThrow(() -> new RuntimeException("Strava user not found"));
 
         if (user.getExpiresAt().isBefore(Instant.now())) {
+            System.out.println("⏰ Token expired. Refreshing in StravaAuthService...");
             StravaAuthTokenResponse refreshed = stravaTokenClient.refreshToken(user.getRefreshToken());
+            System.out.println("🔐 New access token in StravaAuthService: " + refreshed.accessToken);
             user.setAccessToken(refreshed.accessToken);
             user.setRefreshToken(refreshed.refreshToken);
             user.setExpiresAt(Instant.ofEpochSecond(refreshed.expiresAt));

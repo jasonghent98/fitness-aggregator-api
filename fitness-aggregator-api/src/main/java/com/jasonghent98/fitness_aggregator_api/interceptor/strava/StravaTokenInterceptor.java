@@ -25,6 +25,8 @@ public class StravaTokenInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String userIdHeader = request.getHeader("X-User-Id");
 
+        System.out.println("✅ [Interceptor] Checking token for user: " + userIdHeader);
+
         if (userIdHeader == null) {
             try {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing user ID");
