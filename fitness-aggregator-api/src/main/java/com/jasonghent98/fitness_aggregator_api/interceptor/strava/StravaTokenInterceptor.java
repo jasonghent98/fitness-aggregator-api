@@ -1,6 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.interceptor.strava;
 
-import com.jasonghent98.fitness_aggregator_api.auth.strava.StravaAuthService;
+import com.jasonghent98.fitness_aggregator_api.service.strava.StravaAuthService;
 import com.jasonghent98.fitness_aggregator_api.context.strava.StravaContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
