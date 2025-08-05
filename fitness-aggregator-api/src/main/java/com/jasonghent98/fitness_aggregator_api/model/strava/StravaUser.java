@@ -67,6 +67,10 @@ public class StravaUser {
         return this.expiresAt;
     }
 
+    public Long getStravaAthleteId() {
+        return this.stravaAthleteId;
+    }
+
     // setter methods
 
     public void setAccessToken(String accessToken) {
