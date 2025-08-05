@@ -62,8 +62,10 @@ public class StravaTokenInterceptor implements HandlerInterceptor {
 
     /*catches incoming requests and runs AFTER the controller*/
 
+    // clear threadlocal memory to avoid leaks
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        StravaContext.clear(); // Clean up thread memory after the request to avoid future users with memory leak issues
+        StravaContext.clear();
+        UserContext.clear();
     }
 }
