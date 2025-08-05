@@ -1,5 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.interceptor.strava;
 
+import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.service.strava.StravaAuthService;
 import com.jasonghent98.fitness_aggregator_api.context.strava.StravaContext;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,8 +38,23 @@ public class StravaTokenInterceptor implements HandlerInterceptor {
         }
 
 
-        UUID userId = UUID.fromString(userIdHeader); // convert to UUID
-        String accessToken = stravaAuthService.getValidAccessToken(userId); // get or set the token if expired in DB
+        UUID userId;
+        // convert to UUID
+        try {
+            userId = UUID.fromString(userIdHeader);
+        } catch (IllegalArgumentException e) {
+            try {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID format");
+            } catch (IOException ioException) {
+                System.err.println("Failed to send error response for invalid UUID: " + ioException);
+            }
+            return false;
+        }
+
+        // add to userid to UserContext for downstream access
+        UserContext.setUserId(userId);
+
+        String accessToken = stravaAuthService.getValidAccessToken(userId); // get or set the strava access token if expired in DB
         StravaContext.setAccessToken(accessToken); // set the token in memory for any other methods that need quick access within thread
 
         return true;
