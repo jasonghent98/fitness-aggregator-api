@@ -11,9 +11,9 @@ import java.util.List;
 @Service
 public class StravaService {
 
-    public List<SummaryActivity> getActivities(String accessToken) {
+    public List<SummaryActivity> getActivities(String userAccessToken) {
         io.swagger.client.ApiClient client = new ApiClient();
-        client.setAccessToken(accessToken);
+        client.setAccessToken(userAccessToken);
 
         ActivitiesApi activitiesApi = new ActivitiesApi(client);
 
