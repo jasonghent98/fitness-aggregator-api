@@ -53,7 +53,21 @@ public class StravaUser {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private com.jasonghent98.fitness_aggregator_api.model.User user;
 
-    // ✅ Add getters and setters below
+    // getter methods
+
+    public String getAccessToken() {
+        return this.accessToken;
+    }
+
+    public String getRefreshToken() {
+        return this.refreshToken;
+    }
+
+    public Instant getExpiresAt() {
+        return this.expiresAt;
+    }
+
+    // setter methods
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;

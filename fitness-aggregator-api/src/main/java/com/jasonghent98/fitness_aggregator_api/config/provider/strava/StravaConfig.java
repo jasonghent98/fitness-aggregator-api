@@ -1,4 +1,4 @@
-package com.jasonghent98.fitness_aggregator_api.config.services;
+package com.jasonghent98.fitness_aggregator_api.config.provider.strava;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

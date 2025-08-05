@@ -2,6 +2,7 @@ package com.jasonghent98.fitness_aggregator_api.controller.strava;
 import com.jasonghent98.fitness_aggregator_api.integrations.strava.StravaService;
 import io.swagger.client.model.SummaryActivity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,12 @@ public class StravaController {
         return "up!";
     }
 
+    // test issue #17
+    @GetMapping("/test17")
+    public ResponseEntity<String> test17() {
+        return ResponseEntity.ok("Middleware injection complete");
+    }
+
     @GetMapping("/activies")
     public List<SummaryActivity> getStravaUser() {
         try {
@@ -33,5 +40,4 @@ public class StravaController {
             return Collections.emptyList();
         }
     }
-
 }
