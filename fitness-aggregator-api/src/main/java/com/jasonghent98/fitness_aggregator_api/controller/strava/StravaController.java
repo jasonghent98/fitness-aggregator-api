@@ -1,5 +1,7 @@
 package com.jasonghent98.fitness_aggregator_api.controller.strava;
+import com.jasonghent98.fitness_aggregator_api.context.strava.StravaContext;
 import com.jasonghent98.fitness_aggregator_api.integrations.strava.StravaService;
+import io.swagger.client.model.ActivityStats;
 import io.swagger.client.model.SummaryActivity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,25 +21,27 @@ public class StravaController {
         this.stravaService = stravaService;
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "up!";
-    }
-
-    // test issue #17
-    @GetMapping("/test17")
-    public ResponseEntity<String> test17() {
-        return ResponseEntity.ok("Middleware injection complete");
-    }
-
-    @GetMapping("/activies")
+    @GetMapping("/activities")
     public List<SummaryActivity> getStravaUser() {
         try {
-            List<SummaryActivity> summaryActivities = stravaService.getActivities("4dc1390fce5a055bd73c441840eda8964d3e7384");
+            String userAccessToken = StravaContext.getAccessToken();
+            List<SummaryActivity> summaryActivities = stravaService.getActivities(userAccessToken);
             return summaryActivities;
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
+        }
+    }
+
+    @GetMapping("/stats")
+    public ActivityStats getAthleteStats() {
+        try {
+            String userAccessToken = StravaContext.getAccessToken();
+            ActivityStats summaryStats = stravaService.getAthleteStats(userAccessToken);
+            return summaryStats;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ActivityStats();
         }
     }
 }
