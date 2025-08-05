@@ -19,17 +19,6 @@ public class StravaController {
         this.stravaService = stravaService;
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return "up!";
-    }
-
-    // test issue #17
-    @GetMapping("/test17")
-    public ResponseEntity<String> test17() {
-        return ResponseEntity.ok("Middleware injection complete");
-    }
-
     @GetMapping("/activies")
     public List<SummaryActivity> getStravaUser() {
         try {
