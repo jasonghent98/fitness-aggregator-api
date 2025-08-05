@@ -1,6 +1,8 @@
 
 package com.jasonghent98.fitness_aggregator_api.integrations.strava;
 
+import com.jasonghent98.fitness_aggregator_api.context.UserContext;
+import com.jasonghent98.fitness_aggregator_api.model.strava.StravaUser;
 import com.jasonghent98.fitness_aggregator_api.repository.strava.StravaUserRepository;
 import io.swagger.client.model.ActivityStats;
 import io.swagger.client.model.SummaryActivity;
@@ -10,8 +12,8 @@ import io.swagger.client.ApiClient;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class StravaService {
@@ -36,7 +38,7 @@ public class StravaService {
     }
 
     // returns athlete stats and summaries (swim, bike, run)
-    public List<ActivityStats> getAthleteStats(String userAccessToken) {
+    public ActivityStats getAthleteStats(String userAccessToken) {
         // set up api client
         ApiClient client = new ApiClient();
         client.setAccessToken(userAccessToken);
@@ -44,23 +46,18 @@ public class StravaService {
 
 
         // Step 2: Get user id from userContext
+        UUID userId = UserContext.getUserId();
 
         // step 3: get user athlete id from userid using stravaUserRepo
+        StravaUser stravaUser = stravaUserRepo.findByUserId(userId).orElseThrow(() -> new RuntimeException("Strava user not found for userId: " + userId));
+        Long stravaAthleteId = stravaUser.getStravaAthleteId();
 
         // step 4: make call to athletesApi.getStats with user athlete id
-
-
-        /*
         try {
-
+            return athletesApi.getStats(stravaAthleteId);
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch Strava athlete stats", e);
         }
-
-         */
-
-        return Collections.emptyList(); // temporary placeholder
-
 
     }
 
