@@ -19,10 +19,10 @@ public class StravaController {
         this.stravaService = stravaService;
     }
 
-    @GetMapping("/activies")
+    @GetMapping("/activities")
     public List<SummaryActivity> getStravaUser() {
         try {
-            List<SummaryActivity> summaryActivities = stravaService.getActivities("4dc1390fce5a055bd73c441840eda8964d3e7384");
+            List<SummaryActivity> summaryActivities = stravaService.getActivities("dummy_token");
             return summaryActivities;
         } catch (Exception e) {
             e.printStackTrace();
