@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: ${DEV_DB_URL}
+    username: ${DEV_DB_USER}
+    password: ${DEV_DB_PASSWORD}
+  application:
+    name: ${DEV_APP_NAME}
+strava:
+  CLIENT_SECRET: ${STRAVA_CLIENT_SECRET}
+  CLIENT_ID: ${STRAVA_CLIENT_ID}
+  REDIRECT_URL: ${STRAVA_REDIRECT_URL}
