@@ -2,6 +2,7 @@ package com.jasonghent98.fitness_aggregator_api.model.strava;
 import jakarta.persistence.*;
 import java.util.UUID;
 import java.time.Instant;
+import lombok.Data;
 
 @Entity
 @Table(
@@ -11,6 +12,7 @@ import java.time.Instant;
                 @UniqueConstraint(name = "uq_strava_users_athlete", columnNames = "strava_athlete_id")
         }
 )
+@Data
 public class StravaUser {
 
     @Id
@@ -55,6 +57,7 @@ public class StravaUser {
 
     // getter methods
 
+    /*
     public String getAccessToken() {
         return this.accessToken;
     }
@@ -93,5 +96,7 @@ public class StravaUser {
         this.user = user;
     }
 
+
+     */
 
 }
