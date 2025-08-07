@@ -2,12 +2,14 @@ package com.jasonghent98.fitness_aggregator_api.model.strava;
 
 import jakarta.persistence.*;
 import java.util.UUID;
+import lombok.Data;
 
 @Entity
 @Table(name = "strava_stats", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id"})
 })
 
+@Data
 public class StravaStats {
 
     @Id
