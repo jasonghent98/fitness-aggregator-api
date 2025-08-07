@@ -1,11 +1,8 @@
 package com.jasonghent98.fitness_aggregator_api.controller.strava;
-import com.jasonghent98.fitness_aggregator_api.context.strava.StravaContext;
 import com.jasonghent98.fitness_aggregator_api.integrations.strava.StravaService;
 import com.jasonghent98.fitness_aggregator_api.model.strava.StravaActivity;
-import io.swagger.client.model.ActivityStats;
-import io.swagger.client.model.SummaryActivity;
+import com.jasonghent98.fitness_aggregator_api.model.strava.StravaStats;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,14 +30,12 @@ public class StravaController {
     }
 
     @GetMapping("/stats")
-    public ActivityStats getAthleteStats() {
+    public List<StravaStats> getAthleteStats() {
         try {
-            String userAccessToken = StravaContext.getAccessToken();
-            ActivityStats summaryStats = stravaService.getAthleteStats(userAccessToken);
-            return summaryStats;
+            return stravaService.getStatsForUser();
         } catch (Exception e) {
             e.printStackTrace();
-            return new ActivityStats();
+            return Collections.emptyList();
         }
     }
 }
