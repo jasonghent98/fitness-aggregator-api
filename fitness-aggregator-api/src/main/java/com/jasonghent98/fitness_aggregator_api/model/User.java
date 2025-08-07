@@ -4,10 +4,11 @@ import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.UUID;
-
+import lombok.Data;
 
 @Entity
 @Table(name = "users")
+@Data // handles getters and setters
 public class User {
 
     @Id
@@ -44,13 +45,5 @@ public class User {
     // The "user" field in the StravaUser class is managing the relationship
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private StravaUser stravaUser;
-
-    // Getters and setters
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
 
 }

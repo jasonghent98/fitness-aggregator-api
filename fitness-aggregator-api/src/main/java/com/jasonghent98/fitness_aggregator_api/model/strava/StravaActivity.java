@@ -3,8 +3,8 @@ package com.jasonghent98.fitness_aggregator_api.model.strava;
 import jakarta.persistence.*;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.UUID;
+import lombok.Data;
 
 @Entity
 @Table(
@@ -14,6 +14,7 @@ import java.util.UUID;
             @Index(name = "idx_strava_activities_user_id", columnList = "user_id")
         }
 )
+@Data
 public class StravaActivity {
 
     @Id
@@ -68,8 +69,7 @@ public class StravaActivity {
     @Column(name = "fetched_at", nullable = false)
     private Instant fetchedAt = Instant.now(); // When we fetched from Strava
 
-    // Getters
-
+    /*
     public UUID getId() { return id; }
     public Long getStravaActivityId() { return stravaActivityId; }
     public UUID getUserId() { return userId; }
@@ -99,4 +99,5 @@ public class StravaActivity {
     public Integer getMaxWatts() { return maxWatts; }
     public Integer getPrCount() { return prCount; }
     public Integer getSufferScore() { return sufferScore; }
+     */
 }
