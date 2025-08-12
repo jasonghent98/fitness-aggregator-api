@@ -1,14 +1,17 @@
-# Use official OpenJDK image with JDK 17
-FROM openjdk:21-jdk-slim
+# Use a lightweight JRE base image for Java 21
+FROM eclipse-temurin:21-jre-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Copy the JAR file (replace this with your actual JAR name if known)
+# Copy the built jar file into the container
 COPY target/fitness-aggregator-api.jar app.jar
 
-# Expose the port your app runs on
+# Cloud Run sends traffic to this env var ($PORT)
+ENV PORT=8080
+
+# Expose the port (optional, Cloud Run sets it automatically)
 EXPOSE 8080
 
-# Run the app
+# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
