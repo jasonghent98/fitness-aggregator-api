@@ -33,3 +33,5 @@ build/
 .vscode/
 
 .env.*
+# docker image tags for deployments
+.last_image_tag.*
