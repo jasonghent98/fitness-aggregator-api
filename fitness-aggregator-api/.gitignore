@@ -35,3 +35,6 @@ build/
 .env.*
 # docker image tags for deployments
 .last_image_tag.*
+
+# used for easy deployment context
+env.*.yaml
