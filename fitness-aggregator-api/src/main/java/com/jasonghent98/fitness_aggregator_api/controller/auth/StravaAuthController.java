@@ -1,5 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
+import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
 import com.jasonghent98.fitness_aggregator_api.config.provider.strava.StravaConfig;
 import com.jasonghent98.fitness_aggregator_api.dto.strava.StravaAuthTokenResponse;
 import com.jasonghent98.fitness_aggregator_api.model.User;
@@ -25,12 +26,14 @@ public class StravaAuthController {
     public final StravaConfig stravaConfig;
     private final UserRepository userRepo;
     private final StravaUserRepository stravaUserRepo;
+    private final FrontendConfig frontendConfig;
 
     /*spring will recognize this is a bean and will handle instantiation and injection*/
-    StravaAuthController (StravaConfig stravaConfig, UserRepository userRepo, StravaUserRepository stravaUserRepo) {
+    StravaAuthController (StravaConfig stravaConfig, UserRepository userRepo, StravaUserRepository stravaUserRepo, FrontendConfig frontendConfig) {
         this.stravaConfig = stravaConfig;
         this.userRepo = userRepo;
         this.stravaUserRepo = stravaUserRepo;
+        this.frontendConfig = frontendConfig;
     }
 
     @GetMapping("/login")
@@ -117,7 +120,11 @@ public class StravaAuthController {
                 stravaUserRepo.save(newStravaUser);
             }
 
-            return ResponseEntity.ok("Strava authentication successful");
+            // 4) redirect back to Next.js Get Started with a flash
+            URI redirect = URI.create(frontendConfig.getFrontendOrigin() + "/get-started?provider=strava&status=success");
+            return ResponseEntity.status(303) // HttpStatus.SEE_OTHER
+                    .location(redirect)
+                    .build();
 
         } catch (Exception e) {
             e.printStackTrace();
