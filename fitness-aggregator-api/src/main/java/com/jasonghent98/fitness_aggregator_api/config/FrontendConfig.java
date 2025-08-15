@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-@ConfigurationProperties(prefix = "app")
 @Data
 public class FrontendConfig {
 
