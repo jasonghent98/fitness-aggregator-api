@@ -1,3 +1,6 @@
+server:
+  port: ${PORT:8080}  # Use Cloud Run's port or default to 8080
+
 spring:
   profiles:
     active: dev

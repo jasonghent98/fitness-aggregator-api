@@ -1,0 +1,63 @@
+swagger: "2.0"
+info: { title: Minimal, version: "1.0" }
+schemes: [ https ]
+basePath: /
+security: []
+
+paths:
+  /api/{proxy=**}:
+    parameters:
+      - name: proxy
+        in: path
+        required: true
+        type: string
+
+    # Preflight (OPTIONS) → forwarded to backend; Spring CORS filter will reply 200/204 with headers
+    options:
+      operationId: corsPreflight
+      x-google-backend:
+        address: https://dev-actualize-api-683754002925.us-central1.run.app
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        "204":
+          description: No Content
+
+    get:
+      operationId: proxyGet
+      x-google-backend:
+        address: https://dev-actualize-api-683754002925.us-central1.run.app
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        "200": { description: OK }
+
+    post:
+      operationId: proxyPost
+      x-google-backend:
+        address: https://dev-actualize-api-683754002925.us-central1.run.app
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        "200": { description: OK }
+
+    put:
+      operationId: proxyPut
+      x-google-backend:
+        address: https://dev-actualize-api-683754002925.us-central1.run.app
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        "200": { description: OK }
+
+    patch:
+      operationId: proxyPatch
+      x-google-backend:
+        address: https://dev-actualize-api-683754002925.us-central1.run.app
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        "200": { description: OK }
+
+    delete:
+      operationId: proxyDelete
+      x-google-backend:
+        address: https://dev-actualize-api-683754002925.us-central1.run.app
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        "200": { description: OK }
