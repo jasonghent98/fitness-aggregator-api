@@ -3,7 +3,6 @@ package com.jasonghent98.fitness_aggregator_api.controller.auth;
 import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
 import com.jasonghent98.fitness_aggregator_api.config.provider.fitbit.FitbitConfig;
 import com.jasonghent98.fitness_aggregator_api.model.User;
-import com.jasonghent98.fitness_aggregator_api.repository.fitbit.FitbitUserRepository;
 import com.jasonghent98.fitness_aggregator_api.util.PkceUtil;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -24,13 +23,13 @@ import java.util.*;
 public class FitbitAuthController {
     public final FitbitConfig fitbitConfig;
     public final FrontendConfig frontendConfig;
-    public final FitbitUserRepository fitbitUserRepo;
+    /*public final FitbitUserRepository fitbitUserRepo;*/
 
     /*spring will recognize this is a bean and will handle instantiation and injection*/
-    FitbitAuthController(FitbitConfig fitbitConfig, FrontendConfig frontendConfig, FitbitUserRepository fitbitUserRepo) {
+    FitbitAuthController(FitbitConfig fitbitConfig, FrontendConfig frontendConfig/*, FitbitUserRepository fitbitUserRepo*/) {
         this.frontendConfig = frontendConfig;
         this.fitbitConfig = fitbitConfig;
-        this.fitbitUserRepo = fitbitUserRepo;
+       /* this.fitbitUserRepo = fitbitUserRepo;*/
     }
 
     @GetMapping("/login")
