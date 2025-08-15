@@ -1,96 +1,63 @@
-# Doesnt contain any auth for frictionless testing
-swagger: '2.0'
-info:
-  title: actualize-dev
-  version: '1.0.0'
-schemes: [https]
+swagger: "2.0"
+info: { title: Minimal, version: "1.0" }
+schemes: [ https ]
 basePath: /
-produces: [application/json]
-consumes: [application/json]
-
-# No gateway-level auth for now
-securityDefinitions: {}
 security: []
 
 paths:
-  # Explicit smoke test route
-  /api/strava/auth/login:
-    get:
-      operationId: loginGet
-      security: []  # silence API key hints
-      x-google-backend:
-        address: https://dev-actualize-api-683754002925.us-central1.run.app
-        path_translation: APPEND_PATH_TO_ADDRESS
-      responses:
-        '200': { description: OK }
-        '302': { description: Redirect to Strava OAuth }
-    options:
-      operationId: loginCorsOptions
-      security: []
-      x-google-backend:
-        address: https://dev-actualize-api-683754002925.us-central1.run.app
-        path_translation: APPEND_PATH_TO_ADDRESS
-      responses:
-        '204': { description: No Content }
-
-  # Catch-all for ALL /api/** routes
-  /api/{proxy+}:
+  /api/{proxy=**}:
     parameters:
       - name: proxy
         in: path
         required: true
         type: string
 
-    get:
-      operationId: proxyGet
-      security: []
+    # Preflight (OPTIONS) → forwarded to backend; Spring CORS filter will reply 200/204 with headers
+    options:
+      operationId: corsPreflight
       x-google-backend:
         address: https://dev-actualize-api-683754002925.us-central1.run.app
         path_translation: APPEND_PATH_TO_ADDRESS
       responses:
-        '200': { description: OK }
+        "204":
+          description: No Content
+
+    get:
+      operationId: proxyGet
+      x-google-backend:
+        address: https://dev-actualize-api-683754002925.us-central1.run.app
+        path_translation: APPEND_PATH_TO_ADDRESS
+      responses:
+        "200": { description: OK }
 
     post:
       operationId: proxyPost
-      security: []
       x-google-backend:
         address: https://dev-actualize-api-683754002925.us-central1.run.app
         path_translation: APPEND_PATH_TO_ADDRESS
       responses:
-        '200': { description: OK }
+        "200": { description: OK }
 
     put:
       operationId: proxyPut
-      security: []
       x-google-backend:
         address: https://dev-actualize-api-683754002925.us-central1.run.app
         path_translation: APPEND_PATH_TO_ADDRESS
       responses:
-        '200': { description: OK }
+        "200": { description: OK }
 
     patch:
       operationId: proxyPatch
-      security: []
       x-google-backend:
         address: https://dev-actualize-api-683754002925.us-central1.run.app
         path_translation: APPEND_PATH_TO_ADDRESS
       responses:
-        '200': { description: OK }
+        "200": { description: OK }
 
     delete:
       operationId: proxyDelete
-      security: []
       x-google-backend:
         address: https://dev-actualize-api-683754002925.us-central1.run.app
         path_translation: APPEND_PATH_TO_ADDRESS
       responses:
-        '200': { description: OK }
-
-    options:
-      operationId: proxyCorsOptions
-      security: []
-      x-google-backend:
-        address: https://dev-actualize-api-683754002925.us-central1.run.app
-        path_translation: APPEND_PATH_TO_ADDRESS
-      responses:
-        '204': { description: No Content }
+        "200": { description: OK }
