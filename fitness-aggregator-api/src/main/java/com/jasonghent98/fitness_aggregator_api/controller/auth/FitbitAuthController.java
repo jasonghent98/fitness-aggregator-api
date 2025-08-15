@@ -2,14 +2,21 @@ package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
 import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
 import com.jasonghent98.fitness_aggregator_api.config.provider.fitbit.FitbitConfig;
+import com.jasonghent98.fitness_aggregator_api.model.User;
+import com.jasonghent98.fitness_aggregator_api.repository.fitbit.FitbitUserRepository;
 import com.jasonghent98.fitness_aggregator_api.util.PkceUtil;
 import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.*;
 
 @RestController
@@ -17,11 +24,13 @@ import java.util.*;
 public class FitbitAuthController {
     public final FitbitConfig fitbitConfig;
     public final FrontendConfig frontendConfig;
+    public final FitbitUserRepository fitbitUserRepo;
 
     /*spring will recognize this is a bean and will handle instantiation and injection*/
-    FitbitAuthController(FitbitConfig fitbitConfig, FrontendConfig frontendConfig) {
+    FitbitAuthController(FitbitConfig fitbitConfig, FrontendConfig frontendConfig, FitbitUserRepository fitbitUserRepo) {
         this.frontendConfig = frontendConfig;
         this.fitbitConfig = fitbitConfig;
+        this.fitbitUserRepo = fitbitUserRepo;
     }
 
     @GetMapping("/login")
@@ -50,8 +59,14 @@ public class FitbitAuthController {
                 .build();
     }
     @GetMapping("/callback")
-    public ResponseEntity<String> handleCallback() {
-       return ResponseEntity.ok("ok");
+    public ResponseEntity<String> handleCallback(@RequestParam Map<String, String> params) {
+        try {
+            params.forEach((k, v) -> System.out.println(k + ": " + v));
+            return ResponseEntity.ok("fitbit callback executed");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to exchange token: " + e.getMessage());
+        }
     }
 }
 
