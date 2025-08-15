@@ -36,7 +36,7 @@ paths:
   # Catch-all for ALL /api/** routes
   /api/{proxy+}:
     parameters:
-      - name: proxy+
+      - name: proxy
         in: path
         required: true
         type: string
