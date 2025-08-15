@@ -1,27 +1,26 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
+import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
 import com.jasonghent98.fitness_aggregator_api.config.provider.fitbit.FitbitConfig;
 import com.jasonghent98.fitness_aggregator_api.util.PkceUtil;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/fitbit/auth")
 public class FitbitAuthController {
     public final FitbitConfig fitbitConfig;
+    public final FrontendConfig frontendConfig;
 
     /*spring will recognize this is a bean and will handle instantiation and injection*/
-    FitbitAuthController(FitbitConfig fitbitConfig) {
+    FitbitAuthController(FitbitConfig fitbitConfig, FrontendConfig frontendConfig) {
+        this.frontendConfig = frontendConfig;
         this.fitbitConfig = fitbitConfig;
     }
 
@@ -49,6 +48,10 @@ public class FitbitAuthController {
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(authUrl))
                 .build();
+    }
+    @GetMapping("/callback")
+    public ResponseEntity<String> handleCallback() {
+       return ResponseEntity.ok("ok");
     }
 }
 
