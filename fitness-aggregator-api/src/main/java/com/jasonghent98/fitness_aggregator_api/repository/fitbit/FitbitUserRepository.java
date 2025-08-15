@@ -1,18 +1,12 @@
 package com.jasonghent98.fitness_aggregator_api.repository.fitbit;
-/*
-import com.jasonghent98.fitness_aggregator_api.model.User;
-import com.jasonghent98.fitness_aggregator_api.model.strava.StravaUser;
+
+import com.jasonghent98.fitness_aggregator_api.model.fitbit.FitbitUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-// methods that JPA will implement during build
-public interface FitbitUserRepository extends JpaRepository<StravaUser, UUID> {
-    Optional<StravaUser> findByFitbitAthleteId(Long stravaAthleteId);
-    Optional<StravaUser> findByUser(User user);
-    Optional<StravaUser> findByUserId(UUID userId);
+public interface FitbitUserRepository extends JpaRepository<FitbitUser, UUID> {
+    Optional<FitbitUser> findByUserId(UUID userId);
+    Optional<FitbitUser> findByFitbitUserId(String fitbitUserId);
 }
-
-
- */
