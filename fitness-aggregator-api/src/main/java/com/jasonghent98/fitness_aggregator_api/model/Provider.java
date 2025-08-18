@@ -9,10 +9,10 @@ import lombok.Data;
 @Table(name = "providers")
 @Data
 public class Provider {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Short id;
     @Column(nullable=false) private String name; // 'strava | 'garmin'
-    @Column(nullable=false) private String authType; // 'oauth2' | 'oauth1' | 'custom'
+    @Column(nullable=false, name="auth_type") private String authType; // 'oauth2' | 'oauth1' | 'custom'
     private String authorizeUrl;
     private String tokenUrl;
     private String defaultScopes;
