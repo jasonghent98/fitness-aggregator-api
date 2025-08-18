@@ -11,7 +11,7 @@ import lombok.Data;
 public class Provider {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Short id;
-    @Column(nullable=false) private String displayName;
+    @Column(nullable=false) private String name; // 'strava | 'garmin'
     @Column(nullable=false) private String authType; // 'oauth2' | 'oauth1' | 'custom'
     private String authorizeUrl;
     private String tokenUrl;
