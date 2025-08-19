@@ -15,3 +15,8 @@ fitbit:
   REDIRECT_URL: ${FITBIT_REDIRECT_URL}
 frontend:
   url: ${DEV_FRONTEND_URL}
+
+jwt:
+  secret: ${JWT_SECRET}
+  ttl-days: ${JWT_TTL_DAYS:28}
+  issuer: ${JWT_ISSUER}
