@@ -48,8 +48,7 @@ public class ProviderAccountService {
         Provider provider = resolveProvider(providerName);
 
         // 2) If an account exists for this provider+providerUserId, update & return
-        Optional<ProviderAccount> existing = providerAccountRepo.findByProviderAndProviderUserId(provider.getId(), providerUserId);
-        User owner;
+        Optional<ProviderAccount> existing = providerAccountRepo.findByProviderAndProviderUserId(provider, providerUserId);
 
         if (existing.isPresent()) {
             ProviderAccount acct = existing.get();
@@ -59,7 +58,7 @@ public class ProviderAccountService {
             return providerAccountRepo.save(acct);
         }
 
-        // if userid != null, means the user was passed in from token and is authenticated already
+        User owner;
         if (userId != null) {
             owner = userRepo.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
@@ -84,15 +83,8 @@ public class ProviderAccountService {
     }
 
     private Provider resolveProvider(String providerName) {
-        // Try numeric id first
-        try {
-            short id = Short.parseShort(providerName);
-            return providerRepo.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Provider not found by id: " + providerName));
-        } catch (NumberFormatException ignore) {
-            // Fallback to name
-            return providerRepo.findByName(providerName)
-                    .orElseThrow(() -> new IllegalArgumentException("Provider not found by name: " + providerName));
-        }
+        return providerRepo.findByName(providerName)
+                .orElseThrow(() -> new IllegalArgumentException("Provider not found by name: " + providerName));
+
     }
 }
