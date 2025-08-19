@@ -9,6 +9,7 @@ import com.jasonghent98.fitness_aggregator_api.model.Provider;
 import com.jasonghent98.fitness_aggregator_api.model.ProviderAccount;
 import com.jasonghent98.fitness_aggregator_api.repository.ProviderAccountRepository;
 import com.jasonghent98.fitness_aggregator_api.repository.ProviderRepository;
+import com.jasonghent98.fitness_aggregator_api.security.JwtService;
 import com.jasonghent98.fitness_aggregator_api.service.ProviderAccountService;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -31,19 +32,22 @@ public class FitbitAuthController {
     private final ProviderAccountService providerAccountService;
     private final ProviderRepository providerRepo;
     private final ProviderAccountRepository providerAccountRepo;
+    private final JwtService jwtService;
 
     public FitbitAuthController(
             FitbitConfig fitbitConfig,
             FrontendConfig frontendConfig,
             ProviderAccountService providerAccountService,
             ProviderRepository providerRepo,
-            ProviderAccountRepository providerAccountRepo
+            ProviderAccountRepository providerAccountRepo,
+            JwtService jwtService
     ) {
         this.fitbitConfig = fitbitConfig;
         this.frontendConfig = frontendConfig;
         this.providerAccountService = providerAccountService;
         this.providerRepo = providerRepo;
         this.providerAccountRepo = providerAccountRepo;
+        this.jwtService = jwtService;
     }
 
     @GetMapping("/login")
@@ -108,11 +112,19 @@ public class FitbitAuthController {
             }
 
             // upsert the fitbit user + base user (pass in the user id from the token if exists)
-            providerAccountService.upsertProviderAccount(userId, "fitbit", fitbitUserId, accessToken, refreshToken, expiresAt);
+            ProviderAccount new_acc = providerAccountService.upsertProviderAccount(userId, "fitbit", fitbitUserId, accessToken, refreshToken, expiresAt);
+
+            // mint/create session JWT
+            String jwt = jwtService.mint(new_acc.getUser().getId());
+            String setCookie = jwtService.buildSessionCookie(jwt);
+
 
             // 4) Redirect back to frontend with success flash
             URI redirect = URI.create(frontendConfig.getFrontendOrigin() + "/get-started?provider=fitbit&status=success");
-            return ResponseEntity.status(303).location(redirect).build();
+            return ResponseEntity
+                    .status(303)
+                    .header(jwtService.headerName(), setCookie)
+                    .location(redirect).build();
 
         } catch (Exception e) {
             e.printStackTrace();

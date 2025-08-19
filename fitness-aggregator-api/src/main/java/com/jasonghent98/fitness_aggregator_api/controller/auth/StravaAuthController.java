@@ -8,6 +8,7 @@ import com.jasonghent98.fitness_aggregator_api.model.Provider;
 import com.jasonghent98.fitness_aggregator_api.model.ProviderAccount;
 import com.jasonghent98.fitness_aggregator_api.repository.ProviderAccountRepository;
 import com.jasonghent98.fitness_aggregator_api.repository.ProviderRepository;
+import com.jasonghent98.fitness_aggregator_api.security.JwtService;
 import com.jasonghent98.fitness_aggregator_api.service.ProviderAccountService;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -31,14 +32,23 @@ public class StravaAuthController {
     private final ProviderRepository providerRepo;
     private final ProviderAccountService providerAccountService;
     private final FrontendConfig frontendConfig;
+    private final JwtService jwtService;
 
     /*spring will recognize this is a bean and will handle instantiation and injection*/
-    StravaAuthController(StravaConfig stravaConfig, FrontendConfig frontendConfig, ProviderAccountRepository providerAccountRepo, ProviderRepository providerRepo, ProviderAccountService providerAccountService) {
+    StravaAuthController(
+            StravaConfig stravaConfig,
+            FrontendConfig frontendConfig,
+            ProviderAccountRepository providerAccountRepo,
+            ProviderRepository providerRepo,
+            ProviderAccountService providerAccountService,
+            JwtService jwtService
+    ) {
         this.stravaConfig = stravaConfig;
         this.providerAccountRepo = providerAccountRepo;
         this.providerRepo = providerRepo;
         this.providerAccountService = providerAccountService;
         this.frontendConfig = frontendConfig;
+        this.jwtService = jwtService;
     }
 
     @GetMapping("/login")
@@ -108,11 +118,18 @@ public class StravaAuthController {
             }
 
             // upsert the strava user (pass in the user id from the token if exists)
-            providerAccountService.upsertProviderAccount(userId, "strava", stravaAthleteId.toString(), accessToken, refreshToken, expiresAt);
+            ProviderAccount new_acc = providerAccountService.upsertProviderAccount(userId, "strava", stravaAthleteId.toString(), accessToken, refreshToken, expiresAt);
 
-            // 4) redirect back to Next.js Get Started with a flash
+
+            // mint/create session JWT
+            String jwt = jwtService.mint(new_acc.getUser().getId());
+            String setCookie = jwtService.buildSessionCookie(jwt);
+
+
+            // redirect back to Next.js Get Started with a flash
             URI redirect = URI.create(frontendConfig.getFrontendOrigin() + "/get-started?provider=strava&status=success");
             return ResponseEntity.status(303) // HttpStatus.SEE_OTHER
+                    .header(jwtService.headerName(), setCookie)
                     .location(redirect)
                     .build();
 

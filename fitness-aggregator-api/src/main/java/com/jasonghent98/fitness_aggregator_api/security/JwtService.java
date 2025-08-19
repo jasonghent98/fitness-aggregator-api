@@ -53,7 +53,7 @@ public class JwtService {
         return ResponseCookie.from(COOKIE_NAME, jwt)
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("Lax")
+                .sameSite("None")
                 .path("/")
                 .maxAge(Duration.ofDays(cfg.getTtlDays()))
                 .build()
