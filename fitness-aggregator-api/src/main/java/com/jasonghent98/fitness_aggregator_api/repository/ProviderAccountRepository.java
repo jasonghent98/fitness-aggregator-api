@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ProviderAccountRepository extends JpaRepository<Provider, UUID> {
-    Optional<ProviderAccount> findByProviderAndProviderUserId(Short providerId, String providerUserId);
+public interface ProviderAccountRepository extends JpaRepository<ProviderAccount, UUID> {
+    Optional<ProviderAccount> findByProviderAndProviderUserId(Provider provider, String providerUserId);
     Optional<ProviderAccount> findAllByUserId(UUID userId);
 }
