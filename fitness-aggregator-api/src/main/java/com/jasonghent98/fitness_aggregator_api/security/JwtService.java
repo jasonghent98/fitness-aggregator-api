@@ -16,7 +16,7 @@ import java.util.UUID;
 @Service
 public class JwtService {
 
-    public static final String COOKIE_NAME = "ACT_SESSION";
+    public static final String COOKIE_NAME = "ACTUALIZE_SESSION";
 
     private final JwtConfig cfg;
     private final Algorithm alg;
