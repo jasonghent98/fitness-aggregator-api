@@ -49,8 +49,8 @@ public class JwtService {
     }
 
     public String buildSessionCookie(String jwt) {
-        // HttpOnly, Secure, SameSite=Lax; path "/" so all routes send it
-        return ResponseCookie.from(COOKIE_NAME, jwt)
+        // HttpOnly, Secure, SameSite=None; path "/" so all routes send it
+        String rc = ResponseCookie.from(COOKIE_NAME, jwt)
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
@@ -58,13 +58,14 @@ public class JwtService {
                 .maxAge(Duration.ofDays(cfg.getTtlDays()))
                 .build()
                 .toString();
+        return rc + "; Partitioned";
     }
 
     public String buildClearCookie() {
         return ResponseCookie.from(COOKIE_NAME, "")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("Lax")
+                .sameSite("None")
                 .path("/")
                 .maxAge(Duration.ZERO)
                 .build()
