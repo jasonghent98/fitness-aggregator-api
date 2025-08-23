@@ -55,6 +55,7 @@ public class JwtService {
                 .secure(true)
                 .sameSite("None")
                 .path("/")
+                .domain("actualize.fit")
                 .maxAge(Duration.ofDays(cfg.getTtlDays()))
                 .build()
                 .toString();
@@ -67,6 +68,7 @@ public class JwtService {
                 .secure(true)
                 .sameSite("None")
                 .path("/")
+                .domain(".actualize.fit") // client is handling the storing of jwt via same-site req for now
                 .maxAge(Duration.ZERO)
                 .build()
                 .toString();
