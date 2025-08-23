@@ -21,6 +21,10 @@ services:
       FITBIT_REDIRECT_URL: ${FITBIT_REDIRECT_URL}
       DEV_FRONTEND_URL: ${DEV_FRONTEND_URL}
 
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_TTL_DAYS: ${JWT_TTL_DAYS}
+      JWT_ISSUER: ${JWT_ISSUER}
+
   postgres:
     container_name: ${DEV_DB_CONTAINER_NAME}
     ports:
