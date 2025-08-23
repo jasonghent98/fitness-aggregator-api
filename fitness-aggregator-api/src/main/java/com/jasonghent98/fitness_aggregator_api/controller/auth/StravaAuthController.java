@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -123,15 +125,17 @@ public class StravaAuthController {
 
             // mint/create session JWT
             String jwt = jwtService.mint(new_acc.getUser().getId());
-            String setCookie = jwtService.buildSessionCookie(jwt);
 
+            // append token as query param
+            URI redirect = URI.create(frontendConfig.getFrontendOrigin()
+                    + "/get-started?provider=strava&status=success&token="
+                    + URLEncoder.encode(jwt, StandardCharsets.UTF_8));
 
-            // redirect back to Next.js Get Started with a flash
-            URI redirect = URI.create(frontendConfig.getFrontendOrigin() + "/get-started?provider=strava&status=success");
-            return ResponseEntity.status(303) // HttpStatus.SEE_OTHER
-                    .header(jwtService.headerName(), setCookie)
+            return ResponseEntity.status(302)
                     .location(redirect)
+                    .header(HttpHeaders.CACHE_CONTROL, "no-store")
                     .build();
+
 
         } catch (Exception e) {
             e.printStackTrace();
