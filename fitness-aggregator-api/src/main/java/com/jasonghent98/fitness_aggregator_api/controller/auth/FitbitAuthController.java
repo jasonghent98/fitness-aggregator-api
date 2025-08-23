@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -116,15 +118,16 @@ public class FitbitAuthController {
 
             // mint/create session JWT
             String jwt = jwtService.mint(new_acc.getUser().getId());
-            String setCookie = jwtService.buildSessionCookie(jwt);
 
+            // append token as query param
+            URI redirect = URI.create(frontendConfig.getFrontendOrigin()
+                    + "/get-started?provider=fitbit&status=success&token="
+                    + URLEncoder.encode(jwt, StandardCharsets.UTF_8));
 
-            // 4) Redirect back to frontend with success flash
-            URI redirect = URI.create(frontendConfig.getFrontendOrigin() + "/get-started?provider=fitbit&status=success");
-            return ResponseEntity
-                    .status(303)
-                    .header(jwtService.headerName(), setCookie)
-                    .location(redirect).build();
+            return ResponseEntity.status(302)
+                    .location(redirect)
+                    .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                    .build();
 
         } catch (Exception e) {
             e.printStackTrace();
