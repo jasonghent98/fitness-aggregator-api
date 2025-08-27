@@ -18,13 +18,19 @@ public class ProviderAccountService {
     private final ProviderAccountRepository providerAccountRepo;
     private final ProviderRepository providerRepo;
     private final UserRepository userRepo;
+    private final TokenRefresherRegistry refresherRegistry;
 
-    public ProviderAccountService(ProviderAccountRepository providerAccountRepo,
-                                  ProviderRepository providerRepo,
-                                  UserRepository userRepo) {
+    public ProviderAccountService(
+            ProviderAccountRepository providerAccountRepo,
+            ProviderRepository providerRepo,
+            UserRepository userRepo,
+            TokenRefresherRegistry refresherRegistry
+    ) {
         this.providerAccountRepo = providerAccountRepo;
         this.providerRepo = providerRepo;
         this.userRepo = userRepo;
+        this.refresherRegistry = refresherRegistry;
+
     }
 
     /**
@@ -82,6 +88,30 @@ public class ProviderAccountService {
         return providerAccountRepo.save(acct);
     }
 
+    /**
+     * Gets a valid access token for user+provider + (refreshes if expired)
+     * */
+    @Transactional
+    public String getValidAccessToken(UUID userId, String providerName) {
+        Provider provider = resolveProvider(providerName);
+
+        ProviderAccount acct = providerAccountRepo
+                .findByUserIdAndProvider(userId, provider)
+                .orElseThrow(() -> new IllegalStateException(
+                        "No provider account for user=" + userId + " provider=" + provider.getName()));
+
+        if (acct.getExpiresAt() == null || acct.getExpiresAt().isBefore(Instant.now())) {
+            var refresher = refresherRegistry.get(provider.getName());
+            refresher.refresh(acct);
+            providerAccountRepo.save(acct);
+        }
+
+        return acct.getAccessToken();
+    }
+
+    /**
+     * Finds and returns the provider name or throws if not found
+     * */
     private Provider resolveProvider(String providerName) {
         return providerRepo.findByName(providerName)
                 .orElseThrow(() -> new IllegalArgumentException("Provider not found by name: " + providerName));
