@@ -1,5 +1,4 @@
 package com.jasonghent98.fitness_aggregator_api.model;
-import com.jasonghent98.fitness_aggregator_api.model.strava.StravaUser;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -43,7 +42,6 @@ public class User {
     // Relationships
     // Only exists in Java code to make it easier to navigate from User → StravaUser. Does NOT create a column
     // The "user" field in the StravaUser class is managing the relationship
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private StravaUser stravaUser;
+
 
 }

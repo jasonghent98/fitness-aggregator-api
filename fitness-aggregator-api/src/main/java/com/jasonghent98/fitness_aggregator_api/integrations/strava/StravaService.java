@@ -4,10 +4,8 @@ package com.jasonghent98.fitness_aggregator_api.integrations.strava;
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.model.strava.StravaActivity;
 import com.jasonghent98.fitness_aggregator_api.model.strava.StravaStats;
-import com.jasonghent98.fitness_aggregator_api.model.strava.StravaUser;
 import com.jasonghent98.fitness_aggregator_api.repository.strava.StravaActivityRepository;
 import com.jasonghent98.fitness_aggregator_api.repository.strava.StravaStatsRepository;
-import com.jasonghent98.fitness_aggregator_api.repository.strava.StravaUserRepository;
 
 import org.springframework.stereotype.Service;
 
