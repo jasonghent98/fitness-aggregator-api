@@ -9,7 +9,7 @@ REGION="us-central1"
 
 SERVICE="dev-actualize-api"
 RUNTIME_SA="actualize-dev-api@${PROJECT}.iam.gserviceaccount.com"
-SQL_INSTANCE="actualize-dev-db"
+SQL_INSTANCE="actualize-dev-db-lite"
 
 APP_DIR="${root}/fitness-aggregator-api"
 ENV_FILE="${APP_DIR}/env.${ENV}.yaml"
