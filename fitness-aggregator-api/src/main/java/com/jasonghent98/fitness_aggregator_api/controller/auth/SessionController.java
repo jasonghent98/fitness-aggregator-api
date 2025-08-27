@@ -23,8 +23,9 @@ public class SessionController {
     @GetMapping("/whoami")
     public ResponseEntity<?> whoami() {
         UUID id = UserContext.getUserId();
+        System.out.println(id + "from SessionController.java");
         if (id == null) {
-            return ResponseEntity.status(401).body(Map.of("userId", null));
+            return ResponseEntity.status(401).body(Map.of("authenticated", false));
         }
         return ResponseEntity.ok(Map.of("userId", id.toString()));
     }

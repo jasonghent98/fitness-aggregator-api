@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface ProviderAccountRepository extends JpaRepository<ProviderAccount, UUID> {
     Optional<ProviderAccount> findByProviderAndProviderUserId(Provider provider, String providerUserId);
     Optional<ProviderAccount> findAllByUserId(UUID userId);
+    Optional<ProviderAccount> findByUserIdAndProvider(UUID userId, Provider provider);
 }

@@ -1,6 +1,5 @@
 package com.jasonghent98.fitness_aggregator_api.security;
 
-
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,7 +15,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
-// the OncePerRequest filter class runs a filter for every incoming HTTP request
 @Component
 @Order(10)
 public class JwtSessionFilter extends OncePerRequestFilter {
@@ -27,25 +25,35 @@ public class JwtSessionFilter extends OncePerRequestFilter {
         this.jwtService = jwtService;
     }
 
-    // finds the cookie issued from this server, verifies the userId and sets it via UserContext for global state access
     @Override
     protected void doFilterInternal(
             HttpServletRequest req,
             HttpServletResponse res,
-            FilterChain chain) throws ServletException, IOException {
+            FilterChain chain
+    ) throws ServletException, IOException {
 
         try {
-            Optional<Cookie> cookie = Optional.ofNullable(req.getCookies())
-                    .flatMap(cookies -> Arrays.stream(cookies)
-                            .filter(c -> JwtService.COOKIE_NAME.equals(c.getName()))
-                            .findFirst());
+            // 1) Prefer our private header (set by Next.js server route)
+            String token = req.getHeader("X-Actualize-Session");
 
-            if (cookie.isPresent()) {
+            // 2) Fallback to cookie (direct browser → backend calls)
+            if (token == null || token.isBlank()) {
+                token = Optional.ofNullable(req.getCookies())
+                        .flatMap(cookies -> Arrays.stream(cookies)
+                                .filter(c -> JwtService.COOKIE_NAME.equals(c.getName()))
+                                .findFirst())
+                        .map(Cookie::getValue)
+                        .orElse(null);
+            }
+
+            // 3) Verify if present
+            if (token != null && !token.isBlank()) {
                 try {
-                    UUID userId = jwtService.verify(cookie.get().getValue());
-                    UserContext.setUserId(userId);
-                } catch (Exception ignored) {
-                    // invalid/expired token -> just proceed unauthenticated
+
+                    Optional<UUID> userId = jwtService.verify(token);
+                    userId.ifPresent(UserContext::setUserId);
+                } catch (Exception verifyErr) {
+                    // Invalid/expired -> just proceed unauthenticated; endpoint decides response
                 }
             }
 
@@ -57,7 +65,7 @@ public class JwtSessionFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        // If you want to skip static/assets, add exclusions here
-        return false;
+        // Skip CORS preflight and anything else you want to allow through unconditionally
+        return "OPTIONS".equalsIgnoreCase(request.getMethod());
     }
 }
