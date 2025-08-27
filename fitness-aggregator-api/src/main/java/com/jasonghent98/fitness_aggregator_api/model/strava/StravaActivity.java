@@ -69,35 +69,4 @@ public class StravaActivity {
     @Column(name = "fetched_at", nullable = false)
     private Instant fetchedAt = Instant.now(); // When we fetched from Strava
 
-    /*
-    public UUID getId() { return id; }
-    public Long getStravaActivityId() { return stravaActivityId; }
-    public UUID getUserId() { return userId; }
-    public String getName() { return name; }
-    public Float getDistance() { return distance; }
-    public Integer getMovingTime() { return movingTime; }
-    public Integer getElapsedTime() { return elapsedTime; }
-    public Float getTotalElevationGain() { return totalElevationGain; }
-    public String getType() { return type; }
-    public String getSportType() { return sportType; }
-    public Long getUploadId() { return uploadId; }
-    public String getExternalId() { return externalId; }
-    public Instant getStartDate() { return startDate; }
-    public Instant getStartDateLocal() { return startDateLocal; }
-    public String getLocationCountry() { return locationCountry; }
-    public Integer getKudosCount() { return kudosCount; }
-    public Integer getCommentCount() { return commentCount; }
-    public String getGearId() { return gearId; }
-    public Float getAverageSpeed() { return averageSpeed; }
-    public Float getMaxSpeed() { return maxSpeed; }
-    public Float getAverageCadence() { return averageCadence; }
-    public Float getAverageWatts() { return averageWatts; }
-    public Integer getWeightedAverageWatts() { return weightedAverageWatts; }
-    public Float getKilojoules() { return kilojoules; }
-    public Float getAverageHeartrate() { return averageHeartrate; }
-    public Integer getMaxHeartrate() { return maxHeartrate; }
-    public Integer getMaxWatts() { return maxWatts; }
-    public Integer getPrCount() { return prCount; }
-    public Integer getSufferScore() { return sufferScore; }
-     */
 }
