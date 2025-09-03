@@ -60,9 +60,14 @@ public class Lead {
     @Column(name = "consent_marketing", nullable = false)
     private boolean consentMarketing = true;
 
-    // Store as text; you can move to INET column later if you want.
+    /** Store as text; you can move to INET column later if you want.
+     * Storing this to fight spam, analyze where leads are coming from, and maintain a compliance trail
+     */
     private String ip;
 
+    /**
+     * Get metadata on the user device to optimize for ux
+     */
     @Column(name = "user_agent")
     private String userAgent;
 
