@@ -24,6 +24,9 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_TTL_DAYS: ${JWT_TTL_DAYS}
       JWT_ISSUER: ${JWT_ISSUER}
+      SES_HOST_NAME: ${SES_HOST_NAME}
+      SES_SMTP_USERNAME: ${SES_SMTP_USERNAME}
+      SES_SMTP_PASSWORD: ${SES_SMTP_PASSWORD}
 
   postgres:
     container_name: ${DEV_DB_CONTAINER_NAME}
