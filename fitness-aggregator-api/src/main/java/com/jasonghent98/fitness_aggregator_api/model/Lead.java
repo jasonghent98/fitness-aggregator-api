@@ -58,7 +58,7 @@ public class Lead {
     private Map<String, Object> surveyAnswers;
 
     @Column(name = "consent_marketing", nullable = false)
-    private boolean consentMarketing = true;
+    private boolean consentMarketing = false; // safe fail for compliance
 
     /** Store as text; you can move to INET column later if you want.
      * Storing this to fight spam, analyze where leads are coming from, and maintain a compliance trail

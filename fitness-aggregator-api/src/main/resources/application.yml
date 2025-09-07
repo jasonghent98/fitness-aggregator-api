@@ -6,7 +6,7 @@ spring:
     active: dev
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
@@ -24,3 +24,8 @@ spring:
           starttls:
             enable: true
             required: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    locations: classpath:db/migration
