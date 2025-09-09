@@ -71,7 +71,6 @@ public class ProviderAccountService {
         } else {
             // No userId passed and no existing account -> create a minimal user record
             owner = new User();
-            owner.setUsername(provider.getName() + ":" + providerUserId);
             owner.setFullName(null);
             owner = userRepo.save(owner);
         }
