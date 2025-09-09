@@ -37,4 +37,17 @@ public class SessionController {
                 .header(HttpHeaders.SET_COOKIE, clear)
                 .body(Map.of("ok", true));
     }
+
+    // creates a record in email_verifications table, gen a magic link with token, sends via ses email
+    @PostMapping("/magic/verify")
+    public ResponseEntity<?> verifyEmail() {
+        return ResponseEntity.ok().build();
+    }
+
+    // verifies the token in the incoming req against the email_verifications for corresp email, then creates user and reroutes /connect-providers
+    @GetMapping("/magic/verify")
+    public ResponseEntity<?> verifyToken() {
+        return ResponseEntity.ok().build();
+    }
+
 }
