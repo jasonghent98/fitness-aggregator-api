@@ -4,11 +4,10 @@ import com.jasonghent98.fitness_aggregator_api.config.BackendConfig;
 import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.dto.auth.MagicLinkRequest;
-import com.jasonghent98.fitness_aggregator_api.model.EmailVerification;
 import com.jasonghent98.fitness_aggregator_api.model.User;
 import com.jasonghent98.fitness_aggregator_api.repository.EmailVerificationRepository;
-import com.jasonghent98.fitness_aggregator_api.repository.UserRepository;
 import com.jasonghent98.fitness_aggregator_api.security.JwtService;
+import com.jasonghent98.fitness_aggregator_api.service.UserService;
 import com.jasonghent98.fitness_aggregator_api.service.auth.EmailVerificationService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,8 +29,7 @@ public class SessionController {
     private final EmailVerificationService evService;
     private final FrontendConfig frontendConfig;
     private final BackendConfig backendConfig;
-    private final EmailVerificationRepository evRepo;
-    private final UserRepository userRepo;
+    private final UserService userService;
 
     public SessionController(
             JwtService jwtService,
@@ -40,14 +37,13 @@ public class SessionController {
             FrontendConfig frontendConfig,
             BackendConfig backendConfig,
             EmailVerificationRepository evRepo,
-            UserRepository userRepo
+            UserService userService
     ) {
         this.jwtService = jwtService;
         this.evService = emailVeriService;
+        this.userService = userService;
         this.frontendConfig = frontendConfig;
         this.backendConfig = backendConfig;
-        this.evRepo = evRepo;
-        this.userRepo = userRepo;
     }
 
     // server-side authentication check (all jwts that make it passed the interceptor make it here)
@@ -111,34 +107,23 @@ public class SessionController {
      */
     @GetMapping("/magic/verify")
     public ResponseEntity<?> verifyToken(@RequestParam("token") String token) {
-        // 1) Decode the email token -> email
-        Optional<String> emailOpt = jwtService.verifyEmailVerification(token); // implement this to return Optional<String> email
+
+        // Decode the email token -> email via the service
+        Optional<String> emailOpt = evService.verifyAndConsume(token);
         if (emailOpt.isEmpty()) {
             return ResponseEntity.status(401).body("Invalid or expired link.");
         }
         String email = emailOpt.get();
 
-        // 2) Ensure there is a matching, unexpired record (defense-in-depth)
-        EmailVerification ev = evRepo.findByEmail(email)
-                .orElse(null);
-        if (ev == null || !token.equals(ev.getAccessToken()) || ev.getExpiresAt().isBefore(Instant.now())) {
-            return ResponseEntity.status(401).body("Link no longer valid. Please request a new one.");
-        }
 
-        // 3) Upsert user (create if not exists)
-        User user = userRepo.findByEmailIgnoreCase(email).orElseGet(() -> {
-            User u = new User();
-            u.setEmail(email);
-            return userRepo.save(u);
-        });
+        // Upsert user (create if not exists)
+        User user = userService.upsertByEmail(email);
 
-        // 4) One-time use: remove the verification row
-        evRepo.deleteByEmail(email);
 
-        // 5) Mint a session JWT (subject = userId) for app auth
+        // Mint a session JWT (subject = userId) for app auth
         String sessionJwt = jwtService.mintSession(user.getId());
 
-        // 6) Redirect to frontend, pass token so Next.js can set cookie via /api/session/set
+        // Redirect to frontend, pass token so Next.js can set cookie via /api/session/set
         String next = frontendConfig.getFrontendOrigin()
                 + "/connect-providers?status=verified&token="
                 + URLEncoder.encode(sessionJwt, StandardCharsets.UTF_8);
