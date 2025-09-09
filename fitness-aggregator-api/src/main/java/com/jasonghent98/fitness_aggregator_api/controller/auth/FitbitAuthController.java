@@ -117,7 +117,7 @@ public class FitbitAuthController {
             ProviderAccount new_acc = providerAccountService.upsertProviderAccount(userId, "fitbit", fitbitUserId, accessToken, refreshToken, expiresAt);
 
             // mint/create session JWT
-            String jwt = jwtService.mint(new_acc.getUser().getId());
+            String jwt = jwtService.mintSession(new_acc.getUser().getId());
 
             // append token as query param
             URI redirect = URI.create(frontendConfig.getFrontendOrigin()

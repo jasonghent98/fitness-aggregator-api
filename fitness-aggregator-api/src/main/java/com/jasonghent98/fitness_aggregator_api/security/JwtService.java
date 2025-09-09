@@ -34,7 +34,7 @@ public class JwtService {
         this.alg = Algorithm.HMAC256(cfg.getSecret());
     }
 
-    public String mint(UUID userId) {
+    public String mintSession(UUID userId) {
         Instant now = Instant.now();
         Instant exp = now.plus(Duration.ofDays(cfg.getTtlDays()));
         return JWT.create()
@@ -45,7 +45,7 @@ public class JwtService {
                 .sign(alg);
     }
 
-    public Optional<UUID> verify(String token) {
+    public Optional<UUID> verifySession(String token) {
         try {
             DecodedJWT jwt = JWT.require(alg)
                     .withIssuer(cfg.getIssuer())   // must match what you used in mint()
@@ -97,6 +97,39 @@ public class JwtService {
                 .maxAge(Duration.ZERO)
                 .build()
                 .toString();
+    }
+
+    public String mintEmailVerification(String email, Duration ttl) {
+        Instant now = Instant.now();
+        Instant exp = now.plus(Duration.ofDays(cfg.getTtlDays()));
+        return JWT.create()
+                .withIssuer(cfg.getIssuer())
+                .withSubject(email)
+                .withClaim("kind", "email-verify")           // disambiguate from session JWTs
+                .withIssuedAt(Date.from(now))
+                .withExpiresAt(Date.from(exp))
+                .sign(alg);
+    }
+
+    // returns the email if valid
+    public Optional<String> verifyEmailVerification(String token) {
+        try {
+            DecodedJWT jwt = JWT.require(alg)
+                    .withIssuer(cfg.getIssuer())
+                    .withClaim("kind", "email-verify")
+                    .acceptLeeway(60)
+                    .build()
+                    .verify(token);
+
+            String email = jwt.getSubject();
+            if (email == null || email.isBlank()) return Optional.empty();
+            return Optional.of(email);
+        } catch (TokenExpiredException e) {
+            log.warn("Email verify token expired at {}", e.getExpiredOn());
+        } catch (JWTVerificationException e) {
+            log.warn("Email verify token invalid: {}", e.getMessage());
+        }
+        return Optional.empty();
     }
 
     public String headerName() {

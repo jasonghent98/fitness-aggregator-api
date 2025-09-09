@@ -131,7 +131,7 @@ public class StravaAuthController {
 
 
             // mint/create session JWT
-            String jwt = jwtService.mint(new_acc.getUser().getId());
+            String jwt = jwtService.mintSession(new_acc.getUser().getId());
 
             // append token as query param
             URI redirect = URI.create(frontendConfig.getFrontendOrigin()

@@ -50,7 +50,7 @@ public class JwtSessionFilter extends OncePerRequestFilter {
             if (token != null && !token.isBlank()) {
                 try {
 
-                    Optional<UUID> userId = jwtService.verify(token);
+                    Optional<UUID> userId = jwtService.verifySession(token);
                     userId.ifPresent(UserContext::setUserId);
                 } catch (Exception verifyErr) {
                     // Invalid/expired -> just proceed unauthenticated; endpoint decides response
