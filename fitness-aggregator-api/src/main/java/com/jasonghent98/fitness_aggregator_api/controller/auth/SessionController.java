@@ -1,5 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
+import com.jasonghent98.fitness_aggregator_api.config.BackendConfig;
 import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.dto.auth.MagicLinkRequest;
@@ -29,6 +30,7 @@ public class SessionController {
     private final JwtService jwtService;
     private final EmailVerificationService evService;
     private final FrontendConfig frontendConfig;
+    private final BackendConfig backendConfig;
     private final EmailVerificationRepository evRepo;
     private final UserRepository userRepo;
 
@@ -36,12 +38,14 @@ public class SessionController {
             JwtService jwtService,
             EmailVerificationService emailVeriService,
             FrontendConfig frontendConfig,
+            BackendConfig backendConfig,
             EmailVerificationRepository evRepo,
             UserRepository userRepo
     ) {
         this.jwtService = jwtService;
         this.evService = emailVeriService;
         this.frontendConfig = frontendConfig;
+        this.backendConfig = backendConfig;
         this.evRepo = evRepo;
         this.userRepo = userRepo;
     }
@@ -50,7 +54,6 @@ public class SessionController {
     @GetMapping("/whoami")
     public ResponseEntity<?> whoami() {
         UUID id = UserContext.getUserId();
-        System.out.println(id + "from SessionController.java");
         if (id == null) {
             return ResponseEntity.status(401).body(Map.of("authenticated", false));
         }
@@ -82,8 +85,7 @@ public class SessionController {
         EmailVerificationService.IssueResult result = evService.issueOrRefresh(email);
 
         // build magic link (optionally carry forward a returnTo)
-        String link = frontendConfig.getFrontendOrigin() + "/api/auth/magic/verify?token=" + URLEncoder.encode(result.token(), StandardCharsets.UTF_8);
-        System.out.println(link +  " FROM SESSIONCONTROLLER.JAVA");
+        String link = backendConfig.getBackendOrigin() + "/api/auth/magic/verify?token=" + URLEncoder.encode(result.token(), StandardCharsets.UTF_8);
 
         // send email
         try {
