@@ -12,7 +12,8 @@ import java.util.UUID;
         name = "email_verifications",
         uniqueConstraints = @UniqueConstraint(columnNames = "email"),
         indexes = {
-                @Index(name = "idx_emails", columnList = "email")
+                @Index(name = "idx_emails", columnList = "email"),
+                @Index(name = "idx_access_token", columnList = "access_token")
         }
 )
 @Data
