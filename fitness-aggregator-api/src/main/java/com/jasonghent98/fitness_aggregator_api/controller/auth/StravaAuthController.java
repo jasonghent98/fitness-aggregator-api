@@ -36,7 +36,7 @@ public class StravaAuthController {
     private final ProviderAccountService providerAccountService;
     private final FrontendConfig frontendConfig;
     private final JwtService jwtService;
-    private final MailerConfig mailerConfig;
+   // private final MailerConfig mailerConfig;
 
     /*spring will recognize this is a bean and will handle instantiation and injection*/
     StravaAuthController(
@@ -45,8 +45,8 @@ public class StravaAuthController {
             ProviderAccountRepository providerAccountRepo,
             ProviderRepository providerRepo,
             ProviderAccountService providerAccountService,
-            JwtService jwtService,
-            MailerConfig mailerConfig
+            JwtService jwtService
+            // MailerConfig mailerConfig
     ) {
         this.stravaConfig = stravaConfig;
         this.providerAccountRepo = providerAccountRepo;
@@ -54,7 +54,7 @@ public class StravaAuthController {
         this.providerAccountService = providerAccountService;
         this.frontendConfig = frontendConfig;
         this.jwtService = jwtService;
-        this.mailerConfig = mailerConfig;
+       // this.mailerConfig = mailerConfig;
     }
 
     @GetMapping("/login")
@@ -77,7 +77,7 @@ public class StravaAuthController {
         RestTemplate restTemplate = new RestTemplate();
 
         // test email runner
-        mailerConfig.sendSimple("jasonghent1008@gmail.com", "test ses", "test run from actualize StravaAuthController.java");
+       // mailerConfig.sendSimple("jasonghent1008@gmail.com", "test ses", "test run from actualize StravaAuthController.java");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
