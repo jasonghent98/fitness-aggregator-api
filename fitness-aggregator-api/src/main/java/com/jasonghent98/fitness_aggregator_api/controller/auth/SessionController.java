@@ -1,25 +1,37 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
+import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.dto.auth.MagicLinkRequest;
 import com.jasonghent98.fitness_aggregator_api.security.JwtService;
+import com.jasonghent98.fitness_aggregator_api.service.auth.EmailVerificationService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.jasonghent98.fitness_aggregator_api.util.auth.EmailVerificationService.looksLikeEmail;
+import static com.jasonghent98.fitness_aggregator_api.util.auth.EmailVerificationUtil.looksLikeEmail;
 
 @RestController
 @RequestMapping("/api/auth")
 public class SessionController {
 
     private final JwtService jwtService;
+    private final EmailVerificationService emailVeriService;
+    private final FrontendConfig frontendConfig;
 
-    public SessionController(JwtService jwtService) {
+    public SessionController(
+            JwtService jwtService,
+            EmailVerificationService emailVeriService,
+            FrontendConfig frontendConfig
+    ) {
         this.jwtService = jwtService;
+        this.emailVeriService = emailVeriService;
+        this.frontendConfig = frontendConfig;
     }
 
     // server-side authentication check (all jwts that make it passed the interceptor make it here)
@@ -54,18 +66,14 @@ public class SessionController {
         // citext handles case-insensitive uniqueness at DB level
         String email = rawEmail;
 
-        // generate a URL-safe random token
-
-
-        // upsert by email (overwrite token + expiry)
-
+        // upsert by email (overwrite token + expiry) and return the token
+        EmailVerificationService.IssueResult result = emailVeriService.issueOrRefresh(email);
 
         // build magic link (optionally carry forward a returnTo)
-
+        String link = frontendConfig.getFrontendOrigin() + "/api/auth/magic/verify?token=" + URLEncoder.encode(result.token(), StandardCharsets.UTF_8);
+        System.out.println(link +  " FROM SESSIONCONTROLLER.JAVA");
 
         // send email
-
-
         try {
             System.out.println("send email with magic link here");
         } catch (Exception e) {
