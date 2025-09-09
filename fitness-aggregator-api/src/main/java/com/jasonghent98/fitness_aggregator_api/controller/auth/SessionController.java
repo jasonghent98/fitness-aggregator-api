@@ -1,6 +1,7 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
+import com.jasonghent98.fitness_aggregator_api.dto.auth.MagicLinkRequest;
 import com.jasonghent98.fitness_aggregator_api.security.JwtService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.UUID;
+
+import static com.jasonghent98.fitness_aggregator_api.util.auth.EmailVerificationService.looksLikeEmail;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -40,8 +43,42 @@ public class SessionController {
 
     // creates a record in email_verifications table, gen a magic link with token, sends via ses email
     @PostMapping("/magic/verify")
-    public ResponseEntity<?> verifyEmail() {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> verifyEmail(@RequestBody MagicLinkRequest req) {
+        String rawEmail = req.getEmail() == null ? "" : req.getEmail().trim();
+        if (rawEmail.isEmpty() || !looksLikeEmail(rawEmail)) {
+            return ResponseEntity.badRequest().body(
+                    java.util.Map.of("ok", false, "error", "invalid_email")
+            );
+        }
+
+        // citext handles case-insensitive uniqueness at DB level
+        String email = rawEmail;
+
+        // generate a URL-safe random token
+
+
+        // upsert by email (overwrite token + expiry)
+
+
+        // build magic link (optionally carry forward a returnTo)
+
+
+        // send email
+
+
+        try {
+            System.out.println("send email with magic link here");
+        } catch (Exception e) {
+            // If email fails, you may still want to keep the token (user could request again)
+            return ResponseEntity.status(502).body(
+                    java.util.Map.of("ok", false, "error", "email_send_failed")
+            );
+        }
+
+        return ResponseEntity.ok(java.util.Map.of(
+                "ok", true,
+                "sent", true
+        ));
     }
 
     // verifies the token in the incoming req against the email_verifications for corresp email, then creates user and reroutes /connect-providers
