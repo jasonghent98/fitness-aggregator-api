@@ -20,3 +20,6 @@ jwt:
   secret: ${JWT_SECRET}
   ttl-days: ${JWT_TTL_DAYS:28}
   issuer: ${JWT_ISSUER}
+auth:
+  magic:
+    ttl-minutes: ${AUTH_MAGIC_TTL_MINUTES}
