@@ -10,4 +10,5 @@ public interface EmailVerificationRepository extends JpaRepository<EmailVerifica
     // case-insensitive by virtue of citext on the column, but this reads clearer
     Optional<EmailVerification> findByEmail(String email);
     Optional<EmailVerification> findByAccessToken(String accessToken);
+    void deleteByEmail(String email);
 }
