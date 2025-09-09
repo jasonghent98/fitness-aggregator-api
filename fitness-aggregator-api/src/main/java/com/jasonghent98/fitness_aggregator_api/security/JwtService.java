@@ -99,7 +99,7 @@ public class JwtService {
                 .toString();
     }
 
-    public String mintEmailVerification(String email, Duration ttl) {
+    public String mintEmailVerification(String email) {
         Instant now = Instant.now();
         Instant exp = now.plus(Duration.ofDays(cfg.getTtlDays()));
         return JWT.create()
