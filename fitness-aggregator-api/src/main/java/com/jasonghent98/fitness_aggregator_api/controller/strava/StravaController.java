@@ -3,9 +3,8 @@ import com.jasonghent98.fitness_aggregator_api.integrations.strava.StravaService
 import com.jasonghent98.fitness_aggregator_api.model.strava.StravaActivity;
 import com.jasonghent98.fitness_aggregator_api.model.strava.StravaStats;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -37,5 +36,23 @@ public class StravaController {
             e.printStackTrace();
             return Collections.emptyList();
         }
+    }
+
+    /**
+     Receives a list of strava object IDs via webhook (similar to SSE but server to server) ->
+        use the returned object ids in the GET webhook controller
+     */
+    @PostMapping("/webhook")
+    public void receiveStravaEvents(RequestBody stravaEvents) {
+
+    }
+
+    /**
+     Gets the list of strava event objects by their objectIds
+
+     */
+    @GetMapping("/webhook")
+    public void getStravaEvents(Integer[] objectIds) {
+
     }
 }
