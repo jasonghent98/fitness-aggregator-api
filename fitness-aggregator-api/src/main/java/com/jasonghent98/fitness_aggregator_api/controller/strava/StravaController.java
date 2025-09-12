@@ -3,7 +3,10 @@ import com.jasonghent98.fitness_aggregator_api.dto.strava.StravaEventWebhookRequ
 import com.jasonghent98.fitness_aggregator_api.service.strava.StravaService;
 import com.jasonghent98.fitness_aggregator_api.model.strava.StravaActivity;
 import com.jasonghent98.fitness_aggregator_api.model.strava.StravaStats;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,10 @@ import java.util.Map;
 @RequestMapping("/api/strava")
 public class StravaController {
     private final StravaService stravaService;
+    private static final Logger log = LoggerFactory.getLogger(StravaController.class);
+
+    @Value("${strava.webhook.verify-token:}")
+    private String verifyToken;
 
     @Autowired
     public StravaController(StravaService stravaService) {
@@ -46,22 +53,21 @@ public class StravaController {
 
     // 1) Verification handshake (Strava will call this once on subscription create)
     // GET /api/strava/webhook?hub.mode=subscribe&hub.verify_token=XYZ&hub.challenge=abc123
-    @GetMapping
+    @GetMapping("/webhook")
     public ResponseEntity<?> verify(
             @RequestParam(name = "hub.mode", required = false) String mode,
             @RequestParam(name = "hub.verify_token", required = false) String token,
             @RequestParam(name = "hub.challenge") String challenge
     ) {
-        if ("subscribe".equalsIgnoreCase(mode) &&
-                (verifyToken == null || verifyToken.isBlank() || verifyToken.equals(token))) {
-            // Must return JSON: {"hub.challenge":"..."}
+        System.out.println(verifyToken + " FROM StravaController!!!! ");
+        if ("subscribe".equalsIgnoreCase(mode) && verifyToken.equals(token)) {
             return ResponseEntity.ok(Map.of("hub.challenge", challenge));
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid verification");
     }
 
     // 2) Event delivery (Strava posts here for activity/athlete changes)
-    @PostMapping
+    @PostMapping("/webhook")
     public ResponseEntity<Void> receive(@RequestBody StravaEventWebhookRequest evt, @RequestHeader Map<String,String> headers) {
         // Minimal logging; keep handler fast (<2s)
         log.info("Strava webhook: object_type={}, aspect_type={}, object_id={}, owner_id={}, updates={}",

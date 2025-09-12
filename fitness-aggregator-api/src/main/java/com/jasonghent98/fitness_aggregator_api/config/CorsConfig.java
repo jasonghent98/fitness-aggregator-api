@@ -20,7 +20,8 @@ public class CorsConfig {
                 "https://dev.actualize.fit",
                 "https://actualize-dev.vercel.app", // optional: your Vercel preview domain
                 "https://test.actualize.fit",
-                "https://actualize.fit"
+                "https://actualize.fit",
+                "https://www.strava.com"
         ));
 
         cfg.setAllowCredentials(true); // if you use cookies/session
