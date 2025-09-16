@@ -1,59 +1,49 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
-import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
-import com.jasonghent98.fitness_aggregator_api.config.provider.strava.StravaConfig;
-import com.jasonghent98.fitness_aggregator_api.repository.ProviderAccountRepository;
-import com.jasonghent98.fitness_aggregator_api.repository.ProviderRepository;
-import com.jasonghent98.fitness_aggregator_api.security.JwtService;
-import com.jasonghent98.fitness_aggregator_api.service.ProviderAccountService;
-import lombok.RequiredArgsConstructor;
+import com.jasonghent98.fitness_aggregator_api.dto.garmin.GarminAuthTokenResponse;
+import com.jasonghent98.fitness_aggregator_api.service.auth.GarminAuthService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/garmin/auth")
-@RequiredArgsConstructor
 public class GarminAuthController {
 
-    private final ProviderAccountRepository proAccRepo;
-    private final ProviderRepository proRepo;
-    private final ProviderAccountService proAccServ;
-    private final FrontendConfig frontendConfig;
-    private final JwtService jwtService;
+    private final GarminAuthService garminAuthService;
 
     public GarminAuthController(
-            ProviderAccountRepository proAccRepo,
-            ProviderRepository proRepo,
-            ProviderAccountService proAccServ,
-            FrontendConfig frontendConfig,
-            JwtService jwtService
+            GarminAuthService garminAuthService
     ) {
-        this.proAccRepo = proAccRepo;
-        this.proRepo = proRepo;
-        this.proAccServ = proAccServ;
-        this.frontendConfig = frontendConfig;
-        this.jwtService = jwtService;
+        this.garminAuthService = garminAuthService;
     }
 
     @GetMapping("/login")
-    public ResponseEntity<?> login() {
-        String redirectUrl = garminAuthService.getRequestTokenAndRedirectUrl();
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .header(HttpHeaders.LOCATION, redirectUrl)
+    public ResponseEntity<?> startGarminAuth() {
+        try {
+            String url = garminAuthService.buildGarminAuthorizationUrl();
+            return ResponseEntity.status(HttpStatus.FOUND)
+                .header("Location", url)
                 .build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to build Garmin authorization URL " + e.getMessage());
+        }
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<?> callback(
-            @RequestParam("oauth_token") String oauthToken,
-            @RequestParam("oauth_verifier") String oauthVerifier
+    public ResponseEntity<?> handleGarminCallback(
+            @RequestParam("code") String authCode,
+            @RequestParam("state") String state // userId passed in from /login
     ) {
-        garminAuthService.exchangeForAccessToken(oauthToken, oauthVerifier);
-        return ResponseEntity.ok("Garmin account linked");
+        try {
+            GarminAuthTokenResponse response = garminAuthService.retrieveAndStoreAndReturnToken(state, authCode);
+            return ResponseEntity.ok(response); // or redirect to UI page
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to exchange token: " + e.getMessage());
+        }
     }
 }

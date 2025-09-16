@@ -14,6 +14,12 @@ public class GarminConfig {
     private String clientSecret;
 
     @Value("${garmin.REDIRECT_URL}")
-    private String redirectUri;
+    private String redirectUrl;
+
+    @Value("${garmin.OAUTH_BASE_URL}")
+    private String oauthBaseUrl;
+
+    @Value("${garmin.OAUTH_TOKEN_URL}")
+    private String oauthTokenUrl;
 }
 
