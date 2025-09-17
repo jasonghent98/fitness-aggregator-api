@@ -1,24 +1,26 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
-import com.jasonghent98.fitness_aggregator_api.dto.garmin.GarminAuthTokenResponse;
+import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
 import com.jasonghent98.fitness_aggregator_api.service.auth.GarminAuthService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/garmin/auth")
 public class GarminAuthController {
 
     private final GarminAuthService garminAuthService;
+    private final FrontendConfig frontendConfig;
 
     public GarminAuthController(
-            GarminAuthService garminAuthService
+            GarminAuthService garminAuthService,
+            FrontendConfig frontendConfig
     ) {
         this.garminAuthService = garminAuthService;
+        this.frontendConfig = frontendConfig;
     }
 
     @GetMapping("/login")
@@ -26,8 +28,8 @@ public class GarminAuthController {
         try {
             String url = garminAuthService.buildGarminAuthorizationUrl();
             return ResponseEntity.status(HttpStatus.FOUND)
-                .header("Location", url)
-                .build();
+                    .location(URI.create(url))
+                    .build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to build Garmin authorization URL " + e.getMessage());
         }
@@ -39,8 +41,11 @@ public class GarminAuthController {
             @RequestParam("state") String state // userId passed in from /login
     ) {
         try {
-            GarminAuthTokenResponse response = garminAuthService.retrieveAndStoreAndReturnToken(state, authCode);
-            return ResponseEntity.ok(response); // or redirect to UI page
+            garminAuthService.retrieveAndStoreAndReturnToken(state, authCode);
+            String url = frontendConfig.getFrontendOrigin() + "/onboarding/connect?provider=garmin&status=success";
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(url))
+                    .build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to exchange token: " + e.getMessage());
