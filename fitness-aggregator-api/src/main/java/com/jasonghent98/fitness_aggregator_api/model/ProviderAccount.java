@@ -37,10 +37,10 @@ public class ProviderAccount {
 
     @Column(nullable=false, name="provider_user_id") private String providerUserId; // string safe to catch all providers
 
-    @Column(name = "access_token", nullable = false)
+    @Column(name = "access_token", nullable = false, columnDefinition = "TEXT")
     private String accessToken;
 
-    @Column(name = "refresh_token", nullable = false)
+    @Column(name = "refresh_token", nullable = false, columnDefinition = "TEXT")
     private String refreshToken;
 
     @Column(name = "expires_at", nullable = false)
