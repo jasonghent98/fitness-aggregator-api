@@ -119,30 +119,6 @@ public class GarminWebhookController {
         }
     }
 
-    @PostMapping("/respiration")
-    public ResponseEntity<Void> receiveRespiration(@RequestBody List<GarminRespirationSummaryPayload> payloads) {
-        try {
-            // Make sure no empty payloads
-            WebhookValidator.requireNonEmpty(payloads, "Garmin Respiration");
-
-            // log event
-            WebhookLogger.logWebhookEvent(
-                    log,
-                    "Garmin Respiration",
-                    payloads,
-                    p -> String.format("summaryId=%s, userId=%s", p.getSummaryId(), p.getUserId())
-            );
-
-            /* TODO: Persist to DB via async processing enqueue */
-
-
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            WebhookLogger.logWebhookError(log, "Garmin Respiration", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
 
     @PostMapping("/sleep")
     public ResponseEntity<Void> receiveSleep(@RequestBody List<GarminSleepSummaryPayload> payloads) {
