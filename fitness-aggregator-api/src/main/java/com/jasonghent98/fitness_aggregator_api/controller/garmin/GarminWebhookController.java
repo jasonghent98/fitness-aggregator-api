@@ -1,6 +1,7 @@
 package com.jasonghent98.fitness_aggregator_api.controller.garmin;
 
 import com.jasonghent98.fitness_aggregator_api.dto.garmin.webhook.*;
+import com.jasonghent98.fitness_aggregator_api.service.garmin.GarminWebhookService;
 import com.jasonghent98.fitness_aggregator_api.util.WebhookLogger;
 import com.jasonghent98.fitness_aggregator_api.util.WebhookValidator;
 import org.slf4j.Logger;
@@ -20,8 +21,11 @@ import java.util.List;
 public class GarminWebhookController {
 
     private static final Logger log = LoggerFactory.getLogger(GarminWebhookController.class);
+    private final GarminWebhookService garminWebhookService;
 
-    GarminWebhookController() {}
+    GarminWebhookController(GarminWebhookService garminWebhookService) {
+        this.garminWebhookService = garminWebhookService;
+    }
 
     @PostMapping("/dailies")
     public ResponseEntity<Void> receiveDailies(@RequestBody List<GarminDailySummaryPayload> payloads) {
@@ -38,6 +42,7 @@ public class GarminWebhookController {
             );
 
             /* TODO: Persist to DB via async processing enqueue */
+            garminWebhookService.handleDailyEvents(payloads);
 
 
             return ResponseEntity.ok().build();
@@ -62,6 +67,7 @@ public class GarminWebhookController {
             );
 
             /* TODO: Persist to DB via async processing enqueue */
+            garminWebhookService.handleHrvEvents(payloads);
 
 
             return ResponseEntity.ok().build();
@@ -86,6 +92,7 @@ public class GarminWebhookController {
             );
 
             /* TODO: Persist to DB via async processing enqueue */
+            garminWebhookService.handleHealthEvents(payloads);
 
 
             return ResponseEntity.ok().build();
@@ -110,6 +117,7 @@ public class GarminWebhookController {
             );
 
             /* TODO: Persist to DB via async processing enqueue */
+            garminWebhookService.handlePulseOxEvents(payloads);
 
 
             return ResponseEntity.ok().build();
@@ -135,6 +143,8 @@ public class GarminWebhookController {
             );
 
             /* TODO: Persist to DB via async processing enqueue */
+            garminWebhookService.handleSleepEvents(payloads);
+
 
 
             return ResponseEntity.ok().build();
@@ -159,6 +169,7 @@ public class GarminWebhookController {
             );
 
             /* TODO: Persist to DB via async processing enqueue */
+            garminWebhookService.handleStressEvents(payloads);
 
 
             return ResponseEntity.ok().build();
