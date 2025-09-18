@@ -1,5 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -27,11 +28,11 @@ public class ProviderAccount {
     @GeneratedValue(strategy = GenerationType.AUTO) // PK
     private UUID id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "provider_id", nullable = false)
     private Provider provider;
 

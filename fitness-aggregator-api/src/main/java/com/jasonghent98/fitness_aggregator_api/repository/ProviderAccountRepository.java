@@ -4,11 +4,12 @@ import com.jasonghent98.fitness_aggregator_api.model.Provider;
 import com.jasonghent98.fitness_aggregator_api.model.ProviderAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface ProviderAccountRepository extends JpaRepository<ProviderAccount, UUID> {
     Optional<ProviderAccount> findByProviderAndProviderUserId(Provider provider, String providerUserId);
-    Optional<ProviderAccount> findAllByUserId(UUID userId);
+    Optional<List<ProviderAccount>> findAllByUserId(UUID userId);
     Optional<ProviderAccount> findByUserIdAndProvider(UUID userId, Provider provider);
 }
