@@ -1,17 +1,28 @@
-# Use a lightweight JRE base image for Java 21
-FROM eclipse-temurin:21-jre-alpine
+# ---- Build stage ----
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy the built jar file into the container
-COPY target/fitness-aggregator-api.jar app.jar
+# Copy Maven wrapper + pom first (better caching)
+COPY mvnw pom.xml ./
+COPY .mvn .mvn
 
-# Cloud Run sends traffic to this env var ($PORT)
+# Download dependencies (cached unless pom.xml changes)
+RUN ./mvnw dependency:go-offline -B
+
+# Copy the source and build
+COPY src src
+RUN ./mvnw clean package -DskipTests
+
+# ---- Runtime stage ----
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+# Copy only the built JAR from builder stage
+COPY --from=builder /app/target/fitness-aggregator-api.jar app.jar
+
 ENV PORT=8080
-
-# Expose the port (optional, Cloud Run sets it automatically)
 EXPOSE 8080
 
-# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
