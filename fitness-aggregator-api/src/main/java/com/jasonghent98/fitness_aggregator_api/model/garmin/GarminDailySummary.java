@@ -1,5 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.model.garmin;
 
+import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringIntegerMapConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.UUID;
 
 @Entity
 @Table(name = "garmin_daily_summaries")
@@ -22,7 +24,13 @@ public class GarminDailySummary {
     private Long id;
 
     private String summaryId;
+
+    @Column(name = "provider_user_id", nullable = false)
     private String userId;
+
+    @Column(name = "user_id", nullable = false)
+    private UUID actualizeUserId;
+
     private LocalDate calendarDate;
 
     private Integer steps;
@@ -37,9 +45,9 @@ public class GarminDailySummary {
     private Integer maxHeartRate;
     private Integer restingHeartRate;
 
+    @Convert(converter = StringIntegerMapConverter.class)
     @Column(columnDefinition = "jsonb")
     private Map<String, Integer> heartRateSamples;
 
-    @Column(columnDefinition = "jsonb")
     private Integer stressDurations; // could combine average, low, medium, high
 }
