@@ -1,6 +1,7 @@
 package com.jasonghent98.fitness_aggregator_api.service.garmin;
 
 import com.jasonghent98.fitness_aggregator_api.dto.garmin.webhook.*;
+import com.jasonghent98.fitness_aggregator_api.repository.garmin.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -12,23 +13,35 @@ import java.util.List;
 public class GarminWebhookService {
 
     private static final Logger log = LoggerFactory.getLogger(GarminWebhookService.class);
+    private final GarminDailyRepository garminDailyRepo;
+    private final GarminSleepRepository garminSleepRepo;
+    private final GarminStressRepository garminStressRepo;
+    private final GarminHrvRepository garminHrvRepo;
+    private final GarminPulseOxRepository garminPulseOxRepo;
+
+
+    GarminWebhookService(
+            GarminDailyRepository garminDailyRepo,
+            GarminSleepRepository garminSleepRepo,
+            GarminStressRepository garminStressRepo,
+            GarminHrvRepository garminHrvRepo,
+            GarminPulseOxRepository garminPulseOxRepo
+    ) {
+        this.garminDailyRepo = garminDailyRepo;
+        this.garminSleepRepo = garminSleepRepo;
+        this.garminStressRepo = garminStressRepo;
+        this.garminHrvRepo = garminHrvRepo;
+        this.garminPulseOxRepo = garminPulseOxRepo;
+    }
 
     @Async
     public void handleDailyEvents(GarminDailySummaryPayload payload) {
         try {
-            // ✅ map DTOs -> entities
-            // ✅ persist with repository.saveAll(...)
-            log.info("Persisting Garmin Daily payloads");
-            System.out.println(payload + " DAILY EVENT ");
+            log.info("Persisting Garmin Daily payload");
 
-            // Example:
-            // List<SleepEntity> entities = payloads.stream()
-            //     .map(this::mapToEntity)
-            //     .toList();
-            // sleepRepository.saveAll(entities);
 
         } catch (Exception e) {
-            log.error("Error persisting Garmin Daily payloads", e);
+            log.error("Error persisting Garmin Daily payload", e);
             // Optional: persist to a dead-letter table for later retry
         }
     }
@@ -36,10 +49,7 @@ public class GarminWebhookService {
     @Async
     public void handleHrvEvents(GarminHrvSummaryPayload payload) {
         try {
-            // ✅ map DTOs -> entities
-            // ✅ persist with repository.saveAll(...)
             log.info("Persisting Garmin HRV payload");
-            System.out.println(payload + " HRV EVENT ");
 
             // Example:
             // List<SleepEntity> entities = payloads.stream()
@@ -48,7 +58,7 @@ public class GarminWebhookService {
             // sleepRepository.saveAll(entities);
 
         } catch (Exception e) {
-            log.error("Error persisting Garmin HRV payloads", e);
+            log.error("Error persisting Garmin HRV payload", e);
             // Optional: persist to a dead-letter table for later retry
         }
     }
@@ -56,19 +66,16 @@ public class GarminWebhookService {
     @Async
     public void handleHealthEvents(GarminHealthSummaryPayload payload) {
         try {
-            // ✅ map DTOs -> entities
-            // ✅ persist with repository.saveAll(...)
             log.info("Persisting Garmin Health payload");
-            System.out.println(payload + " HEALTH EVENT ");
 
-            // Example:
+
             // List<SleepEntity> entities = payloads.stream()
             //     .map(this::mapToEntity)
             //     .toList();
             // sleepRepository.saveAll(entities);
 
         } catch (Exception e) {
-            log.error("Error persisting Garmin Health payloads", e);
+            log.error("Error persisting Garmin Health payload", e);
             // Optional: persist to a dead-letter table for later retry
         }
     }
@@ -76,10 +83,7 @@ public class GarminWebhookService {
     @Async
     public void handlePulseOxEvents(GarminPulseOxSummaryPayload payload) {
         try {
-            // ✅ map DTOs -> entities
-            // ✅ persist with repository.saveAll(...)
             log.info("Persisting Garmin Pulse Ox payload");
-            System.out.println(payload + " PULSE OX EVENT ");
 
             // Example:
             // List<SleepEntity> entities = payloads.stream()
@@ -88,7 +92,7 @@ public class GarminWebhookService {
             // sleepRepository.saveAll(entities);
 
         } catch (Exception e) {
-            log.error("Error persisting Garmin Pulse Ox payloads", e);
+            log.error("Error persisting Garmin Pulse Ox payload", e);
             // Optional: persist to a dead-letter table for later retry
         }
     }
@@ -96,10 +100,7 @@ public class GarminWebhookService {
     @Async
     public void handleSleepEvents(GarminSleepSummaryPayload payload) {
         try {
-            // ✅ map DTOs -> entities
-            // ✅ persist with repository.saveAll(...)
             log.info("Persisting Garmin Sleep payloads");
-            System.out.println(payload + " SLEEP EVENT");
 
             // Example:
             // List<SleepEntity> entities = payloads.stream()
@@ -108,7 +109,7 @@ public class GarminWebhookService {
             // sleepRepository.saveAll(entities);
 
         } catch (Exception e) {
-            log.error("Error persisting Garmin Sleep payloads", e);
+            log.error("Error persisting Garmin Sleep payload", e);
             // Optional: persist to a dead-letter table for later retry
         }
     }
@@ -117,8 +118,8 @@ public class GarminWebhookService {
     public void handleStressEvents(GarminStressSummaryPayload payload) {
         try {
             log.info("Persisting Garmin Stress payloads");
-            System.out.println(payload + " FROM STRESS EVENT");
             // map & persist
+
         } catch (Exception e) {
             log.error("Error persisting Garmin Stress payloads", e);
         }
