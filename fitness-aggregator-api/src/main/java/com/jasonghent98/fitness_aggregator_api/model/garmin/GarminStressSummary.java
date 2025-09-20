@@ -1,5 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.model.garmin;
 
+import com.jasonghent98.fitness_aggregator_api.dto.garmin.webhook.GarminStressSummaryPayload;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "garmin_stress_summaries")
@@ -29,11 +32,11 @@ public class GarminStressSummary {
     private Integer durationInSeconds;
 
     @Column(columnDefinition = "jsonb")
-    private String timeOffsetStressLevelValues;
+    private Map<String, Integer> timeOffsetStressLevelValues;
 
     @Column(columnDefinition = "jsonb")
-    private String timeOffsetBodyBatteryValues;
+    private Map<String, Integer> timeOffsetBodyBatteryValues;
 
     @Column(columnDefinition = "jsonb")
-    private String bodyBatteryEvents;
+    private List<GarminStressSummaryPayload.StressSummary.BodyBatteryActivityEvent> bodyBatteryEvents;
 }

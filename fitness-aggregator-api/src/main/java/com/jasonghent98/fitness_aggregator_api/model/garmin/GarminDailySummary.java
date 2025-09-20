@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @Entity
 @Table(name = "garmin_daily_summaries")
@@ -37,8 +38,8 @@ public class GarminDailySummary {
     private Integer restingHeartRate;
 
     @Column(columnDefinition = "jsonb")
-    private String heartRateSamples;
+    private Map<String, Integer> heartRateSamples;
 
     @Column(columnDefinition = "jsonb")
-    private String stressDurations; // could combine average, low, medium, high
+    private Integer stressDurations; // could combine average, low, medium, high
 }

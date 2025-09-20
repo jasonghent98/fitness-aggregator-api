@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @Entity
 @Table(name = "garmin_pulseox_summaries")
@@ -29,5 +30,5 @@ public class GarminPulseOxSummary {
     private Integer durationInSeconds;
 
     @Column(columnDefinition = "jsonb")
-    private String spo2Samples;
+    private Map<String, Integer> spo2Samples;
 }

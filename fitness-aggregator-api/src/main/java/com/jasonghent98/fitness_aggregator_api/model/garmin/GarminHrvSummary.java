@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @Entity
 @Table(name = "garmin_hrv_summaries")
@@ -33,5 +34,5 @@ public class GarminHrvSummary {
     private Double lastNight5MinHigh;
 
     @Column(columnDefinition = "jsonb")
-    private String hrvValues; // store offset→value as JSON
+    private Map<String, Double> hrvValues; // store offset→value as JSON
 }
