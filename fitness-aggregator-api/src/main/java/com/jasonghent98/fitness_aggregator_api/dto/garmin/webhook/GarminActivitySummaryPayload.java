@@ -1,4 +1,8 @@
 package com.jasonghent98.fitness_aggregator_api.dto.garmin.webhook;
 
-public class GarminActivityPayload {
+import lombok.Data;
+
+@Data
+public class GarminActivitySummaryPayload {
+
 }

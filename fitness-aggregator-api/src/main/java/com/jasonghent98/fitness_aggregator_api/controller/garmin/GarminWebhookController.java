@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/garmin/webhook")
@@ -28,22 +26,22 @@ public class GarminWebhookController {
     }
 
     @PostMapping("/dailies")
-    public ResponseEntity<Void> receiveDailies(@RequestBody List<GarminDailySummaryPayload> payloads) {
+    public ResponseEntity<Void> receiveDailies(@RequestBody GarminDailySummaryPayload payload) {
         try {
-            // Make sure no empty payloads
-            WebhookValidator.requireNonEmpty(payloads, "Garmin Daily");
+            log.info("RAWD DAILY JSON: {}", payload);
+            /*
+            WebhookValidator.requireNonEmpty(payload, "Garmin Daily");
 
-            // log event
             WebhookLogger.logWebhookEvent(
                     log,
                     "Garmin Daily",
-                    payloads,
-                    p -> String.format("summaryId=%s, userId=%s", p.getSummaryId(), p.getUserId())
+                    payload,
+                    p -> String.format("summaryId=%s, userId=%s", p.getSummaryType(), p.getUserId())
             );
 
-            /* TODO: Persist to DB via async processing enqueue */
-            garminWebhookService.handleDailyEvents(payloads);
+            garminWebhookService.handleDailyEvents(payload);
 
+            */
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -53,22 +51,22 @@ public class GarminWebhookController {
     }
 
     @PostMapping("/hrvsummary")
-    public ResponseEntity<Void> receiveHrvSummary(@RequestBody List<GarminHrvSummaryPayload> payloads) {
+    public ResponseEntity<Void> receiveHrvSummary(@RequestBody GarminHrvSummaryPayload payload) {
         try {
-            // Make sure no empty payloads
-            WebhookValidator.requireNonEmpty(payloads, "Garmin HRV");
+            log.info("RAW HRV JSON: {}", payload);
 
-            // log event
+            /*
+            WebhookValidator.requireNonEmpty(payload, "Garmin HRV");
+
             WebhookLogger.logWebhookEvent(
                     log,
                     "Garmin HRV",
-                    payloads,
-                    p -> String.format("summaryId=%s, userId=%s", p.getSummaryId(), p.getUserId())
+                    payload,
+                    p -> String.format("summaryId=%s, userId=%s", p.getSummaryType(), p.getUserId())
             );
 
-            /* TODO: Persist to DB via async processing enqueue */
-            garminWebhookService.handleHrvEvents(payloads);
-
+            garminWebhookService.handleHrvEvents(payload);
+            */
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -78,23 +76,22 @@ public class GarminWebhookController {
     }
 
     @PostMapping("/healthsummary")
-    public ResponseEntity<Void> retrieveHealthSummary(@RequestBody List<GarminHealthSummaryPayload> payloads) {
+    public ResponseEntity<Void> retrieveHealthSummary(@RequestBody GarminHealthSummaryPayload payload) {
         try {
-            // Make sure no empty payloads
-            WebhookValidator.requireNonEmpty(payloads, "Garmin Health");
+            /*
+            WebhookValidator.requireNonEmpty(payload, "Garmin Health");
 
-            // log event
+
             WebhookLogger.logWebhookEvent(
                     log,
                     "Garmin Health",
-                    payloads,
-                    p -> String.format("summaryId=%s, userId=%s", p.getSummaryId(), p.getUserId())
+                    payload,
+                    p -> String.format("summaryId=%s, userId=%s", p.getSummaryType(), p.getHealthSummaries())
             );
 
-            /* TODO: Persist to DB via async processing enqueue */
-            garminWebhookService.handleHealthEvents(payloads);
+            garminWebhookService.handleHealthEvents(payload);
 
-
+            */
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             WebhookLogger.logWebhookError(log, "Garmin Health", e);
@@ -103,22 +100,22 @@ public class GarminWebhookController {
     }
 
     @PostMapping("/pulseox")
-    public ResponseEntity<Void> receivePulseOx(@RequestBody List<GarminPulseOxSummaryPayload> payloads) {
+    public ResponseEntity<Void> receivePulseOx(@RequestBody GarminPulseOxSummaryPayload payload) {
         try {
-            // Make sure no empty payloads
-            WebhookValidator.requireNonEmpty(payloads, "Garmin Pulse Ox");
+            log.info("RAW PULSE OX JSON: {}", payload);
 
-            // log event
+            /*
+            WebhookValidator.requireNonEmpty(payload, "Garmin Pulse Ox");
+
             WebhookLogger.logWebhookEvent(
                     log,
                     "Garmin Pulse Ox",
-                    payloads,
-                    p -> String.format("summaryId=%s, userId=%s", p.getSummaryId(), p.getUserId())
+                    payload,
+                    p -> String.format("summaryId=%s, userId=%s", p.getSummaryType(), p.getUserId())
             );
 
-            /* TODO: Persist to DB via async processing enqueue */
-            garminWebhookService.handlePulseOxEvents(payloads);
-
+            garminWebhookService.handlePulseOxEvents(payload);
+            */
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -129,23 +126,23 @@ public class GarminWebhookController {
 
 
     @PostMapping("/sleep")
-    public ResponseEntity<Void> receiveSleep(@RequestBody List<GarminSleepSummaryPayload> payloads) {
+    public ResponseEntity<Void> receiveSleep(@RequestBody GarminSleepSummaryPayload payload) {
         try {
-            // Make sure no empty payloads
-            WebhookValidator.requireNonEmpty(payloads, "Garmin Sleep");
+            log.info("RAW SLEEP JSON: {}", payload);
+            /*
+            WebhookValidator.requireNonEmpty(payload, "Garmin Sleep");
 
-            // log event
+
             WebhookLogger.logWebhookEvent(
                     log,
                     "Garmin Sleep",
-                    payloads,
-                    p -> String.format("summaryId=%s, userId=%s", p.getSummaryId(), p.getUserId())
+                    payload,
+                    p -> String.format("summaryId=%s", p.getSummaryId())
             );
 
-            /* TODO: Persist to DB via async processing enqueue */
-            garminWebhookService.handleSleepEvents(payloads);
+            garminWebhookService.handleSleepEvents(payload);
 
-
+            */
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
@@ -155,22 +152,22 @@ public class GarminWebhookController {
     }
 
     @PostMapping("/stress")
-    public ResponseEntity<Void> receiveStress(@RequestBody List<GarminStressSummaryPayload> payloads) {
+    public ResponseEntity<Void> receiveStress(@RequestBody GarminStressSummaryPayload payload) {
         try {
-            // Make sure no empty payloads
-            WebhookValidator.requireNonEmpty(payloads, "Garmin Stress");
+            log.info("RAW STRESS JSON: {}", payload);
 
-            // log event
+            /*
+            WebhookValidator.requireNonEmpty(payload, "Garmin Stress");
+
             WebhookLogger.logWebhookEvent(
                     log,
                     "Garmin Stress",
-                    payloads,
-                    p -> String.format("summaryId=%s, userId=%s", p.getSummaryId(), p.getUserId())
+                    payload,
+                    p -> String.format("summaryId=%s", p.getSummaryId())
             );
 
-            /* TODO: Persist to DB via async processing enqueue */
-            garminWebhookService.handleStressEvents(payloads);
-
+            garminWebhookService.handleStressEvents(payload);
+            */
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {

@@ -1,7 +1,5 @@
 package com.jasonghent98.fitness_aggregator_api.controller.garmin;
 
-import com.jasonghent98.fitness_aggregator_api.service.garmin.GarminWebhookService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,17 +9,13 @@ import java.util.Map;
 @RequestMapping("/api/garmin")
 public class GarminController {
 
-    private final GarminWebhookService garminWebServ;
 
-    public GarminController(GarminWebhookService garminWebServ) {
-        this.garminWebServ = garminWebServ;
-    }
+
+    public GarminController() {}
 
     @PostMapping
-    public ResponseEntity<Void> receive(@RequestBody Map<String, Object> payload,
+    public void receive(@RequestBody Map<String, Object> payload,
                                         @RequestHeader Map<String, String> headers) {
         // TODO: verify HMAC signature later using headers (X-...)
-        garminWebServ.handleEvent(payload);
-        return ResponseEntity.noContent().build(); // 204 quick response
     }
 }

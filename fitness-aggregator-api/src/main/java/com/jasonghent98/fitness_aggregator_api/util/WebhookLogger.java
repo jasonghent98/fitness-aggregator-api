@@ -12,23 +12,21 @@ public class WebhookLogger {
      *
      * @param log the logger from the calling class
      * @param eventName a label for the webhook (e.g. "Garmin Sleep", "Garmin Stress")
-     * @param payloads the list of payloads received
+     * @param payload the list of payloads received
      * @param summarizer function to extract a short summary string from a payload (for debug logging)
      */
     public static <T> void logWebhookEvent(
             Logger log,
             String eventName,
-            List<T> payloads,
+            T payload,
             Function<T, String> summarizer
     ) {
         // Always log count at INFO
-        log.info("Received {} {} payload(s)", payloads.size(), eventName);
+        log.info("Received {} payload(s)", eventName);
 
         // Only log details if DEBUG is enabled
         if (log.isDebugEnabled()) {
-            payloads.forEach(p ->
-                    log.debug("{} payload details: {}", eventName, summarizer.apply(p))
-            );
+            log.debug("{} payload details: {}", eventName, summarizer.apply(payload));
         }
     }
 
