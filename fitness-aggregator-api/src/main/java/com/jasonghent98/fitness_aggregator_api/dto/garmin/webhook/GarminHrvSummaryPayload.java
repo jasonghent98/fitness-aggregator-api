@@ -20,6 +20,9 @@ public class GarminHrvSummaryPayload {
         @JsonProperty("userId")
         private String userId;
 
+        @JsonProperty("summaryId")
+        private String summaryId;
+
         @JsonProperty("calendarDate")
         @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate calendarDate;

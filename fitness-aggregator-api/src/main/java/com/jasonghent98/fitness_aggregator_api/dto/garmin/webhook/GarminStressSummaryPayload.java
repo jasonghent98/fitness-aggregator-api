@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class GarminStressSummaryPayload {
                 private Integer durationInSeconds;
 
                 @JsonProperty("calendarDate")
-                private String calendarDate;
+                private LocalDate calendarDate;
 
                 @JsonProperty("timeOffsetStressLevelValues")
                 private Map<String, Integer> timeOffsetStressLevelValues;
