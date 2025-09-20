@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -109,11 +110,30 @@ public class ProviderAccountService {
     }
 
     /**
+     * Finds and returns provider accounts for the user
+     * */
+    public List<ProviderAccount> getProviderAccountsForUser(String userId) {
+        return providerAccountRepo.findAllByUserId(UUID.fromString(userId))
+                .orElseThrow(() -> new IllegalArgumentException("No provider accounts for userId: " + userId));
+
+    }
+
+    /**
      * Finds and returns the provider name or throws if not found
      * */
     private Provider resolveProvider(String providerName) {
         return providerRepo.findByName(providerName)
                 .orElseThrow(() -> new IllegalArgumentException("Provider not found by name: " + providerName));
+
+    }
+
+    /**
+     * Finds and returns user for a given provider_user_id
+     * */
+    public ProviderAccount getProviderAccountForUserAndProvider(String providerName, String providerUserId) {
+        Provider provider = resolveProvider(providerName);
+        return providerAccountRepo.findByProviderAndProviderUserId(provider, providerUserId)
+                .orElseThrow(() -> new IllegalArgumentException("No + " + providerName + " account for given provider user id: " + providerUserId));
 
     }
 }

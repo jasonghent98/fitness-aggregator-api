@@ -135,7 +135,7 @@ public class StravaAuthController {
 
             // append token as query param
             URI redirect = URI.create(frontendConfig.getFrontendOrigin()
-                    + "/get-started?provider=strava&status=success&token="
+                    + "/onboarding/connect?provider=strava&status=success&token="
                     + URLEncoder.encode(jwt, StandardCharsets.UTF_8));
 
             return ResponseEntity.status(302)

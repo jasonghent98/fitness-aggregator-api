@@ -20,12 +20,13 @@ public class CorsConfig {
                 "https://dev.actualize.fit",
                 "https://actualize-dev.vercel.app", // optional: your Vercel preview domain
                 "https://test.actualize.fit",
-                "https://actualize.fit"
+                "https://actualize.fit",
+                "https://www.strava.com"
         ));
 
         cfg.setAllowCredentials(true); // if you use cookies/session
         cfg.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
-        cfg.setAllowedHeaders(List.of("Authorization","Content-Type","X-Requested-With","X-User-Id","Accept","Origin","Referer"));
+        cfg.setAllowedHeaders(List.of("Authorization","Content-Type","X-Requested-With","X-Actualize-Session","Accept","Origin","Referer"));
         cfg.setExposedHeaders(List.of("Location")); // optional, if you read Location on 3xx
         cfg.setMaxAge(3600L); // cache preflight for 1 hour
 

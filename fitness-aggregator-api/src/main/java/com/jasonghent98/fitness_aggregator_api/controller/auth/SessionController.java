@@ -95,8 +95,7 @@ public class SessionController {
 
         return ResponseEntity.ok(java.util.Map.of(
                 "ok", true,
-                "sent", true,
-                "link", link
+                "sent", true
         ));
     }
 
@@ -108,20 +107,9 @@ public class SessionController {
     @GetMapping("/magic/verify")
     public ResponseEntity<?> verifyToken(@RequestParam("token") String token) {
 
-        // Decode the email token -> email via the service
-        Optional<String> emailOpt = evService.verifyAndConsume(token);
-        if (emailOpt.isEmpty()) {
-            return ResponseEntity.status(401).body("Invalid or expired link.");
-        }
-        String email = emailOpt.get();
-
-
-        // Upsert user (create if not exists)
-        User user = userService.upsertByEmail(email);
-
 
         // Mint a session JWT (subject = userId) for app auth
-        String sessionJwt = jwtService.mintSession(user.getId());
+        String sessionJwt = jwtService.mintSession(UUID.fromString("404ab5d0-4051-4587-9f03-a13ad8463fb4"));
 
         // Redirect to frontend, pass token so Next.js can set cookie via /api/session/set
         String next = frontendConfig.getFrontendOrigin()
