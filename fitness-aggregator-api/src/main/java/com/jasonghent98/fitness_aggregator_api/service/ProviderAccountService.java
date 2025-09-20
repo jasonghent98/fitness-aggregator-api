@@ -126,4 +126,14 @@ public class ProviderAccountService {
                 .orElseThrow(() -> new IllegalArgumentException("Provider not found by name: " + providerName));
 
     }
+
+    /**
+     * Finds and returns user for a given provider_user_id
+     * */
+    public ProviderAccount getProviderAccountForUserAndProvider(String providerName, String providerUserId) {
+        Provider provider = resolveProvider(providerName);
+        return providerAccountRepo.findByProviderAndProviderUserId(provider, providerUserId)
+                .orElseThrow(() -> new IllegalArgumentException("No + " + providerName + " account for given provider user id: " + providerUserId));
+
+    }
 }
