@@ -1,15 +1,27 @@
 # ---- Build stage ----
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
 WORKDIR /workspace
 
-# Copy Maven wrapper + root pom.xml
-COPY mvnw pom.xml .mvn/ ./
+# Copy pom.xml first to leverage dependency caching
+COPY pom.xml ./
+RUN mvn dependency:go-offline -B
 
-RUN chmod +x ./mvnw
-RUN ./mvnw dependency:go-offline -B
+# Copy source code
+COPY src ./src
 
-# Copy module sources
-COPY fitness-aggregator-api ./fitness-aggregator-api
+# Build the application JAR
+RUN mvn clean package -DskipTests
 
-WORKDIR /workspace/fitness-aggregator-api
-RUN ../mvnw clean package -DskipTests
+# ---- Runtime stage ----
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+
+# Copy the built JAR from the builder stage
+COPY --from=builder /workspace/target/fitness-aggregator-api.jar app.jar
+
+# Cloud Run sets $PORT automatically
+ENV PORT=8080
+EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
