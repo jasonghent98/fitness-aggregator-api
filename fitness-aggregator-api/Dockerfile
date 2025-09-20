@@ -1,17 +1,21 @@
 # ---- Build stage ----
 FROM eclipse-temurin:21-jdk-alpine AS builder
 
-WORKDIR /app
+WORKDIR /workspace
 
-# Copy Maven wrapper + pom first (better caching)
-COPY mvnw pom.xml ./
-COPY .mvn .mvn
+# Copy Maven wrapper and project files from root
+COPY ../mvnw ../pom.xml ../.mvn/ ./
 
-# Download dependencies (cached unless pom.xml changes)
+# Ensure wrapper is executable
+RUN chmod +x ./mvnw
+
+# Pre-download dependencies
 RUN ./mvnw dependency:go-offline -B
 
-# Copy the source and build
-COPY src src
+# Copy actual app source
+COPY . .
+
+# Build the JAR
 RUN ./mvnw clean package -DskipTests
 
 # ---- Runtime stage ----
@@ -19,8 +23,8 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-# Copy only the built JAR from builder stage
-COPY --from=builder /app/target/fitness-aggregator-api.jar app.jar
+# Copy the JAR from builder
+COPY --from=builder /workspace/target/fitness-aggregator-api.jar app.jar
 
 ENV PORT=8080
 EXPOSE 8080
