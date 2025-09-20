@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/strava/auth/**",
                                 "/api/fitbit/auth/**",
+                                "/api/garmin/auth/**",
                                 "/api/auth/whoami",
                                 "/api/config",
                                 "/actuator/**"

@@ -2,6 +2,7 @@
 CREATE TABLE garmin_daily_summaries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     provider_user_id VARCHAR NOT NULL, -- Garmin userId
+    user_id UUID NOT NULL CONSTRAINT fk_user REFERENCES users(id),
     summary_id VARCHAR(255) NOT NULL,
     calendar_date DATE NOT NULL,
     active_kilocalories INT,
@@ -24,14 +25,16 @@ CREATE TABLE garmin_daily_summaries (
     floors_climbed INT,
     moderate_intensity_duration_in_seconds INT,
     vigorous_intensity_duration_in_seconds INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 -- Garmin Sleep Summary Table
 CREATE TABLE garmin_sleep_summaries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     provider_user_id VARCHAR NOT NULL, -- Garmin userId
+    user_id UUID NOT NULL CONSTRAINT fk_user REFERENCES users(id),
     summary_id VARCHAR(255) NOT NULL,
     calendar_date DATE NOT NULL,
     start_time_in_seconds BIGINT,
@@ -47,7 +50,7 @@ CREATE TABLE garmin_sleep_summaries (
     overall_sleep_score JSONB,
     sleep_scores JSONB,
     naps JSONB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -55,6 +58,7 @@ CREATE TABLE garmin_sleep_summaries (
 CREATE TABLE garmin_stress_summaries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     provider_user_id VARCHAR NOT NULL, -- Garmin userId
+    user_id UUID NOT NULL CONSTRAINT fk_user REFERENCES users(id),
     summary_id VARCHAR(255) NOT NULL,
     calendar_date DATE NOT NULL,
     start_time_in_seconds BIGINT,
@@ -64,7 +68,7 @@ CREATE TABLE garmin_stress_summaries (
     max_stress_level INT,
     stress_details JSONB,
     body_battery_events JSONB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -72,6 +76,7 @@ CREATE TABLE garmin_stress_summaries (
 CREATE TABLE garmin_hrv_summaries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     provider_user_id VARCHAR NOT NULL, -- Garmin userId
+    user_id UUID NOT NULL CONSTRAINT fk_user REFERENCES users(id),
     summary_id VARCHAR(255) NOT NULL,
     calendar_date DATE NOT NULL,
     start_time_in_seconds BIGINT,
@@ -80,7 +85,7 @@ CREATE TABLE garmin_hrv_summaries (
     avg_rmssd DOUBLE PRECISION,
     avg_sdrr DOUBLE PRECISION,
     hrv_details JSONB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -88,6 +93,7 @@ CREATE TABLE garmin_hrv_summaries (
 CREATE TABLE garmin_pulseox_summaries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     provider_user_id VARCHAR NOT NULL, -- Garmin userId
+    user_id UUID NOT NULL CONSTRAINT fk_user REFERENCES users(id),
     summary_id VARCHAR(255) NOT NULL,
     calendar_date DATE NOT NULL,
     start_time_in_seconds BIGINT,
@@ -97,7 +103,7 @@ CREATE TABLE garmin_pulseox_summaries (
     min_spo2 INT,
     max_spo2 INT,
     spo2_samples JSONB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 );
