@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 @Service
@@ -28,6 +29,17 @@ public class UserService {
         if (onCreate != null) onCreate.accept(u);
         return userRepo.save(u);
     }
+
+    /**
+     * Resolves the subscription tier for a given user.
+     * Falls back to "FREE" if no tier is stored.
+     */
+    public String findTierForUser(UUID userId) {
+        return userRepo.findById(userId)
+                .map(User::getSubscriptionTier)
+                .orElse("FREE");
+    }
+
 
     @Transactional
     public User upsertByEmail(String rawEmail) {
