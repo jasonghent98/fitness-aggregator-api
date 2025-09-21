@@ -37,10 +37,10 @@ public class GarminHrvSummaryPayload {
         private Integer startTimeOffsetInSeconds;
 
         @JsonProperty("lastNightAvg")
-        private Double lastNightAvg;
+        private Integer lastNightAvg;
 
         @JsonProperty("lastNight5MinHigh")
-        private Double lastNight5MinHigh;
+        private Integer lastNight5MinHigh;
 
         @JsonProperty("hrvValues")
         private Map<String, Double> hrvValues;  // keys are offset in seconds, values are HRV values

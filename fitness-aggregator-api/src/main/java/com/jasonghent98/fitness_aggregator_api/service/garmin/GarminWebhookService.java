@@ -200,6 +200,11 @@ public class GarminWebhookService {
         model.setLightSleepDurationInSeconds(dto.getSleepSummaries().getFirst().getLightSleepDurationInSeconds());
         model.setRemSleepInSeconds(dto.getSleepSummaries().getFirst().getRemSleepInSeconds());
         model.setAwakeDurationInSeconds(dto.getSleepSummaries().getFirst().getAwakeDurationInSeconds());
+        model.setNaps(dto.getSleepSummaries().getFirst().getNaps());
+        model.setStartTimeInSeconds(dto.getSleepSummaries().getFirst().getStartTimeInSeconds());
+        model.setStartTimeOffsetInSeconds(dto.getSleepSummaries().getFirst().getStartTimeOffsetInSeconds());
+        model.setOverallSleepScore(dto.getSleepSummaries().getFirst().getOverallSleepScore());
+        model.setSleepScores(dto.getSleepSummaries().getFirst().getSleepScores());
         return model;
     }
 
@@ -229,7 +234,7 @@ public class GarminWebhookService {
         model.setCalendarDate(dto.getStressSummaries().getFirst().getCalendarDate());
         model.setTimeOffsetStressLevelValues(dto.getStressSummaries().getFirst().getTimeOffsetStressLevelValues());
         model.setTimeOffsetBodyBatteryValues(dto.getStressSummaries().getFirst().getTimeOffsetBodyBatteryValues());
-        model.setBodyBatteryEvents(dto.getStressSummaries().getFirst().getBodyBatteryActivityEventList());
+        model.setBodyBatteryActivityEvents(dto.getStressSummaries().getFirst().getBodyBatteryActivityEventList());
         return model;
     }
 
@@ -249,8 +254,18 @@ public class GarminWebhookService {
         model.setAverageHeartRate(dto.getDailySummaries().getFirst().getAverageHeartRate());
         model.setMaxHeartRate(dto.getDailySummaries().getFirst().getMaxHeartRate());
         model.setRestingHeartRate(dto.getDailySummaries().getFirst().getRestingHeartRate());
-        model.setHeartRateSamples(dto.getDailySummaries().getFirst().getHeartRateSamples());
-        model.setStressDurations(dto.getDailySummaries().getFirst().getStressDuration());
+        model.setTimeOffsetHeartRateSamples(dto.getDailySummaries().getFirst().getHeartRateSamples());
+        model.setStressDurationInSeconds(dto.getDailySummaries().getFirst().getStressDuration());
+        model.setLowStressDurationInSeconds(dto.getDailySummaries().getFirst().getLowStressDuration());
+        model.setMediumStressDurationInSeconds(dto.getDailySummaries().getFirst().getMediumStressDuration());
+        model.setHighStressDurationInSeconds(dto.getDailySummaries().getFirst().getHighStressDuration());
+        model.setDurationInSeconds(dto.getDailySummaries().getFirst().getDurationInSeconds());
+        model.setActiveTimeInSeconds(dto.getDailySummaries().getFirst().getActiveTimeInSeconds());
+        model.setMaxStressLevel(dto.getDailySummaries().getFirst().getMaxStressLevel());
+        model.setAverageStressLevel(dto.getDailySummaries().getFirst().getAverageStressLevel());
+        model.setFloorsClimbed(dto.getDailySummaries().getFirst().getFloorsClimbed());
+        model.setModerateIntensityDurationInSeconds(dto.getDailySummaries().getFirst().getModerateIntensityDuration());
+        model.setVigorousIntensityDurationInSeconds(dto.getDailySummaries().getFirst().getVigorousIntensityDuration());
         return model;
     }
 
@@ -263,7 +278,7 @@ public class GarminWebhookService {
         model.setStartTimeInSeconds(dto.getPulseOxSummaries().getFirst().getStartTimeInSeconds());
         model.setStartTimeOffsetInSeconds(dto.getPulseOxSummaries().getFirst().getStartTimeOffsetInSeconds());
         model.setDurationInSeconds(dto.getPulseOxSummaries().getFirst().getDurationInSeconds());
-        model.setSpo2Samples(dto.getPulseOxSummaries().getFirst().getSpo2Values());
+        model.setTimeOffsetSpo2Values(dto.getPulseOxSummaries().getFirst().getSpo2Values());
         return model;
     }
 }
