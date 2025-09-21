@@ -26,6 +26,9 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Column
+    private String subscriptionTier;
+
     // handled before just before writes are persisted to DB vis JPA API
     @PrePersist
     void onCreate() {
