@@ -2,11 +2,13 @@ package com.jasonghent98.fitness_aggregator_api.model.garmin;
 
 import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringDoubleMapConverter;
 import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringIntegerMapConverter;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -22,7 +24,7 @@ public class GarminPulseOxSummary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private UUID id;
 
     private String summaryId;
 
@@ -37,7 +39,8 @@ public class GarminPulseOxSummary {
     private Integer startTimeOffsetInSeconds;
     private Integer durationInSeconds;
 
-    @Convert(converter = StringIntegerMapConverter.class)
+    // @Convert(converter = StringIntegerMapConverter.class)
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
-    private Map<String, Integer> spo2Samples;
+    private Map<String, Integer> timeOffsetSpo2Values;
 }

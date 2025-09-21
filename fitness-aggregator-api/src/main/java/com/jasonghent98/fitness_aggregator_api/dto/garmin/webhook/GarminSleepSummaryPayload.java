@@ -2,6 +2,7 @@ package com.jasonghent98.fitness_aggregator_api.dto.garmin.webhook;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jasonghent98.fitness_aggregator_api.model.garmin.GarminSleepSummary;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -74,21 +75,7 @@ public class GarminSleepSummaryPayload {
                 private Map<String, Object> sleepScores;
 
                 @JsonProperty("naps")
-                private List<NapSummary> naps;
+                private List<GarminSleepSummary.NapSummary> naps;
 
-                @Data
-                public static class NapSummary {
-                        @JsonProperty("napDurationInSeconds")
-                        private Integer napDurationInSeconds;
-
-                        @JsonProperty("napStartTimeInSeconds")
-                        private Long napStartTimeInSeconds;
-
-                        @JsonProperty("napValidation")
-                        private String napValidation;
-
-                        @JsonProperty("napOffsetInSeconds")
-                        private Integer napOffsetInSeconds;
-                }
         }
 }

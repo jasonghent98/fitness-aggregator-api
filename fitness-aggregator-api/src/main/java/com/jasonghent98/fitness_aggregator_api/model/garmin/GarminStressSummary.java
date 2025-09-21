@@ -3,12 +3,15 @@ package com.jasonghent98.fitness_aggregator_api.model.garmin;
 import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.BodyBatteryActivityEventListConverter;
 import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringIntegerMapConverter;
 import com.jasonghent98.fitness_aggregator_api.dto.garmin.webhook.GarminStressSummaryPayload;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +27,7 @@ public class GarminStressSummary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private UUID id;
 
     private String summaryId;
 
@@ -39,15 +42,31 @@ public class GarminStressSummary {
     private Integer startTimeOffsetInSeconds;
     private Integer durationInSeconds;
 
-    @Convert(converter = StringIntegerMapConverter.class)
+    // @Convert(converter = StringIntegerMapConverter.class)
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Map<String, Integer> timeOffsetStressLevelValues;
 
-    @Convert(converter = StringIntegerMapConverter.class)
+    // @Convert(converter = StringIntegerMapConverter.class)
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Map<String, Integer> timeOffsetBodyBatteryValues;
 
-    @Convert(converter = BodyBatteryActivityEventListConverter.class)
+    // @Convert(converter = BodyBatteryActivityEventListConverter.class)
+    @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
-    private List<GarminStressSummaryPayload.StressSummary.BodyBatteryActivityEvent> bodyBatteryEvents;
+    private List<GarminStressSummaryPayload.StressSummary.BodyBatteryActivityEvent> bodyBatteryActivityEvents;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
+    @PrePersist
+    void onCreate() {
+        Instant now = Instant.now();
+        createdAt = now;
+        updatedAt = now;
+    }
 }
