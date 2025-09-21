@@ -1,8 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.model.garmin;
 
 
-import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringDoubleMapConverter;
-import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringIntegerMapConverter;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -43,7 +41,6 @@ public class GarminHrvSummary {
     private Integer lastNightAvg;
     private Integer lastNight5MinHigh;
 
-    // @Convert(converter = StringDoubleMapConverter.class)
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Map<String, Double> hrvValues; // store offset→value as JSON
