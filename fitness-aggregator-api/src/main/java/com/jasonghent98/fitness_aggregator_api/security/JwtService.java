@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.*;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jasonghent98.fitness_aggregator_api.config.JwtConfig;
+import com.jasonghent98.fitness_aggregator_api.context.UserContextResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -34,28 +35,32 @@ public class JwtService {
         this.alg = Algorithm.HMAC256(cfg.getSecret());
     }
 
-    public String mintSession(UUID userId) {
+    public String mintSession(UUID userId, String tier) {
         Instant now = Instant.now();
         Instant exp = now.plus(Duration.ofDays(cfg.getTtlDays()));
         return JWT.create()
                 .withIssuer(cfg.getIssuer())
                 .withSubject(userId.toString())
+                .withClaim("tier", tier)
                 .withIssuedAt(Date.from(now))
                 .withExpiresAt(Date.from(exp))
                 .sign(alg);
     }
 
-    public Optional<UUID> verifySession(String token) {
+    public Optional<SessionInfo> verifySession(String token) {
         try {
             DecodedJWT jwt = JWT.require(alg)
-                    .withIssuer(cfg.getIssuer())   // must match what you used in mint()
-                    .acceptLeeway(60)              // tolerate small clock skew
+                    .withIssuer(cfg.getIssuer())
+                    .acceptLeeway(60)
                     .build()
                     .verify(token);
 
             String sub = jwt.getSubject();
-            UUID userId = UUID.fromString(sub); // will throw if not a UUID
-            return Optional.of(userId);
+            UUID userId = UUID.fromString(sub);
+
+            String tier = jwt.getClaim("tier").asString();
+
+            return Optional.of(new SessionInfo(userId, tier));
 
         } catch (TokenExpiredException e) {
             log.warn("JWT expired at {}", e.getExpiredOn());
@@ -135,4 +140,7 @@ public class JwtService {
     public String headerName() {
         return HttpHeaders.SET_COOKIE;
     }
+
+    // small dto for verifyToken
+    public record SessionInfo(UUID userId, String tier) {}
 }
