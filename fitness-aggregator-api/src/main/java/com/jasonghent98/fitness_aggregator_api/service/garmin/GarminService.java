@@ -1,7 +1,7 @@
 package com.jasonghent98.fitness_aggregator_api.service.garmin;
 
-import com.jasonghent98.fitness_aggregator_api.model.garmin.GarminSleepSummary;
-import com.jasonghent98.fitness_aggregator_api.repository.garmin.GarminSleepRepository;
+import com.jasonghent98.fitness_aggregator_api.model.garmin.*;
+import com.jasonghent98.fitness_aggregator_api.repository.garmin.*;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -13,9 +13,23 @@ import java.util.Map;
 public class GarminService {
 
     private final GarminSleepRepository garminSleepRepo;
+    private final GarminStressRepository garminStressRepo;
+    private final GarminHrvRepository garminHrvRepo;
+    private final GarminDailyRepository garminDailyRepo;
+    private final GarminPulseOxRepository garminPulseOxRepo;
 
-    GarminService(GarminSleepRepository garminSleepRepo) {
+    GarminService(
+            GarminSleepRepository garminSleepRepo,
+            GarminStressRepository garminStressRepo,
+            GarminHrvRepository garminHrvRepo,
+            GarminDailyRepository garminDailyRepo,
+            GarminPulseOxRepository garminPulseOxRepo
+    ) {
         this.garminSleepRepo = garminSleepRepo;
+        this.garminStressRepo = garminStressRepo;
+        this.garminHrvRepo = garminHrvRepo;
+        this.garminDailyRepo = garminDailyRepo;
+        this.garminPulseOxRepo = garminPulseOxRepo;
     }
 
     public List<Map<String, Object>> getActivities(int page, int size, Instant since) {
@@ -31,6 +45,7 @@ public class GarminService {
         // TODO: soft deactivate ProviderAccount
     }
 
+    /** Returns sleep data for user for given range */
     public List<GarminSleepSummary> getSleepForUserForGivenRange(
             String userId,
             LocalDate startDate,
@@ -39,7 +54,45 @@ public class GarminService {
         return garminSleepRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
     }
 
-    // local dto for getSleepForUserForGivenRange
+    /** Returns stress data for user for given range */
+    public List<GarminStressSummary> getStressForUserForGivenRange(
+            String userId,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        return garminStressRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
+    }
+
+
+    /** Returns hrv data for user for given range */
+    public List<GarminHrvSummary> getHrvForUserForGivenRange(
+            String userId,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        return garminHrvRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
+    }
+
+    /** Returns daily data for user for given range */
+    public List<GarminDailySummary> getDailyForUserForGivenRange(
+            String userId,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        return garminDailyRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
+    }
+
+    /** Returns pulse ox data for user for given range */
+    public List<GarminPulseOxSummary> getPulseOxForUserForGivenRange(
+            String userId,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        return garminPulseOxRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
+    }
+
+
+    /** Resolves range or start/end date depending on what time frame user wants for data */
     public DateRange resolveRange(String range, LocalDate startDate, LocalDate endDate, int maxDays) {
         LocalDate today = LocalDate.now();
 
@@ -65,5 +118,6 @@ public class GarminService {
         return new DateRange(today.minusDays(maxDays), today);
     }
 
+    /** Local dto for getSleepForUserForGivenRange */
     public record DateRange(LocalDate start, LocalDate end) {}
 }
