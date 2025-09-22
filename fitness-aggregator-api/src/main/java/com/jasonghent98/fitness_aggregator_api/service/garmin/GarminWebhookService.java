@@ -7,6 +7,10 @@ import com.jasonghent98.fitness_aggregator_api.repository.garmin.*;
 import com.jasonghent98.fitness_aggregator_api.service.ProviderAccountService;
 import com.jasonghent98.fitness_aggregator_api.util.WebhookLogger;
 import com.jasonghent98.fitness_aggregator_api.util.WebhookValidator;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -24,12 +28,14 @@ public class GarminWebhookService {
     private final GarminStressRepository garminStressRepo;
     private final GarminHrvRepository garminHrvRepo;
     private final GarminPulseOxRepository garminPulseOxRepo;
+    private final GarminActivityRepository garminActivityRepo;
     private final ProviderAccountService providerAccountService;
     private static final String GARMIN_SLEEP_EVENT = "Garmin Sleep Summary";
     private static final String GARMIN_STRESS_EVENT = "Garmin Stress Summary";
     private static final String GARMIN_HRV_EVENT = "Garmin HRV Summary";
     private static final String GARMIN_PULSE_OX_EVENT = "Garmin Pulse Ox Summary";
     private static final String GARMIN_DAILY_EVENT = "Garmin Daily Summary";
+    private static final String GARMIN_ACTIVITY_EVENT = "Garmin Activity Summary";
 
 
     GarminWebhookService(
@@ -38,14 +44,42 @@ public class GarminWebhookService {
             GarminStressRepository garminStressRepo,
             GarminHrvRepository garminHrvRepo,
             GarminPulseOxRepository garminPulseOxRepo,
-            ProviderAccountService providerAccountService
+            ProviderAccountService providerAccountService,
+            GarminActivityRepository garminActivityRepo
     ) {
         this.garminDailyRepo = garminDailyRepo;
         this.garminSleepRepo = garminSleepRepo;
         this.garminStressRepo = garminStressRepo;
         this.garminHrvRepo = garminHrvRepo;
         this.garminPulseOxRepo = garminPulseOxRepo;
+        this.garminActivityRepo = garminActivityRepo;
         this.providerAccountService = providerAccountService;
+    }
+
+    @Async
+    public void handleActivityEvents(GarminActivitySummaryPayload payload) {
+        try {
+            WebhookValidator.requireNonEmpty(payload, GARMIN_ACTIVITY_EVENT);
+            WebhookLogger.logWebhookEvent(
+                    log,
+                    GARMIN_ACTIVITY_EVENT,
+                    payload,
+                    p -> GARMIN_ACTIVITY_EVENT + ": " + p
+            );
+            // get the provider user id to our platform user id to store for faster retrievals
+            ProviderAccount garminAcc = providerAccountService.getProviderAccountForUserAndProvider(
+                    "garmin",
+                    payload.getUserId()
+            );
+            UUID userId = garminAcc.getUser().getId();
+            // persist
+            GarminActivitySummary persist = mapActivityPayload(payload, userId);
+            garminActivityRepo.save(persist);
+
+        } catch (Exception e) {
+            log.error("Error persisting Garmin Daily payload", e);
+            // Optional: persist to a dead-letter table for later retry
+        }
     }
 
     @Async
@@ -186,6 +220,46 @@ public class GarminWebhookService {
         } catch (Exception e) {
             log.error("Error persisting Garmin Stress payloads", e);
         }
+    }
+
+
+    private GarminActivitySummary mapActivityPayload(GarminActivitySummaryPayload dto, UUID actualizeUserId) {
+        GarminActivitySummary model = new GarminActivitySummary();
+        model.setUserId(dto.getUserId());
+        model.setActualizeUserId(actualizeUserId);
+        model.setSummaryId(dto.getSummaryId());
+        model.setActivityName(dto.getActivityName());
+        model.setActivityType(dto.getActivityType());
+        model.setActivityDescription(dto.getActivityDescription());
+        model.setDurationInSeconds(dto.getDurationInSeconds());
+        model.setStartTimeInSeconds(dto.getStartTimeInSeconds());
+        model.setStartTimeOffsetInSeconds(dto.getStartTimeOffsetInSeconds());
+        model.setAverageBikeCadenceInRoundsPerMinute(dto.getAverageBikeCadenceInRoundsPerMinute());
+        model.setAverageHeartRateInBeatsPerMinute(dto.getAverageHeartRateInBeatsPerMinute());
+        model.setAverageRunCadenceInStepsPerMinute(dto.getAverageRunCadenceInStepsPerMinute());
+        model.setAveragePushCadenceInPushesPerMinute(dto.getAveragePushCadenceInPushesPerMinute());
+        model.setAverageSpeedInMetersPerSecond(dto.getAverageSpeedInMetersPerSecond());
+        model.setActivityType(dto.getActivityType());
+        model.setAverageSwimCadenceInStrokesPerMinute(dto.getAverageSwimCadenceInStrokesPerMinute());
+        model.setAveragePaceInMinutesPerKilometer(dto.getAveragePaceInMinutesPerKilometer());
+        model.setActiveKilocalories(dto.getActiveKilocalories());
+        model.setDistanceInMeters(dto.getDistanceInMeters());
+        model.setDeviceName(dto.getDeviceName());
+        model.setMaxBikeCadenceInRoundsPerMinute(dto.getMaxBikeCadenceInRoundsPerMinute());
+        model.setMaxHeartRateInBeatsPerMinute(dto.getMaxHeartRateInBeatsPerMinute());
+        model.setMaxPaceInMinutesPerKilometer(dto.getMaxPaceInMinutesPerKilometer());
+        model.setMaxRunCadenceInStepsPerMinute(dto.getMaxRunCadenceInStepsPerMinute());
+        model.setMaxPushCadenceInPushesPerMinute(dto.getMaxPushCadenceInPushesPerMinute());
+        model.setMaxSpeedInMetersPerSecond(dto.getMaxSpeedInMetersPerSecond());
+        model.setStartingLatitudeInDegree(dto.getStartingLatitudeInDegree());
+        model.setStartingLongitudeInDegree(dto.getStartingLongitudeInDegree());
+        model.setSteps(dto.getSteps());
+        model.setPushes(dto.getPushes());
+        model.setTotalElevationGainInMeters(dto.getTotalElevationGainInMeters());
+        model.setTotalElevationLossInMeters(dto.getTotalElevationLossInMeters());
+        model.setManual(dto.getManual());
+        model.setIsWebUpload(dto.getIsWebUpload());
+        return model;
     }
 
 

@@ -1,4 +1,4 @@
-package com.jasonghent98.fitness_aggregator_api.dto.garmin;
+package com.jasonghent98.fitness_aggregator_api.dto.garmin.webhook;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
