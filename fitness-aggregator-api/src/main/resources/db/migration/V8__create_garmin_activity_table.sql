@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS garmin_activities (
     -- Garmin-specific identifiers
     summary_id TEXT,
     activity_id BIGINT NOT NULL,
+    calendar_date DATE NOT NULL,
 
     -- Activity metadata
     activity_name TEXT,
