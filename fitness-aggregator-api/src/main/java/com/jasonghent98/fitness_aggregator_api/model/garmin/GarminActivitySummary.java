@@ -1,7 +1,13 @@
 package com.jasonghent98.fitness_aggregator_api.model.garmin;
 
+import com.jasonghent98.fitness_aggregator_api.dto.garmin.webhook.GarminActivitySummaryPayload;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Type;
+
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -23,6 +29,7 @@ public class GarminActivitySummary {
     private UUID actualizeUserId;
 
     private String summaryId;
+    private LocalDate calendarDate;
 
     @Column(unique = true)
     private Long activityId;
@@ -71,4 +78,10 @@ public class GarminActivitySummary {
 
     private Boolean manual;
     private Boolean isWebUpload;
+
+    /*
+    @Type(JsonType.class)
+    @Column(columnDefinition = "jsonb")
+    private List<GarminActivitySummaryPayload.ActivityLap> laps;
+     */
 }

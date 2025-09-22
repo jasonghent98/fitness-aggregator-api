@@ -2,12 +2,10 @@ package com.jasonghent98.fitness_aggregator_api.repository.garmin;
 
 import com.jasonghent98.fitness_aggregator_api.model.garmin.GarminActivitySummary;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Repository
 public interface GarminActivityRepository extends JpaRepository<GarminActivitySummary, Long> {
 
     /**
