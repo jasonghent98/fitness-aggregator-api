@@ -1,23 +1,44 @@
-package com.jasonghent98.fitness_aggregator_api.dto.garmin;
+package com.jasonghent98.fitness_aggregator_api.model.garmin;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
+import java.util.UUID;
 
+@Entity
+@Table(name = "garmin_activities")
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class GarminActivitySummaryPayload {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class GarminActivitySummary {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id; // internal primary key
+
+    @Column(name = "provider_user_id", nullable = false)
     private String userId;
+
+    @Column(name = "user_id", nullable = false)
+    private UUID actualizeUserId;
+
     private String summaryId;
+
+    @Column(unique = true)
     private Long activityId;
+
     private String activityName;
     private String activityDescription;
+
+
     private Boolean isParent;
+
     private String parentSummaryId;
 
     private Integer durationInSeconds;
     private Long startTimeInSeconds;
     private Integer startTimeOffsetInSeconds;
+
     private String activityType;
 
     private Double averageBikeCadenceInRoundsPerMinute;

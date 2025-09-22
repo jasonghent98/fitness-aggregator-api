@@ -22,6 +22,25 @@ public class GarminController {
         this.userContextResolver = userContextResolver;
     }
 
+    // Activity data
+    @GetMapping("/activity")
+    public ResponseEntity<List<GarminActivitySummary>> getGarminActivity(
+            @RequestParam(required = false) String range,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate
+    ) {
+
+
+        UUID userId = UserContext.getUserId();
+        String subTier = userContextResolver.getSubscriptionTier();
+
+        int maxDays = subTier.equalsIgnoreCase("ENHANCED") ? 90 : (subTier.equalsIgnoreCase("ELITE") ? 365 : 30);
+        GarminService.DateRange window = garminService.resolveRange(range, startDate, endDate, maxDays);
+
+        List<GarminActivitySummary> results = garminService.getActivityForUserForGivenRange(userId.toString(), window.start(), window.end());
+        return ResponseEntity.ok(results);
+    }
+
 
     // Sleep data
     @GetMapping("/sleep")

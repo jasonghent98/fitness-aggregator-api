@@ -17,25 +17,24 @@ public class GarminService {
     private final GarminHrvRepository garminHrvRepo;
     private final GarminDailyRepository garminDailyRepo;
     private final GarminPulseOxRepository garminPulseOxRepo;
+    private final GarminActivityRepository garminActivityRepo;
 
     GarminService(
             GarminSleepRepository garminSleepRepo,
             GarminStressRepository garminStressRepo,
             GarminHrvRepository garminHrvRepo,
             GarminDailyRepository garminDailyRepo,
-            GarminPulseOxRepository garminPulseOxRepo
+            GarminPulseOxRepository garminPulseOxRepo,
+            GarminActivityRepository garminActivityRepo
     ) {
         this.garminSleepRepo = garminSleepRepo;
         this.garminStressRepo = garminStressRepo;
         this.garminHrvRepo = garminHrvRepo;
         this.garminDailyRepo = garminDailyRepo;
         this.garminPulseOxRepo = garminPulseOxRepo;
+        this.garminActivityRepo = garminActivityRepo;
     }
 
-    public List<Map<String, Object>> getActivities(int page, int size, Instant since) {
-        // TODO: return paginated DB results
-        return List.of();
-    }
 
     public void triggerSync(String mode) {
         // TODO: enqueue a sync job (recent vs full backfill)
@@ -43,6 +42,15 @@ public class GarminService {
 
     public void disconnect() {
         // TODO: soft deactivate ProviderAccount
+    }
+
+    /** Returns activity data for user for given range */
+    public List<GarminActivitySummary> getActivityForUserForGivenRange(
+            String userId,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        return garminActivityRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
     }
 
     /** Returns sleep data for user for given range */
