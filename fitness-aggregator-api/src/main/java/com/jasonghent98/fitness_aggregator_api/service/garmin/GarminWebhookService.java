@@ -7,15 +7,14 @@ import com.jasonghent98.fitness_aggregator_api.repository.garmin.*;
 import com.jasonghent98.fitness_aggregator_api.service.ProviderAccountService;
 import com.jasonghent98.fitness_aggregator_api.util.WebhookLogger;
 import com.jasonghent98.fitness_aggregator_api.util.WebhookValidator;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 
@@ -69,15 +68,15 @@ public class GarminWebhookService {
             // get the provider user id to our platform user id to store for faster retrievals
             ProviderAccount garminAcc = providerAccountService.getProviderAccountForUserAndProvider(
                     "garmin",
-                    payload.getUserId()
+                    payload.getActivitySummary().getFirst().getUserId()
             );
             UUID userId = garminAcc.getUser().getId();
             // persist
-            GarminActivitySummary persist = mapActivityPayload(payload, userId);
-            garminActivityRepo.save(persist);
+           GarminActivitySummary persist = mapActivityPayload(payload, userId);
+           garminActivityRepo.save(persist);
 
         } catch (Exception e) {
-            log.error("Error persisting Garmin Daily payload", e);
+            log.error("Error persisting Garmin Activity payload", e);
             // Optional: persist to a dead-letter table for later retry
         }
     }
@@ -222,43 +221,49 @@ public class GarminWebhookService {
         }
     }
 
-
     private GarminActivitySummary mapActivityPayload(GarminActivitySummaryPayload dto, UUID actualizeUserId) {
         GarminActivitySummary model = new GarminActivitySummary();
-        model.setUserId(dto.getUserId());
+        model.setUserId(dto.getActivitySummary().getFirst().getUserId());
         model.setActualizeUserId(actualizeUserId);
-        model.setSummaryId(dto.getSummaryId());
-        model.setActivityName(dto.getActivityName());
-        model.setActivityType(dto.getActivityType());
-        model.setActivityDescription(dto.getActivityDescription());
-        model.setDurationInSeconds(dto.getDurationInSeconds());
-        model.setStartTimeInSeconds(dto.getStartTimeInSeconds());
-        model.setStartTimeOffsetInSeconds(dto.getStartTimeOffsetInSeconds());
-        model.setAverageBikeCadenceInRoundsPerMinute(dto.getAverageBikeCadenceInRoundsPerMinute());
-        model.setAverageHeartRateInBeatsPerMinute(dto.getAverageHeartRateInBeatsPerMinute());
-        model.setAverageRunCadenceInStepsPerMinute(dto.getAverageRunCadenceInStepsPerMinute());
-        model.setAveragePushCadenceInPushesPerMinute(dto.getAveragePushCadenceInPushesPerMinute());
-        model.setAverageSpeedInMetersPerSecond(dto.getAverageSpeedInMetersPerSecond());
-        model.setActivityType(dto.getActivityType());
-        model.setAverageSwimCadenceInStrokesPerMinute(dto.getAverageSwimCadenceInStrokesPerMinute());
-        model.setAveragePaceInMinutesPerKilometer(dto.getAveragePaceInMinutesPerKilometer());
-        model.setActiveKilocalories(dto.getActiveKilocalories());
-        model.setDistanceInMeters(dto.getDistanceInMeters());
-        model.setDeviceName(dto.getDeviceName());
-        model.setMaxBikeCadenceInRoundsPerMinute(dto.getMaxBikeCadenceInRoundsPerMinute());
-        model.setMaxHeartRateInBeatsPerMinute(dto.getMaxHeartRateInBeatsPerMinute());
-        model.setMaxPaceInMinutesPerKilometer(dto.getMaxPaceInMinutesPerKilometer());
-        model.setMaxRunCadenceInStepsPerMinute(dto.getMaxRunCadenceInStepsPerMinute());
-        model.setMaxPushCadenceInPushesPerMinute(dto.getMaxPushCadenceInPushesPerMinute());
-        model.setMaxSpeedInMetersPerSecond(dto.getMaxSpeedInMetersPerSecond());
-        model.setStartingLatitudeInDegree(dto.getStartingLatitudeInDegree());
-        model.setStartingLongitudeInDegree(dto.getStartingLongitudeInDegree());
-        model.setSteps(dto.getSteps());
-        model.setPushes(dto.getPushes());
-        model.setTotalElevationGainInMeters(dto.getTotalElevationGainInMeters());
-        model.setTotalElevationLossInMeters(dto.getTotalElevationLossInMeters());
-        model.setManual(dto.getManual());
-        model.setIsWebUpload(dto.getIsWebUpload());
+        model.setSummaryId(dto.getActivitySummary().getFirst().getSummaryId());
+        model.setActivityName(dto.getActivitySummary().getFirst().getActivityName());
+        model.setActivityType(dto.getActivitySummary().getFirst().getActivityType());
+        model.setActivityDescription(dto.getActivitySummary().getFirst().getActivityDescription());
+        model.setDurationInSeconds(dto.getActivitySummary().getFirst().getDurationInSeconds());
+        model.setStartTimeInSeconds(dto.getActivitySummary().getFirst().getStartTimeInSeconds());
+        model.setStartTimeOffsetInSeconds(dto.getActivitySummary().getFirst().getStartTimeOffsetInSeconds());
+        model.setAverageBikeCadenceInRoundsPerMinute(dto.getActivitySummary().getFirst().getAverageBikeCadenceInRoundsPerMinute());
+        model.setAverageHeartRateInBeatsPerMinute(dto.getActivitySummary().getFirst().getAverageHeartRateInBeatsPerMinute());
+        model.setAverageRunCadenceInStepsPerMinute(dto.getActivitySummary().getFirst().getAverageRunCadenceInStepsPerMinute());
+        model.setAveragePushCadenceInPushesPerMinute(dto.getActivitySummary().getFirst().getAveragePushCadenceInPushesPerMinute());
+        model.setAverageSpeedInMetersPerSecond(dto.getActivitySummary().getFirst().getAverageSpeedInMetersPerSecond());
+        model.setActivityType(dto.getActivitySummary().getFirst().getActivityType());
+        model.setAverageSwimCadenceInStrokesPerMinute(dto.getActivitySummary().getFirst().getAverageSwimCadenceInStrokesPerMinute());
+        model.setAveragePaceInMinutesPerKilometer(dto.getActivitySummary().getFirst().getAveragePaceInMinutesPerKilometer());
+        model.setActiveKilocalories(dto.getActivitySummary().getFirst().getActiveKilocalories());
+        model.setDistanceInMeters(dto.getActivitySummary().getFirst().getDistanceInMeters());
+        model.setDeviceName(dto.getActivitySummary().getFirst().getDeviceName());
+        model.setMaxBikeCadenceInRoundsPerMinute(dto.getActivitySummary().getFirst().getMaxBikeCadenceInRoundsPerMinute());
+        model.setMaxHeartRateInBeatsPerMinute(dto.getActivitySummary().getFirst().getMaxHeartRateInBeatsPerMinute());
+        model.setMaxPaceInMinutesPerKilometer(dto.getActivitySummary().getFirst().getMaxPaceInMinutesPerKilometer());
+        model.setMaxRunCadenceInStepsPerMinute(dto.getActivitySummary().getFirst().getMaxRunCadenceInStepsPerMinute());
+        model.setMaxPushCadenceInPushesPerMinute(dto.getActivitySummary().getFirst().getMaxPushCadenceInPushesPerMinute());
+        model.setMaxSpeedInMetersPerSecond(dto.getActivitySummary().getFirst().getMaxSpeedInMetersPerSecond());
+        model.setStartingLatitudeInDegree(dto.getActivitySummary().getFirst().getStartingLatitudeInDegree());
+        model.setStartingLongitudeInDegree(dto.getActivitySummary().getFirst().getStartingLongitudeInDegree());
+        model.setSteps(dto.getActivitySummary().getFirst().getSteps());
+        model.setPushes(dto.getActivitySummary().getFirst().getPushes());
+        model.setTotalElevationGainInMeters(dto.getActivitySummary().getFirst().getTotalElevationGainInMeters());
+        model.setTotalElevationLossInMeters(dto.getActivitySummary().getFirst().getTotalElevationLossInMeters());
+        model.setManual(dto.getActivitySummary().getFirst().getManual());
+        model.setIsWebUpload(dto.getActivitySummary().getFirst().getIsWebUpload());
+
+        // model.setLaps(dto.getActivitySummary().getFirst().getLap);
+        // persist the utc timestamp to Local Date type for easier querying
+
+        Instant instant = Instant.ofEpochSecond(dto.getActivitySummary().getFirst().getStartTimeInSeconds());
+        LocalDate calendarDate = instant.atZone(ZoneOffset.UTC).toLocalDate();
+        model.setCalendarDate(calendarDate);
         return model;
     }
 

@@ -1,7 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.dto.garmin.webhook;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
