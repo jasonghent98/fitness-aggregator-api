@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS garmin_activities (
     duration_in_seconds INT,
     start_time_in_seconds BIGINT,
     start_time_offset_in_seconds INT,
+    number_of_active_lengths INT,
 
     -- Type + device
     activity_type TEXT,

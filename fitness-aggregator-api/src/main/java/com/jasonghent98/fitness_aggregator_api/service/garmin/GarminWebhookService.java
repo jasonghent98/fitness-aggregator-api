@@ -225,6 +225,7 @@ public class GarminWebhookService {
         GarminActivitySummary model = new GarminActivitySummary();
         model.setUserId(dto.getActivitySummary().getFirst().getUserId());
         model.setActualizeUserId(actualizeUserId);
+        model.setActivityId(dto.getActivitySummary().getFirst().getActivityId());
         model.setSummaryId(dto.getActivitySummary().getFirst().getSummaryId());
         model.setActivityName(dto.getActivitySummary().getFirst().getActivityName());
         model.setActivityType(dto.getActivitySummary().getFirst().getActivityType());
