@@ -1,7 +1,5 @@
 package com.jasonghent98.fitness_aggregator_api.model.garmin;
 
-import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringDoubleMapConverter;
-import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringIntegerMapConverter;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,7 +37,6 @@ public class GarminPulseOxSummary {
     private Integer startTimeOffsetInSeconds;
     private Integer durationInSeconds;
 
-    // @Convert(converter = StringIntegerMapConverter.class)
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Map<String, Integer> timeOffsetSpo2Values;

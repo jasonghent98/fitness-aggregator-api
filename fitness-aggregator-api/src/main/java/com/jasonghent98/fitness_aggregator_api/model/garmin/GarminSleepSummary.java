@@ -1,8 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.model.garmin;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringIntegerMapConverter;
-import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringObjectMapConverter;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;

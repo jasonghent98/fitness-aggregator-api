@@ -1,7 +1,5 @@
 package com.jasonghent98.fitness_aggregator_api.model.garmin;
 
-import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.BodyBatteryActivityEventListConverter;
-import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringIntegerMapConverter;
 import com.jasonghent98.fitness_aggregator_api.dto.garmin.webhook.GarminStressSummaryPayload;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
@@ -42,17 +40,14 @@ public class GarminStressSummary {
     private Integer startTimeOffsetInSeconds;
     private Integer durationInSeconds;
 
-    // @Convert(converter = StringIntegerMapConverter.class)
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Map<String, Integer> timeOffsetStressLevelValues;
 
-    // @Convert(converter = StringIntegerMapConverter.class)
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Map<String, Integer> timeOffsetBodyBatteryValues;
 
-    // @Convert(converter = BodyBatteryActivityEventListConverter.class)
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private List<GarminStressSummaryPayload.StressSummary.BodyBatteryActivityEvent> bodyBatteryActivityEvents;

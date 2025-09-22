@@ -1,26 +1,16 @@
-# ---- Build stage ----
-FROM maven:3.9.9-eclipse-temurin-21 AS builder
-WORKDIR /workspace
-
-# Copy pom.xml first to leverage dependency caching
-COPY pom.xml ./
-RUN mvn dependency:go-offline -B
-
-# Copy source code
-COPY src ./src
-
-# Build the application JAR
-RUN mvn clean package -DskipTests
-
-# ---- Runtime stage ----
+# Use a lightweight JRE base image for Java 21
 FROM eclipse-temurin:21-jre-alpine
+
+# Set working directory
 WORKDIR /app
 
-# Copy the built JAR from the builder stage
-COPY --from=builder /workspace/target/fitness-aggregator-api.jar app.jar
+# Copy the built jar file into the container
+COPY target/fitness-aggregator-api.jar app.jar
 
-# Cloud Run sets $PORT automatically
+# Cloud Run sends traffic to this env var ($PORT)
 ENV PORT=8080
+
+# Expose the port (optional, Cloud Run sets it automatically)
 EXPOSE 8080
 
 # Run the application

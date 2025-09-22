@@ -1,6 +1,5 @@
 package com.jasonghent98.fitness_aggregator_api.model.garmin;
 
-import com.jasonghent98.fitness_aggregator_api.config.persistance.converter.StringIntegerMapConverter;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -62,7 +61,6 @@ public class GarminDailySummary {
     private Integer maxHeartRate;
     private Integer restingHeartRate;
 
-    // @Convert(converter = StringIntegerMapConverter.class)
     @Type(JsonType.class)
     @Column(columnDefinition = "jsonb")
     private Map<String, Integer> timeOffsetHeartRateSamples;
