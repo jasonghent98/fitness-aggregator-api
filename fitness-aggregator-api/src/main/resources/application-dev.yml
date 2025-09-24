@@ -31,3 +31,7 @@ jwt:
 auth:
   magic:
     ttl-minutes: ${AUTH_MAGIC_TTL_MINUTES}
+aws:
+  ses:
+    region: ${AWS_SES_REGION}
+    host: ${AWS_SES_HOST}
