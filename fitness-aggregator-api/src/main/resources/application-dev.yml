@@ -35,3 +35,4 @@ aws:
   ses:
     region: ${AWS_SES_REGION}
     host: ${AWS_SES_HOST}
+    from-email: ${AWS_SES_FROM_EMAIL}
