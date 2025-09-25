@@ -25,9 +25,9 @@ public class GarminController {
     // Activity data
     @GetMapping("/activity")
     public ResponseEntity<List<GarminActivitySummary>> getGarminActivity(
-            @RequestParam(required = false) String range,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate
+            @RequestParam(name = "range", required = false) String range,
+            @RequestParam(name = "startDate", required = false) LocalDate startDate,
+            @RequestParam(name = "endDate", required = false) LocalDate endDate
     ) {
 
 
