@@ -19,15 +19,20 @@ public class UserService {
     }
 
     @Transactional
-    public User upsertByEmail(String rawEmail, Consumer<User> onCreate) {
+    public User upsertByEmail(String rawEmail) {
         String email = normalize(rawEmail);
-        Optional<User> existing = userRepo.findByEmailIgnoreCase(email);
-        if (existing.isPresent()) return existing.get();
-
-        User u = new User();
-        u.setEmail(email);
-        if (onCreate != null) onCreate.accept(u);
-        return userRepo.save(u);
+        return userRepo.findByEmailIgnoreCase(email)
+                .map(existing -> {
+                    // Apply updates if needed
+                    return userRepo.save(existing);
+                })
+                .orElseGet(() -> {
+                    // Create new user
+                    User u = new User();
+                    u.setEmail(email);
+                    u.setSubscriptionTier("FREE");
+                    return userRepo.save(u);
+                });
     }
 
     /**
@@ -40,11 +45,6 @@ public class UserService {
                 .orElse("FREE");
     }
 
-
-    @Transactional
-    public User upsertByEmail(String rawEmail) {
-        return upsertByEmail(rawEmail, null);
-    }
 
     private String normalize(String e) {
         if (e == null) throw new IllegalArgumentException("email is required");

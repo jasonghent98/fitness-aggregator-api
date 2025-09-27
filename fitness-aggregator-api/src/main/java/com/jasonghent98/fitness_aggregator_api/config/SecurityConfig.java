@@ -24,12 +24,13 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // keep routes open during dev; your controllers decide what to return
+                        .requestMatchers("/api/fitbit/**").permitAll()
                         .requestMatchers("/api/strava/webhook", "/api/strava/webhook/**").permitAll()
                         .requestMatchers("/api/auth/magic/**").permitAll()
                         .requestMatchers(
                                 "/api/strava/auth/**",
-                                "/api/fitbit/auth/**",
-                                "/api/garmin/auth/**",
+                                "/api/fitbit/**",
+                                "/api/garmin/**",
                                 "/api/auth/whoami",
                                 "/api/config",
                                 "/actuator/**"
