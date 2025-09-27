@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class GarminService {
@@ -46,57 +47,57 @@ public class GarminService {
 
     /** Returns activity data for user for given range */
     public List<GarminActivitySummary> getActivityForUserForGivenRange(
-            String userId,
+            UUID userId,
             LocalDate startDate,
             LocalDate endDate
     ) {
-        return garminActivityRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
+        return garminActivityRepo.findByActualizeUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
     }
 
     /** Returns sleep data for user for given range */
     public List<GarminSleepSummary> getSleepForUserForGivenRange(
-            String userId,
+            UUID userId,
             LocalDate startDate,
             LocalDate endDate
     ) {
-        return garminSleepRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
+        return garminSleepRepo.findByActualizeUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
     }
 
     /** Returns stress data for user for given range */
     public List<GarminStressSummary> getStressForUserForGivenRange(
-            String userId,
+            UUID userId,
             LocalDate startDate,
             LocalDate endDate
     ) {
-        return garminStressRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
+        return garminStressRepo.findByActualizeUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
     }
 
 
     /** Returns hrv data for user for given range */
     public List<GarminHrvSummary> getHrvForUserForGivenRange(
-            String userId,
+            UUID userId,
             LocalDate startDate,
             LocalDate endDate
     ) {
-        return garminHrvRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
+        return garminHrvRepo.findByActualizeUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
     }
 
     /** Returns daily data for user for given range */
     public List<GarminDailySummary> getDailyForUserForGivenRange(
-            String userId,
+            UUID userId,
             LocalDate startDate,
             LocalDate endDate
     ) {
-        return garminDailyRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
+        return garminDailyRepo.findByActualizeUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
     }
 
     /** Returns pulse ox data for user for given range */
     public List<GarminPulseOxSummary> getPulseOxForUserForGivenRange(
-            String userId,
+            UUID userId,
             LocalDate startDate,
             LocalDate endDate
     ) {
-        return garminPulseOxRepo.findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
+        return garminPulseOxRepo.findByActualizeUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(userId, startDate, endDate);
     }
 
 
