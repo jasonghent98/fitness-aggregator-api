@@ -12,9 +12,6 @@ public class EmailService {
 
     private final SesClient sesClient;
 
-    @Value("${aws.ses.source}")
-    private String sourceEmail;
-
     @Value("${aws.ses.from-email}")
     private String fromEmail;
 
@@ -24,7 +21,7 @@ public class EmailService {
 
     /** Sends asynchronous emails related to app-related events (i.e. billing, authentication, etc.) */
     @Async
-    public void sendEmail(String to, String subject, String bodyHtml, String bodyText) {
+    public void sendEmail(String to, String subject, String bodyHtml) {
 
         Destination destination = Destination.builder()
                 .toAddresses(to)
@@ -35,10 +32,6 @@ public class EmailService {
                 .charset("UTF-8")
                 .build();
 
-        Content textContent = Content.builder()
-                .data(bodyText)
-                .charset("UTF-8")
-                .build();
 
         Content htmlContent = Content.builder()
                 .data(bodyHtml)
@@ -46,7 +39,6 @@ public class EmailService {
                 .build();
 
         Body body = Body.builder()
-                .text(textContent)
                 .html(htmlContent)
                 .build();
 
