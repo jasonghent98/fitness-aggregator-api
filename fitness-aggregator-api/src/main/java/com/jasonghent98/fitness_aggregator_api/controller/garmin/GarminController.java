@@ -37,7 +37,7 @@ public class GarminController {
         int maxDays = subTier.equalsIgnoreCase("ENHANCED") ? 90 : (subTier.equalsIgnoreCase("ELITE") ? 365 : 30);
         GarminService.DateRange window = garminService.resolveRange(range, startDate, endDate, maxDays);
 
-        List<GarminActivitySummary> results = garminService.getActivityForUserForGivenRange(userId.toString(), window.start(), window.end());
+        List<GarminActivitySummary> results = garminService.getActivityForUserForGivenRange(userId, window.start(), window.end());
         return ResponseEntity.ok(results);
     }
 
@@ -45,9 +45,9 @@ public class GarminController {
     // Sleep data
     @GetMapping("/sleep")
     public ResponseEntity<List<GarminSleepSummary>> getGarminSleep(
-            @RequestParam(required = false) String range,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate
+            @RequestParam(name = "range", required = false) String range,
+            @RequestParam(name = "startDate", required = false) LocalDate startDate,
+            @RequestParam(name = "endDate", required = false) LocalDate endDate
             ) {
 
 
@@ -57,16 +57,16 @@ public class GarminController {
         int maxDays = subTier.equalsIgnoreCase("ENHANCED") ? 90 : (subTier.equalsIgnoreCase("ELITE") ? 365 : 30);
         GarminService.DateRange window = garminService.resolveRange(range, startDate, endDate, maxDays);
 
-        List<GarminSleepSummary> results = garminService.getSleepForUserForGivenRange(userId.toString(), window.start(), window.end());
+        List<GarminSleepSummary> results = garminService.getSleepForUserForGivenRange(userId, window.start(), window.end());
         return ResponseEntity.ok(results);
     }
 
     // Stress data
     @GetMapping("/stress")
     public ResponseEntity<List<GarminStressSummary>> getGarminStress(
-            @RequestParam(required = false) String range,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate) {
+            @RequestParam(name = "range", required = false) String range,
+            @RequestParam(name = "startDate", required = false) LocalDate startDate,
+            @RequestParam(name = "endDate", required = false) LocalDate endDate) {
 
         UUID userId = UserContext.getUserId();
         String subTier = userContextResolver.getSubscriptionTier();
@@ -75,16 +75,16 @@ public class GarminController {
         int maxDays = subTier.equalsIgnoreCase("ENHANCED") ? 90 : (subTier.equalsIgnoreCase("ELITE") ? 365 : 30);
         GarminService.DateRange window = garminService.resolveRange(range, startDate, endDate, maxDays);
 
-        List<GarminStressSummary> results = garminService.getStressForUserForGivenRange(userId.toString(), window.start(), window.end());
-        return ResponseEntity.ok().build();
+        List<GarminStressSummary> results = garminService.getStressForUserForGivenRange(userId, window.start(), window.end());
+        return ResponseEntity.ok(results);
     }
 
     // HRV data
     @GetMapping("/hrv")
     public ResponseEntity<List<GarminHrvSummary>> getGarminHrv(
-            @RequestParam(required = false) String range,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate) {
+            @RequestParam(name ="range", required = false) String range,
+            @RequestParam(name ="startDate", required = false) LocalDate startDate,
+            @RequestParam(name ="endDate", required = false) LocalDate endDate) {
 
         UUID userId = UserContext.getUserId();
         String subTier = userContextResolver.getSubscriptionTier();
@@ -93,16 +93,16 @@ public class GarminController {
         int maxDays = subTier.equalsIgnoreCase("ENHANCED") ? 90 : (subTier.equalsIgnoreCase("ELITE") ? 365 : 30);
         GarminService.DateRange window = garminService.resolveRange(range, startDate, endDate, maxDays);
 
-        List<GarminHrvSummary> results = garminService.getHrvForUserForGivenRange(userId.toString(), window.start(), window.end());
-        return ResponseEntity.ok().build();
+        List<GarminHrvSummary> results = garminService.getHrvForUserForGivenRange(userId, window.start(), window.end());
+        return ResponseEntity.ok(results);
     }
 
     // Daily summaries
     @GetMapping("/dailies")
     public ResponseEntity<List<GarminDailySummary>> getGarminDailies(
-            @RequestParam(required = false) String range,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate) {
+            @RequestParam(name="range", required = false) String range,
+            @RequestParam(name="startDate", required = false) LocalDate startDate,
+            @RequestParam(name="endDate", required = false) LocalDate endDate) {
 
         UUID userId = UserContext.getUserId();
         String subTier = userContextResolver.getSubscriptionTier();
@@ -111,16 +111,16 @@ public class GarminController {
         int maxDays = subTier.equalsIgnoreCase("ENHANCED") ? 90 : (subTier.equalsIgnoreCase("ELITE") ? 365 : 30);
         GarminService.DateRange window = garminService.resolveRange(range, startDate, endDate, maxDays);
 
-        List<GarminDailySummary> results = garminService.getDailyForUserForGivenRange(userId.toString(), window.start(), window.end());
-        return ResponseEntity.ok().build();
+        List<GarminDailySummary> results = garminService.getDailyForUserForGivenRange(userId, window.start(), window.end());
+        return ResponseEntity.ok(results);
     }
 
     // PulseOx
     @GetMapping("/pulseox")
     public ResponseEntity<List<GarminPulseOxSummary>> getGarminPulseOx(
-            @RequestParam(required = false) String range,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate) {
+            @RequestParam(name= "range", required = false) String range,
+            @RequestParam(name= "startDate", required = false) LocalDate startDate,
+            @RequestParam(name= "endDate", required = false) LocalDate endDate) {
 
         UUID userId = UserContext.getUserId();
         String subTier = userContextResolver.getSubscriptionTier();
@@ -129,7 +129,7 @@ public class GarminController {
         int maxDays = subTier.equalsIgnoreCase("ENHANCED") ? 90 : (subTier.equalsIgnoreCase("ELITE") ? 365 : 30);
         GarminService.DateRange window = garminService.resolveRange(range, startDate, endDate, maxDays);
 
-        List<GarminPulseOxSummary> results = garminService.getPulseOxForUserForGivenRange(userId.toString(), window.start(), window.end());
-        return ResponseEntity.ok().build();
+        List<GarminPulseOxSummary> results = garminService.getPulseOxForUserForGivenRange(userId, window.start(), window.end());
+        return ResponseEntity.ok(results);
     }
 }
