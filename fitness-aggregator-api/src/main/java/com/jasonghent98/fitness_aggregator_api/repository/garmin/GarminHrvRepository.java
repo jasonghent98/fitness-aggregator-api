@@ -5,11 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface GarminHrvRepository extends JpaRepository<GarminHrvSummary, Long> {
 
-    List<GarminHrvSummary> findByUserIdOrderByCalendarDateDesc(String userId);
+    List<GarminHrvSummary> findByActualizeUserIdOrderByCalendarDateDesc(UUID userId);
 
-    List<GarminHrvSummary> findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(
-            String userId, LocalDate start, LocalDate end);
+    List<GarminHrvSummary> findByActualizeUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(
+            UUID userId, LocalDate start, LocalDate end);
 }

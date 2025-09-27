@@ -5,11 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface GarminPulseOxRepository extends JpaRepository<GarminPulseOxSummary, Long> {
 
-    List<GarminPulseOxSummary> findByUserIdOrderByCalendarDateDesc(String userId);
+    List<GarminPulseOxSummary> findByActualizeUserIdOrderByCalendarDateDesc(UUID userId);
 
-    List<GarminPulseOxSummary> findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(
-            String userId, LocalDate start, LocalDate end);
+    List<GarminPulseOxSummary> findByActualizeUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(
+            UUID userId, LocalDate start, LocalDate end);
 }

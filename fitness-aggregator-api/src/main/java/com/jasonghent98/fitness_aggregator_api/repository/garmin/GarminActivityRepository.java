@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface GarminActivityRepository extends JpaRepository<GarminActivitySummary, Long> {
 
@@ -12,8 +13,8 @@ public interface GarminActivityRepository extends JpaRepository<GarminActivitySu
      * Fetch all activities for a given user within a date range (inclusive),
      * ordered by calendarDate ascending.
      */
-    List<GarminActivitySummary> findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(
-            String userId,
+    List<GarminActivitySummary> findByActualizeUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(
+            UUID userId,
             LocalDate startDate,
             LocalDate endDate
     );
@@ -21,5 +22,5 @@ public interface GarminActivityRepository extends JpaRepository<GarminActivitySu
     /**
      * Fetch all activities for a given user, regardless of date.
      */
-    List<GarminActivitySummary> findByUserId(String userId);
+    List<GarminActivitySummary> findByActualizeUserId(UUID userId);
 }

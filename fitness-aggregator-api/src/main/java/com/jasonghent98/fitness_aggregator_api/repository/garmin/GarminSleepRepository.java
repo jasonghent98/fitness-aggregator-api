@@ -5,11 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface GarminSleepRepository extends JpaRepository<GarminSleepSummary, Long> {
 
-    List<GarminSleepSummary> findByUserIdOrderByCalendarDateDesc(String userId);
+    List<GarminSleepSummary> findByActualizeUserIdOrderByCalendarDateDesc(UUID userId);
 
-    List<GarminSleepSummary> findByUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(
-            String userId, LocalDate start, LocalDate end);
+    List<GarminSleepSummary> findByActualizeUserIdAndCalendarDateBetweenOrderByCalendarDateAsc(
+            UUID userId, LocalDate start, LocalDate end);
 }
