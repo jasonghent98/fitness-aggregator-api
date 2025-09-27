@@ -1,5 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.service.auth;
 
+import com.jasonghent98.fitness_aggregator_api.config.BackendConfig;
 import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
 import com.jasonghent98.fitness_aggregator_api.model.User;
 import com.jasonghent98.fitness_aggregator_api.model.auth.UserSession;
@@ -7,6 +8,7 @@ import com.jasonghent98.fitness_aggregator_api.repository.auth.UserSessionReposi
 import com.jasonghent98.fitness_aggregator_api.security.JwtService;
 import com.jasonghent98.fitness_aggregator_api.service.EmailService;
 import com.jasonghent98.fitness_aggregator_api.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class SessionService {
 
@@ -30,6 +33,7 @@ public class SessionService {
     private final JwtService jwtService;
     private final EmailVerificationService evService;
     private final FrontendConfig frontendConfig;
+    private final BackendConfig backendConfig;
     private final EmailService emailService;
 
     public SessionService(
@@ -38,12 +42,14 @@ public class SessionService {
             JwtService jwtService,
             EmailVerificationService evService,
             FrontendConfig frontendConfig,
+            BackendConfig backendConfig,
             EmailService emailService
     ) {
         this.userService = userService;
         this.sessionRepo = sessionRepo;
         this.jwtService = jwtService;
         this.evService = evService;
+        this.backendConfig = backendConfig;
         this.frontendConfig = frontendConfig;
         this.emailService = emailService;
     }
@@ -75,7 +81,7 @@ public class SessionService {
         var result = evService.issueOrRefresh(email);
 
         // reroute through Next.js proxy
-        String link = frontendConfig.getFrontendOrigin() +
+        String link = backendConfig.getBackendOrigin() +
                 "/api/auth/magic/verify?token=" +
                 URLEncoder.encode(result.token(), StandardCharsets.UTF_8);
 
@@ -104,7 +110,9 @@ public class SessionService {
                             "  </body>\n" +
                             "</html>"
             );
+            log.info("Magic link email successfully sent to {}", email);
         } catch (Exception e) {
+            log.error("Failed to send magic link email to {}: {}", email, e.getMessage(), e);
             return ResponseEntity.status(502).body(Map.of(
                     "ok", false,
                     "error", "email_send_failed"
@@ -127,16 +135,19 @@ public class SessionService {
         User user = userService.upsertByEmail(email);
 
         // Create session
-        UserSession session = createSession(user.getId());
+        String refreshToken = createSessionAndReturnRefreshToken(user.getId());
 
         // Mint short-lived access JWT
         String accessJwt = jwtService.mintSession(user.getId());
 
         // Redirect
-        String next = frontendConfig.getFrontendOrigin() + "/connect-providers?status=verified";
+        String next = frontendConfig.getFrontendOrigin() + "/onboarding/connect?status=verified";
         return ResponseEntity.status(303)
                 .header(HttpHeaders.LOCATION, next)
+                // short lived 15 min jwt token
                 .header(HttpHeaders.SET_COOKIE, jwtService.buildSessionCookie(accessJwt))
+                // refresh token cookie (longer-lived ~90 day token)
+                .header(HttpHeaders.SET_COOKIE, jwtService.buildRefreshCookie(refreshToken))
                 .build();
     }
 
@@ -163,7 +174,7 @@ public class SessionService {
      * If you want only one session at a time, it replaces existing.
      */
     @Transactional
-    public UserSession createSession(UUID userId) {
+    public String createSessionAndReturnRefreshToken(UUID userId) {
         String refreshToken = UUID.randomUUID().toString();
         Instant expiry = Instant.now().plus(Duration.ofDays(30));
 
@@ -177,7 +188,8 @@ public class SessionService {
                 .refreshTokenExpiresAt(expiry)
                 .build();
 
-        return sessionRepo.save(session);
+        sessionRepo.save(session);
+        return refreshToken;
     }
 
     /**
