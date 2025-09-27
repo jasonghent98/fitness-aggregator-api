@@ -34,5 +34,7 @@ auth:
 aws:
   ses:
     region: ${AWS_SES_REGION}
-    host: ${AWS_SES_HOST}
     from-email: ${AWS_SES_FROM_EMAIL}
+    access-key-id: ${AWS_SES_SMTP_ACCESS_KEY_ID}
+    secret-access-key: ${AWS_SES_SMTP_SECRET_ACCESS_KEY}
+    ttl-minutes: ${AUTH_MAGIC_TTL_MINUTES}
