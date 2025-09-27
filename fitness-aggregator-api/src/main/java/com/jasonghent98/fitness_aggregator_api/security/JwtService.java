@@ -5,7 +5,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.*;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jasonghent98.fitness_aggregator_api.config.JwtConfig;
-import com.jasonghent98.fitness_aggregator_api.context.UserContextResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +20,9 @@ import java.util.UUID;
 @Service
 public class JwtService {
 
-    public static final String COOKIE_NAME = "ACTUALIZE_SESSION";
+    public static final String SESSION_COOKIE_NAME = "ACTUALIZE_SESSION";
+    public static final String REFRESH_COOKIE_NAME = "ACTUALIZE_REFRESH";
+    public static final String DOMAIN_FOR_COOKIE = ".actualize.fit";
 
     private final JwtConfig cfg;
     private final Algorithm alg;
@@ -35,13 +36,12 @@ public class JwtService {
         this.alg = Algorithm.HMAC256(cfg.getSecret());
     }
 
-    public String mintSession(UUID userId, String tier) {
+    public String mintSession(UUID userId) {
         Instant now = Instant.now();
-        Instant exp = now.plus(Duration.ofDays(cfg.getTtlDays()));
+        Instant exp = now.plus(Duration.ofDays(cfg.getTtlMinutes()));
         return JWT.create()
                 .withIssuer(cfg.getIssuer())
                 .withSubject(userId.toString())
-                .withClaim("tier", tier)
                 .withIssuedAt(Date.from(now))
                 .withExpiresAt(Date.from(exp))
                 .sign(alg);
@@ -78,27 +78,40 @@ public class JwtService {
         return Optional.empty();
     }
 
+    /** Builds the session cookie for frontend auth */
     public String buildSessionCookie(String jwt) {
         // HttpOnly, Secure, SameSite=None; path "/" so all routes send it
-        String rc = ResponseCookie.from(COOKIE_NAME, jwt)
+        String rc = ResponseCookie.from(SESSION_COOKIE_NAME, jwt)
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
                 .path("/")
                 .domain(".actualize.fit") // client is handling the storing of jwt via same-site req for now
-                .maxAge(Duration.ofDays(cfg.getTtlDays()))
+                .maxAge(Duration.ofDays(cfg.getTtlMinutes()))
                 .build()
                 .toString();
         return rc + "; Partitioned";
     }
 
+    /** Builds the refresh cookie for silent user auth persistence */
+    public String buildRefreshCookie(String refreshToken) {
+        return ResponseCookie.from(REFRESH_COOKIE_NAME, refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(Duration.ofDays(90))
+                .domain(DOMAIN_FOR_COOKIE)
+                .build()
+                .toString();
+    }
+
     public String buildClearCookie() {
-        return ResponseCookie.from(COOKIE_NAME, "")
+        return ResponseCookie.from(REFRESH_COOKIE_NAME, "")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("None")
                 .path("/")
-                .domain(".actualize.fit") // client is handling the storing of jwt via same-site req for now
+                .domain(DOMAIN_FOR_COOKIE) // client is handling the storing of jwt via same-site req for now
                 .maxAge(Duration.ZERO)
                 .build()
                 .toString();
@@ -106,11 +119,11 @@ public class JwtService {
 
     public String mintEmailVerification(String email) {
         Instant now = Instant.now();
-        Instant exp = now.plus(Duration.ofDays(cfg.getTtlDays()));
+        Instant exp = now.plus(Duration.ofMinutes(15));
         return JWT.create()
                 .withIssuer(cfg.getIssuer())
                 .withSubject(email)
-                .withClaim("kind", "email-verify")           // disambiguate from session JWTs
+                .withClaim("kind", "email-verify") // disambiguate from session JWTs
                 .withIssuedAt(Date.from(now))
                 .withExpiresAt(Date.from(exp))
                 .sign(alg);

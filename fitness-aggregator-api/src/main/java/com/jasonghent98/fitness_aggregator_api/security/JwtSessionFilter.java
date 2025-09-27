@@ -36,11 +36,11 @@ public class JwtSessionFilter extends OncePerRequestFilter {
             // 1) Prefer our private header (set by Next.js server route)
             String token = req.getHeader("X-Actualize-Session");
 
-            // 2) Fallback to cookie (direct browser → backend calls)
+            // 2) Fallback to jwt cookie (direct browser → backend calls)
             if (token == null || token.isBlank()) {
                 token = Optional.ofNullable(req.getCookies())
                         .flatMap(cookies -> Arrays.stream(cookies)
-                                .filter(c -> JwtService.COOKIE_NAME.equals(c.getName()))
+                                .filter(c -> JwtService.SESSION_COOKIE_NAME.equals(c.getName()))
                                 .findFirst())
                         .map(Cookie::getValue)
                         .orElse(null);
