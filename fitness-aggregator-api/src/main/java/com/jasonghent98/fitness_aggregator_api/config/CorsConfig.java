@@ -17,6 +17,7 @@ public class CorsConfig {
 
         // TODO: put your actual frontend origins here (dev + any preview domains you use)
         cfg.setAllowedOrigins(List.of(
+                "http://localhost:3000",
                 "https://dev.actualize.fit",
                 "https://actualize-dev.vercel.app", // optional: your Vercel preview domain
                 "https://test.actualize.fit",
