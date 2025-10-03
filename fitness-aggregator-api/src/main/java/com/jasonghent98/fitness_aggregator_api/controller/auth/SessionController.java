@@ -22,10 +22,10 @@ public class SessionController {
         this.jwtService = jwtService;
     }
 
-    @GetMapping("/whoami")
+    @GetMapping("/me")
     public ResponseEntity<?> whoami() {
         UUID userId = UserContext.getUserId();
-        return ResponseEntity.ok(sessionService.whoAmI(userId));
+        return ResponseEntity.ok(sessionService.me(userId));
     }
     /** Generate a valid JWT tied to a user for testing purposes: delete once in prod */
     @GetMapping("/generateToken")

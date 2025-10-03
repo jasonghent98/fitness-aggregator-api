@@ -59,12 +59,14 @@ public class SessionService {
     // Public orchestration APIs
     // -----------------------
 
-    /** WhoAmI helper */
-    public Map<String, Object> whoAmI(UUID userId) {
+    /** Returns user metadata */
+    public Map<String, Object> me(UUID userId) {
         if (userId == null) {
             return Map.of("authenticated", false);
         }
-        return Map.of("authenticated", true, "userId", userId.toString());
+        // get the user metadata (tier)
+        String subTier = userService.findTierForUser(userId);
+        return Map.of("authenticated", true, "userId", userId.toString(), "subscriptionTier", subTier);
     }
 
     /** Logout and revoke session by refresh token */
