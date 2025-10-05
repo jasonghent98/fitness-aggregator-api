@@ -116,13 +116,18 @@ public class FitbitAuthController {
             // upsert the fitbit user + base user (pass in the user id from the token if exists)
             ProviderAccount new_acc = providerAccountService.upsertProviderAccount(userId, "fitbit", fitbitUserId, accessToken, refreshToken, expiresAt);
 
-            // mint/create session JWT
-            String jwt = jwtService.mintSession(new_acc.getUser().getId());
+            // 3) Create per-user subscriptions (activities + sleep) and do a small backfill into our system
+
+
+            /*
+            fitbitSubscriptionService.createDefaultSubscriptions(accessToken, new_acc.getUser().getId().toString());
+            fitbitBackfillService.backfillRecent(new_acc.getUser().getId(), fitbitUserId, accessToken);
+
+             */
 
             // append token as query param
             URI redirect = URI.create(frontendConfig.getFrontendOrigin()
-                    + "/get-started?provider=fitbit&status=success&token="
-                    + URLEncoder.encode(jwt, StandardCharsets.UTF_8));
+                    + "/onboarding/connect?provider=fitbit&status=success");
 
             return ResponseEntity.status(302)
                     .location(redirect)

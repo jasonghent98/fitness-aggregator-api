@@ -55,15 +55,14 @@ public class StravaController {
     // GET /api/strava/webhook?hub.mode=subscribe&hub.verify_token=XYZ&hub.challenge=abc123
     @GetMapping("/webhook")
     public ResponseEntity<?> verify(
-            @RequestParam(name = "hub.mode", required = false) String mode,
             @RequestParam(name = "hub.verify_token", required = false) String token,
-            @RequestParam(name = "hub.challenge") String challenge
+            @RequestParam(name = "hub.challenge") String challenge,
+            @RequestParam(name = "hub.mode", required = false) String mode
     ) {
-        System.out.println(verifyToken + " FROM StravaController!!!! ");
-        if ("subscribe".equalsIgnoreCase(mode) && verifyToken.equals(token)) {
-            return ResponseEntity.ok(Map.of("hub.challenge", challenge));
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid verification");
+        String json = String.format("{\"hub.challenge\":\"%s\"}", challenge);
+        return ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(json);
     }
 
     // 2) Event delivery (Strava posts here for activity/athlete changes)

@@ -17,4 +17,7 @@ public class FitbitConfig {
     @Value("${fitbit.REDIRECT_URL}")
     private String redirectUrl;
 
+    @Value("${fitbit.WEBHOOK_VERIFICATION_CODE}")
+    private String webhookVerificationCode;
+
 }

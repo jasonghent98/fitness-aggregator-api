@@ -1,6 +1,7 @@
 package com.jasonghent98.fitness_aggregator_api.controller.fitbit;
 
 import com.jasonghent98.fitness_aggregator_api.config.provider.fitbit.FitbitConfig;
+import com.jasonghent98.fitness_aggregator_api.service.fitbit.FitbitIngestionService;
 import com.jasonghent98.fitness_aggregator_api.service.fitbit.FitbitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,23 +25,30 @@ public class FitbitWebhookController {
     private final FitbitService fitbitService;
     private final FitbitIngestionService fitbitIngestionService;
 
-    public FitbitWebhookController(FitbitService fitbitService, FitbitIngestionService fitbitIngestionService) {
+    private final FitbitConfig fitbitConfig;
+
+
+    public FitbitWebhookController(FitbitService fitbitService, FitbitIngestionService fitbitIngestionService, FitbitConfig fitbitConfig) {
         this.fitbitService = fitbitService;
         this.fitbitIngestionService = fitbitIngestionService;
+        this.fitbitConfig = fitbitConfig;
     }
 
     // Verification handshake (like Strava/Garmin)
-    @GetMapping
-    public ResponseEntity<String> verify(@RequestParam("verify") String verify) {
-        // Fitbit sends a verify param, echo it back
-        return ResponseEntity.ok(verify);
+    @GetMapping("/verify")
+    public ResponseEntity<Void> verifySubscription(@RequestParam(name="verify") String verify) {
+        if (!verify.equals(fitbitConfig.getWebhookVerificationCode())) {
+            return ResponseEntity.status(404).build();
+        }
+        // Respond with the same header and 204 No Content
+        return ResponseEntity.status(204).build();
     }
 
     // Actual push events
     @PostMapping
     public ResponseEntity<Void> receive(@RequestBody String raw) {
         // Fitbit sends event payloads with collectionType (activities, sleep, etc.)
-        fitbitIngestionService.handleWebhook(raw);
+        // fitbitIngestionService.handleWebhook(raw);
         return ResponseEntity.ok().build();
     }
 }

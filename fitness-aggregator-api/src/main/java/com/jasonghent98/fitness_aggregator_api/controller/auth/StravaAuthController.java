@@ -1,7 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
 import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
-import com.jasonghent98.fitness_aggregator_api.config.MailerConfig;
 import com.jasonghent98.fitness_aggregator_api.config.provider.strava.StravaConfig;
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.dto.strava.StravaAuthTokenResponse;
@@ -21,8 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -130,13 +127,10 @@ public class StravaAuthController {
             ProviderAccount new_acc = providerAccountService.upsertProviderAccount(userId, "strava", stravaAthleteId.toString(), accessToken, refreshToken, expiresAt);
 
 
-            // mint/create session JWT
-            String jwt = jwtService.mintSession(new_acc.getUser().getId());
-
             // append token as query param
             URI redirect = URI.create(frontendConfig.getFrontendOrigin()
-                    + "/onboarding/connect?provider=strava&status=success&token="
-                    + URLEncoder.encode(jwt, StandardCharsets.UTF_8));
+                    + "/onboarding/connect?provider=strava&status=success&token=5");
+                    // + URLEncoder.encode(jwt, StandardCharsets.UTF_8));
 
             return ResponseEntity.status(302)
                     .location(redirect)

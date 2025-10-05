@@ -1,5 +1,7 @@
+
 package com.jasonghent98.fitness_aggregator_api.service.fitbit;
 
+import com.jasonghent98.fitness_aggregator_api.dto.fitbit.*;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,8 +19,8 @@ public class FitbitIngestionService {
     private final FitbitService fitbitService;
     private final FitbitActivityRepository activityRepo;
     private final FitbitSleepRepository sleepRepo;
-    private final FitbitHeartRateRepository heartRateRepo;
-    private final FitbitFoodLogRepository foodRepo;
+    private final FitbitHRRepository heartRateRepo;
+    private final FitbitFoodRepository foodRepo;
     private final FitbitBodyRepository bodyRepo;
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -26,8 +28,8 @@ public class FitbitIngestionService {
             FitbitService fitbitService,
             FitbitActivityRepository activityRepo,
             FitbitSleepRepository sleepRepo,
-            FitbitHeartRateRepository heartRateRepo,
-            FitbitFoodLogRepository foodRepo,
+            FitbitHRRepository heartRateRepo,
+            FitbitFoodRepository foodRepo,
             FitbitBodyRepository bodyRepo
     ) {
         this.fitbitService = fitbitService;
@@ -38,10 +40,7 @@ public class FitbitIngestionService {
         this.bodyRepo = bodyRepo;
     }
 
-    /**
-     * Handles Fitbit webhook push event.
-     * Parses event → decides what collection to refresh → fetches latest Fitbit data → persists.
-     */
+/*
     @Transactional
     public void handleWebhook(String rawJson) {
         try {
@@ -73,39 +72,44 @@ public class FitbitIngestionService {
 
     // ---------------- INGEST METHODS ---------------- //
 
+
     private void ingestActivities(String fitbitUserId) {
-        List<FitbitActivity> activities = fitbitService.fetchUserActivities(fitbitUserId, LocalDate.now().minusDays(7), LocalDate.now());
+        List<FitbitActivityLog> activities = fitbitService.fetchUserActivities(fitbitUserId, LocalDate.now().minusDays(7), LocalDate.now());
         // Save or upsert
-        for (FitbitActivity act : activities) {
+        for (FitbitActivityLog act : activities) {
             activityRepo.save(act);
         }
     }
 
+
+
     private void ingestSleep(String fitbitUserId) {
-        List<FitbitSleepLog> sleeps = fitbitService.fetchUserSleep(fitbitUserId, LocalDate.now().minusDays(7), LocalDate.now());
+       List<FitbitSleepLog> sleeps = fitbitService.fetchUserSleep(fitbitUserId, LocalDate.now().minusDays(7), LocalDate.now());
         for (FitbitSleepLog s : sleeps) {
-            sleepRepo.save(s);
+
         }
     }
 
     private void ingestHeartRate(String fitbitUserId) {
-        List<FitbitHeartRateLog> hr = fitbitService.fetchUserHeartRate(fitbitUserId, LocalDate.now().minusDays(1), LocalDate.now());
+       List<FitbitHeartRateLog> hr = fitbitService.fetchUserHeartRate(fitbitUserId, LocalDate.now().minusDays(1), LocalDate.now());
         for (FitbitHeartRateLog h : hr) {
-            heartRateRepo.save(h);
+
         }
     }
 
     private void ingestFoods(String fitbitUserId) {
         List<FitbitFoodLog> foods = fitbitService.fetchUserFoods(fitbitUserId, LocalDate.now().minusDays(7), LocalDate.now());
         for (FitbitFoodLog f : foods) {
-            foodRepo.save(f);
+
         }
     }
 
     private void ingestBody(String fitbitUserId) {
         List<FitbitBodyLog> bodyLogs = fitbitService.fetchUserBody(fitbitUserId, LocalDate.now().minusDays(30), LocalDate.now());
         for (FitbitBodyLog b : bodyLogs) {
-            bodyRepo.save(b);
+
         }
     }
+
+     */
 }
