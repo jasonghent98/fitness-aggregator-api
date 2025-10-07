@@ -22,7 +22,7 @@ public class SessionController {
         this.jwtService = jwtService;
     }
 
-    @GetMapping("/whoami")
+    @GetMapping("/me")
     public ResponseEntity<?> whoami() {
         UUID userId = UserContext.getUserId();
         return ResponseEntity.ok(sessionService.whoAmI(userId));
