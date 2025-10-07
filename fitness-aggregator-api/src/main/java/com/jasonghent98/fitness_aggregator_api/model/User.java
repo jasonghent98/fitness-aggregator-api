@@ -14,6 +14,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(unique = true)
+    private String stripeCustomerId;
+
     @Column(nullable = false, unique = true, columnDefinition = "citext")
     private String email;
 
