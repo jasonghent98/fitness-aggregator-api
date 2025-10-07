@@ -38,6 +38,8 @@ services:
       AWS_SES_FROM_EMAIL: ${AWS_SES_FROM_EMAIL}
       AUTH_MAGIC_TTL_MINUTES: ${AUTH_MAGIC_TTL_MINUTES}
 
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+
   postgres:
     container_name: ${DEV_DB_CONTAINER_NAME}
     ports:
