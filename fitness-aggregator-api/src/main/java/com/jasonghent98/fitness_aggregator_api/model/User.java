@@ -20,9 +20,6 @@ public class User {
     @Column(nullable = false, unique = true, columnDefinition = "citext")
     private String email;
 
-    @Column
-    private String fullName;
-
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -48,6 +45,4 @@ public class User {
     // Relationships
     // Only exists in Java code to make it easier to navigate from User → StravaUser. Does NOT create a column
     // The "user" field in the StravaUser class is managing the relationship
-
-
 }
