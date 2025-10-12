@@ -8,6 +8,7 @@ import com.jasonghent98.fitness_aggregator_api.repository.auth.UserSessionReposi
 import com.jasonghent98.fitness_aggregator_api.security.JwtService;
 import com.jasonghent98.fitness_aggregator_api.service.EmailService;
 import com.jasonghent98.fitness_aggregator_api.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -81,8 +82,8 @@ public class SessionService {
         var result = evService.issueOrRefresh(email);
 
         // reroute through Next.js proxy
-        String link = backendConfig.getBackendOrigin() +
-                "/api/auth/magic/verify?token=" +
+        String link = frontendConfig.getFrontendOrigin() +
+                "/api/email/verify-email?token=" +
                 URLEncoder.encode(result.token(), StandardCharsets.UTF_8);
 
         try {
@@ -127,7 +128,7 @@ public class SessionService {
 
     /** Verify magic link token */
     @Transactional
-    public ResponseEntity<?> verifyMagicToken(String token) {
+    public ResponseEntity<?> verifyMagicToken(String token, HttpServletRequest req) {
         String email = jwtService.verifyEmailVerification(token)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
@@ -140,14 +141,17 @@ public class SessionService {
         // Mint short-lived access JWT
         String accessJwt = jwtService.mintSession(user.getId());
 
-        // Redirect
+        // Redirect (check if local testing)
         String next = frontendConfig.getFrontendOrigin() + "/onboarding/connect?status=verified";
+        String host = req.getServerName(); // e.g. "localhost", "api.dev.actualize.fit"
+        boolean isLocal = host.equals("localhost") || host.equals("127.0.0.1");
+
         return ResponseEntity.status(303)
                 .header(HttpHeaders.LOCATION, next)
                 // short lived 15 min jwt token
-                .header(HttpHeaders.SET_COOKIE, jwtService.buildSessionCookie(accessJwt))
+                .header(HttpHeaders.SET_COOKIE, jwtService.buildSessionCookie(accessJwt, isLocal))
                 // refresh token cookie (longer-lived ~90 day token)
-                .header(HttpHeaders.SET_COOKIE, jwtService.buildRefreshCookie(refreshToken))
+                .header(HttpHeaders.SET_COOKIE, jwtService.buildRefreshCookie(refreshToken, isLocal))
                 .build();
     }
 
@@ -175,8 +179,8 @@ public class SessionService {
      */
     @Transactional
     public String createSessionAndReturnRefreshToken(UUID userId) {
-        String refreshToken = UUID.randomUUID().toString();
-        Instant expiry = Instant.now().plus(Duration.ofDays(30));
+
+       Map<String, Object> data = jwtService.mintRefresh(userId);
 
         // 💡 Choice: allow multiple sessions or force single session
         // If single-session, delete old ones:
@@ -184,12 +188,12 @@ public class SessionService {
 
         UserSession session = UserSession.builder()
                 .userId(userId)
-                .refreshToken(refreshToken)
-                .refreshTokenExpiresAt(expiry)
+                .refreshToken(data.get("token").toString())
+                .refreshTokenExpiresAt((Instant) data.get("expiresAt"))
                 .build();
 
         sessionRepo.save(session);
-        return refreshToken;
+        return data.get("token").toString();
     }
 
     /**
