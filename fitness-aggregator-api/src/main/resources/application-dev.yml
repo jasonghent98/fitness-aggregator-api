@@ -41,3 +41,7 @@ aws:
 
 stripe:
   secret-key: ${STRIPE_SECRET_KEY}
+  price:
+    enhanced:
+      monthly: ${STRIPE_PRICE_ENHANCED_MONTHLY}
+      annual: ${STRIPE_PRICE_ENHANCED_ANNUAL}

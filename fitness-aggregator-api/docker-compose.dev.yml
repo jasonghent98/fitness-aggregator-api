@@ -39,9 +39,12 @@ services:
       AUTH_MAGIC_TTL_MINUTES: ${AUTH_MAGIC_TTL_MINUTES}
 
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_PRICE_ENHANCED_MONTHLY: ${STRIPE_PRICE_ENHANCED_MONTHLY}
+      STRIPE_PRICE_ENHANCED_ANNUAL: ${STRIPE_PRICE_ENHANCED_ANNUAL}
 
   postgres:
     container_name: ${DEV_DB_CONTAINER_NAME}
+    image: postgres:15
     ports:
       - "${DEV_DB_PORT}:5432"
     environment:

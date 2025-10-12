@@ -1,55 +1,38 @@
 package com.jasonghent98.fitness_aggregator_api.controller;
 
-
-
-import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
-import com.jasonghent98.fitness_aggregator_api.context.UserContext;
-import com.jasonghent98.fitness_aggregator_api.service.StripeCustomerService;
-import com.stripe.model.billingportal.Session;
-import com.stripe.param.billingportal.SessionCreateParams;
-import org.springframework.http.HttpHeaders;
+import com.jasonghent98.fitness_aggregator_api.service.BillingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-        import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/billing")
 public class BillingController {
 
-    private final StripeCustomerService stripeCustomerService;
-    private final FrontendConfig frontendConfig;
+    private final BillingService billing;
 
-    public BillingController(StripeCustomerService stripeCustomerService,
-                             FrontendConfig frontendConfig) {
-        this.stripeCustomerService = stripeCustomerService;
-        this.frontendConfig = frontendConfig;
+    public BillingController(BillingService billing) {
+        this.billing = billing;
     }
 
-    /**
-     * Creates a Stripe Billing Portal session and redirects the browser to it.
-     * Expects auth via your existing session (e.g., X-Actualize-Session header → UserContext).
-     */
     @PostMapping("/portal")
     public ResponseEntity<Void> openPortal() throws Exception {
-        UUID userId = UserContext.getUserId();
+        return billing.openPortal();
+    }
 
-        // Ensure the user has a Stripe customer id (create if missing)
-        String customerId = stripeCustomerService.getOrCreateCustomerId(userId);
+    record CheckoutReq(String cadence) {}
 
-        // Where Stripe will send the user after they exit the Portal
-        String returnUrl = frontendConfig.getFrontendOrigin() + "/app/account";
+    @PostMapping("/checkout")
+    public ResponseEntity<Void> openCheckout(@RequestBody CheckoutReq body) throws Exception {
+        return billing.openCheckout(body.cadence());
+    }
 
-        SessionCreateParams params = SessionCreateParams.builder()
-                .setCustomer(customerId)
-                .setReturnUrl(returnUrl)
-                .build();
+    @GetMapping("/success")
+    public ResponseEntity<Void> success(@RequestParam("session_id") String sessionId) throws Exception {
+        return billing.handleCheckoutSuccess(sessionId);
+    }
 
-        Session session = Session.create(params);
-
-        // 302 to Stripe-hosted Portal
-        return ResponseEntity.status(302)
-                .header(HttpHeaders.LOCATION, session.getUrl())
-                .build();
+    @GetMapping("/cancel")
+    public ResponseEntity<Void> cancel() {
+        return billing.handleCheckoutCancel();
     }
 }

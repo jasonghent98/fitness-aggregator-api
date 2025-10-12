@@ -26,6 +26,12 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    private String dashboardPreset;
+
+    private String trainingStyle;
+
+    private String trainingFocus;
+
     @Column
     private String subscriptionTier;
 

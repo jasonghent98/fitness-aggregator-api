@@ -1,5 +1,10 @@
 package com.jasonghent98.fitness_aggregator_api.seed;
 
+/*
+
+!! NOT NEEDED SINCE USING FLYWAY FOR DB MIGRATIONS !!
+
+
 import com.jasonghent98.fitness_aggregator_api.model.Provider;
 import com.jasonghent98.fitness_aggregator_api.repository.ProviderRepository;
 import org.springframework.boot.ApplicationRunner;
@@ -85,3 +90,5 @@ public class ProviderSeed {
             boolean enabled
     ) {}
 }
+
+ */
