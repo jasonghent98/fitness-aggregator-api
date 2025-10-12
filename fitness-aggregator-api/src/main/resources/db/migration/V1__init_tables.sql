@@ -13,8 +13,16 @@ CREATE TABLE IF NOT EXISTS users (
   created_at         timestamptz NOT NULL DEFAULT now(),
   updated_at         timestamptz NOT NULL DEFAULT now(),
   subscription_tier VARCHAR(20) DEFAULT 'FREE',
-  stripe_customer_id text
+  stripe_customer_id text,
+  dashboard_preset VARCHAR(50),
+  training_style VARCHAR(50),
+  training_focus VARCHAR(50)
 );
+
+-- add enum constraint on users for dashboard preset
+ALTER TABLE users
+ADD CONSTRAINT chk_users_dashboard_preset
+    CHECK (dashboard_preset IN ('wellness','performance','body') OR dashboard_preset IS NULL);
 
 -- 2) Leads
 CREATE TABLE IF NOT EXISTS leads (
