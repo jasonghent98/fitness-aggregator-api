@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 @Data
 public class JwtConfig {
     private String secret;
-    private int ttlMinutes = 15;
+    private int sessionTtlMinutes = 15;
+    private int refreshTtlDays = 60;
     private String issuer;
 
 }

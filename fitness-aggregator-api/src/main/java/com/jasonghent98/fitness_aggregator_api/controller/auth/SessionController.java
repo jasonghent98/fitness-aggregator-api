@@ -4,6 +4,7 @@ import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.dto.auth.MagicLinkRequest;
 import com.jasonghent98.fitness_aggregator_api.security.JwtService;
 import com.jasonghent98.fitness_aggregator_api.service.auth.SessionService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,8 +46,8 @@ public class SessionController {
     }
 
     @GetMapping("/magic/verify")
-    public ResponseEntity<?> verifyToken(@RequestParam("token") String token) {
-        return sessionService.verifyMagicToken(token);
+    public ResponseEntity<?> verifyToken(@RequestParam("token") String token, HttpServletRequest req) {
+        return sessionService.verifyMagicToken(token, req);
     }
 
     @PostMapping("/refresh")

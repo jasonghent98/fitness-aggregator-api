@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,13 +39,28 @@ public class JwtService {
 
     public String mintSession(UUID userId) {
         Instant now = Instant.now();
-        Instant exp = now.plus(Duration.ofDays(cfg.getTtlMinutes()));
+        Instant exp = now.plus(Duration.ofMinutes(cfg.getSessionTtlMinutes()));
         return JWT.create()
                 .withIssuer(cfg.getIssuer())
                 .withSubject(userId.toString())
                 .withIssuedAt(Date.from(now))
                 .withExpiresAt(Date.from(exp))
                 .sign(alg);
+    }
+
+    public Map<String, Object> mintRefresh(UUID userId) {
+        Instant now = Instant.now();
+        Instant exp = now.plus(Duration.ofDays(cfg.getRefreshTtlDays()));
+        String token = JWT.create()
+                .withIssuer(cfg.getIssuer())
+                .withSubject(userId.toString())
+                .withIssuedAt(Date.from(now))
+                .withExpiresAt(Date.from(exp))
+                .sign(alg);
+        return Map.of(
+                "token", token,
+                "expiresAt", exp
+        );
     }
 
     public Optional<SessionInfo> verifySession(String token) {
@@ -79,30 +95,39 @@ public class JwtService {
     }
 
     /** Builds the session cookie for frontend auth */
-    public String buildSessionCookie(String jwt) {
+    public String buildSessionCookie(String jwt, Boolean isLocal) {
         // HttpOnly, Secure, SameSite=None; path "/" so all routes send it
-        String rc = ResponseCookie.from(SESSION_COOKIE_NAME, jwt)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
+        ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from(SESSION_COOKIE_NAME, jwt)
                 .path("/")
-                .domain(".actualize.fit") // client is handling the storing of jwt via same-site req for now
-                .maxAge(Duration.ofDays(cfg.getTtlMinutes()))
-                .build()
-                .toString();
-        return rc + "; Partitioned";
+                .sameSite("Lax")
+                .httpOnly(true)
+                .maxAge(Duration.ofMinutes(cfg.getSessionTtlMinutes())); // short-lived token (~15 mins)
+        if (isLocal) {
+            cookieBuilder.secure(false);
+        } else {
+            cookieBuilder.secure(true);
+            cookieBuilder.domain(DOMAIN_FOR_COOKIE);
+        }
+
+        return cookieBuilder.build().toString();
     }
 
     /** Builds the refresh cookie for silent user auth persistence */
-    public String buildRefreshCookie(String refreshToken) {
-        return ResponseCookie.from(REFRESH_COOKIE_NAME, refreshToken)
-                .httpOnly(true)
-                .secure(true)
+    public String buildRefreshCookie(String refreshToken, Boolean isLocal) {
+
+        ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from(REFRESH_COOKIE_NAME, refreshToken)
                 .path("/")
-                .maxAge(Duration.ofDays(90))
-                .domain(DOMAIN_FOR_COOKIE)
-                .build()
-                .toString();
+                .sameSite("Lax")
+                .httpOnly(true)
+                .maxAge(Duration.ofDays(cfg.getRefreshTtlDays()));  // long-lived token (~60 days)
+        if (isLocal) {
+            cookieBuilder.secure(false);
+        } else {
+            cookieBuilder.secure(true);
+            cookieBuilder.domain(DOMAIN_FOR_COOKIE);
+        }
+
+        return cookieBuilder.build().toString();
     }
 
     public String buildClearCookie() {

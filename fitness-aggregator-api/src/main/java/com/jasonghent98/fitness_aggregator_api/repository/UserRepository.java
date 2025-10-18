@@ -9,4 +9,5 @@ import java.util.UUID;
 // inherits all the CRUD API operations by default: specify any custom queries if needed
 public interface UserRepository extends JpaRepository<User, UUID> {
     public Optional<User> findByEmailIgnoreCase(String email);
+    public Optional<User> findByStripeCustomerId(String stripeCustomerId);
 }

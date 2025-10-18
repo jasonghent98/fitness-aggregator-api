@@ -40,3 +40,10 @@ aws:
     access-key-id: ${AWS_SES_SMTP_ACCESS_KEY_ID}
     secret-access-key: ${AWS_SES_SMTP_SECRET_ACCESS_KEY}
     ttl-minutes: ${AUTH_MAGIC_TTL_MINUTES}
+
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY}
+  price:
+    enhanced:
+      monthly: ${STRIPE_PRICE_ENHANCED_MONTHLY}
+      annual: ${STRIPE_PRICE_ENHANCED_ANNUAL}

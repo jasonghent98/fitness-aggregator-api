@@ -14,17 +14,23 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(unique = true)
+    private String stripeCustomerId;
+
     @Column(nullable = false, unique = true, columnDefinition = "citext")
     private String email;
-
-    @Column
-    private String fullName;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    private String dashboardPreset;
+
+    private String trainingStyle;
+
+    private String trainingFocus;
 
     @Column
     private String subscriptionTier;
@@ -45,6 +51,4 @@ public class User {
     // Relationships
     // Only exists in Java code to make it easier to navigate from User → StravaUser. Does NOT create a column
     // The "user" field in the StravaUser class is managing the relationship
-
-
 }
