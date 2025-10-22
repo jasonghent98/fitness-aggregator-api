@@ -129,10 +129,18 @@ public class ProviderAccountService {
     /**
      * Finds and returns user for a given provider_user_id
      * */
-    public ProviderAccount getProviderAccountForUserAndProvider(String providerName, String providerUserId) {
+    public ProviderAccount getProviderAccountForProviderUserAndProvider(String providerName, String providerUserId) {
         Provider provider = resolveProvider(providerName);
         return providerAccountRepo.findByProviderAndProviderUserId(provider, providerUserId)
                 .orElseThrow(() -> new IllegalArgumentException("No + " + providerName + " account for given provider user id: " + providerUserId));
 
     }
+
+    /***/
+    public ProviderAccount getProviderAccountForUserAndProvider(String providerName, UUID userId) {
+        Provider provider = resolveProvider(providerName);
+        return providerAccountRepo.findByUserIdAndProvider(userId, provider)
+                .orElseThrow(() -> new IllegalArgumentException("No + " + providerName + " account for given user id: " + userId.toString()));
+    }
+
 }
