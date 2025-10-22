@@ -1,6 +1,6 @@
-package com.jasonghent98.fitness_aggregator_api.repository;
+package com.jasonghent98.fitness_aggregator_api.repository.sync;
 
-import com.jasonghent98.fitness_aggregator_api.model.UserProviderSyncState;
+import com.jasonghent98.fitness_aggregator_api.model.sync.UserProviderSyncState;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

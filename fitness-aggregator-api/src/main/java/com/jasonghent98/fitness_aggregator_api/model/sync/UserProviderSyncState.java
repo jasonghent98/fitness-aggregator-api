@@ -1,4 +1,4 @@
-package com.jasonghent98.fitness_aggregator_api.model;
+package com.jasonghent98.fitness_aggregator_api.model.sync;
 
 import com.jasonghent98.fitness_aggregator_api.enums.UserProviderSyncBackfillStatus;
 import jakarta.persistence.*;
