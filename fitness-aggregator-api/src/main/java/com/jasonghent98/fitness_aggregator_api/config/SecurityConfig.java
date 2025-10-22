@@ -24,16 +24,14 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // keep routes open during dev; your controllers decide what to return
-                        .requestMatchers("/api/fitbit/**").permitAll()
-                        .requestMatchers("/api/strava/webhook", "/api/strava/webhook/**").permitAll()
-                        .requestMatchers("/api/auth/magic/**").permitAll()
                         .requestMatchers(
                                 "/api/strava/auth/**",
                                 "/api/fitbit/**",
                                 "/api/garmin/**",
                                 "/api/auth/whoami",
                                 "/api/config",
-                                "/actuator/**"
+                                "/actuator/**",
+                                "/api/auth/magic/**"
                         ).permitAll()
                         .anyRequest().permitAll()
                 )
@@ -46,14 +44,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
-        cfg.setAllowedOrigins(List.of(
+        /*cfg.setAllowedOrigins(List.of(
                 "https://dev.actualize.fit",
                 "http://localhost:3000",
                 "https://www.strava.com"
-        ));
+        ));*/
+        cfg.setAllowedOrigins(List.of("*"));
         cfg.setAllowedMethods(List.of("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
         cfg.setAllowedHeaders(List.of("Content-Type","Authorization","Accept","Origin"));
-        cfg.setAllowCredentials(true);
+        /*cfg.setAllowCredentials(true);*/
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
         return source;

@@ -65,7 +65,7 @@ INSERT INTO providers (auth_type, name, active) VALUES
 
 -- 4) Provider accounts (Garmin/Fitbit/Strava, etc.)
 CREATE TABLE IF NOT EXISTS provider_accounts (
-  id               bigserial PRIMARY KEY,
+  id               uuid PRIMARY KEY,
   user_id          uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   provider_id      integer NOT NULL REFERENCES providers(id),                             -- 'garmin' | 'fitbit' | 'strava' ...
   provider_user_id text,                                      -- external user id
@@ -354,6 +354,45 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 
 CREATE INDEX IF NOT EXISTS idx_subscriptions_user   ON subscriptions (user_id);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON subscriptions (status);
+
+
+-- TABLE TO KEEP TRACK OF SYNCS PER PROVIDER PER USER
+CREATE TABLE IF NOT EXISTS user_provider_sync_state (
+  id                           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  user_id                      UUID        NOT NULL,
+  provider_id                  smallint    NOT NULL,
+  dataset                      TEXT        NOT NULL,  -- e.g. 'sleep','hrv','daily','stress','pulseox','activities','oura_sleep',...
+
+  earliest_synced_date         DATE        NULL,      -- oldest date we have
+  latest_synced_date           DATE        NULL,      -- newest date we have
+
+  backfill_status              TEXT        NOT NULL DEFAULT 'IDLE', -- IDLE|RUNNING|SUCCESS|ERROR
+  backfill_started_at          TIMESTAMPTZ NULL,
+  backfill_finished_at         TIMESTAMPTZ NULL,
+
+  last_incremental_received_at TIMESTAMPTZ NULL,      -- last webhook “we saw new data” (optional but useful)
+
+  created_at                   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at                   TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  -- Relationships
+  CONSTRAINT fk_upss_user     FOREIGN KEY (user_id)     REFERENCES users(id)     ON DELETE CASCADE,
+  CONSTRAINT fk_upss_provider FOREIGN KEY (provider_id) REFERENCES providers(id) ON DELETE CASCADE,
+
+  -- One row per (user, provider, dataset)
+  CONSTRAINT uq_upss_user_provider_dataset UNIQUE (user_id, provider_id, dataset),
+
+  -- Sanity checks
+  CONSTRAINT ck_upss_backfill_status CHECK (backfill_status IN ('IDLE','RUNNING','SUCCESS','ERROR')),
+  CONSTRAINT ck_upss_date_range CHECK (
+    earliest_synced_date IS NULL OR latest_synced_date IS NULL OR earliest_synced_date <= latest_synced_date
+  )
+);
+
+-- Fast lookups by user, and by user+provider (the UNIQUE also helps).
+CREATE INDEX IF NOT EXISTS idx_upss_user            ON user_provider_sync_state (user_id);
+CREATE INDEX IF NOT EXISTS idx_upss_user_provider   ON user_provider_sync_state (user_id, provider_id);
 
 
 -- 9) Helpful triggers (optional)
