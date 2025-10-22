@@ -68,7 +68,18 @@ public class JwtSessionFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
         // Skip CORS preflight and anything else you want to allow through unconditionally
-        return "OPTIONS".equalsIgnoreCase(request.getMethod());
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
+        // Skip third-party webhook endpoints (they never send your JWT)
+
+        if (path.startsWith("/api/fitbit/webhook") ||
+                path.startsWith("/api/oura/webhook") ||
+                path.startsWith("/api/garmin/webhook")) {
+            return true;
+        }
+
+        return false;
     }
 }
