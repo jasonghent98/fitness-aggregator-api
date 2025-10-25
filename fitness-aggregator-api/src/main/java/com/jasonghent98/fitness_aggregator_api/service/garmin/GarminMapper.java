@@ -14,48 +14,48 @@ public class GarminMapper {
 
     GarminMapper() {}
 
-    public GarminActivitySummary mapActivityPayload(GarminActivitySummaryPayload dto, UUID actualizeUserId) {
+    public GarminActivitySummary mapActivityPayload(GarminActivitySummaryPayload.ActivitySummary dto, UUID actualizeUserId) {
         GarminActivitySummary model = new GarminActivitySummary();
-        model.setUserId(dto.getActivitySummary().getFirst().getUserId());
+        model.setUserId(dto.getUserId());
         model.setActualizeUserId(actualizeUserId);
-        model.setActivityId(dto.getActivitySummary().getFirst().getActivityId());
-        model.setSummaryId(dto.getActivitySummary().getFirst().getSummaryId());
-        model.setActivityName(dto.getActivitySummary().getFirst().getActivityName());
-        model.setActivityType(dto.getActivitySummary().getFirst().getActivityType());
-        model.setActivityDescription(dto.getActivitySummary().getFirst().getActivityDescription());
-        model.setDurationInSeconds(dto.getActivitySummary().getFirst().getDurationInSeconds());
-        model.setStartTimeInSeconds(dto.getActivitySummary().getFirst().getStartTimeInSeconds());
-        model.setStartTimeOffsetInSeconds(dto.getActivitySummary().getFirst().getStartTimeOffsetInSeconds());
-        model.setAverageBikeCadenceInRoundsPerMinute(dto.getActivitySummary().getFirst().getAverageBikeCadenceInRoundsPerMinute());
-        model.setAverageHeartRateInBeatsPerMinute(dto.getActivitySummary().getFirst().getAverageHeartRateInBeatsPerMinute());
-        model.setAverageRunCadenceInStepsPerMinute(dto.getActivitySummary().getFirst().getAverageRunCadenceInStepsPerMinute());
-        model.setAveragePushCadenceInPushesPerMinute(dto.getActivitySummary().getFirst().getAveragePushCadenceInPushesPerMinute());
-        model.setAverageSpeedInMetersPerSecond(dto.getActivitySummary().getFirst().getAverageSpeedInMetersPerSecond());
-        model.setActivityType(dto.getActivitySummary().getFirst().getActivityType());
-        model.setAverageSwimCadenceInStrokesPerMinute(dto.getActivitySummary().getFirst().getAverageSwimCadenceInStrokesPerMinute());
-        model.setAveragePaceInMinutesPerKilometer(dto.getActivitySummary().getFirst().getAveragePaceInMinutesPerKilometer());
-        model.setActiveKilocalories(dto.getActivitySummary().getFirst().getActiveKilocalories());
-        model.setDistanceInMeters(dto.getActivitySummary().getFirst().getDistanceInMeters());
-        model.setDeviceName(dto.getActivitySummary().getFirst().getDeviceName());
-        model.setMaxBikeCadenceInRoundsPerMinute(dto.getActivitySummary().getFirst().getMaxBikeCadenceInRoundsPerMinute());
-        model.setMaxHeartRateInBeatsPerMinute(dto.getActivitySummary().getFirst().getMaxHeartRateInBeatsPerMinute());
-        model.setMaxPaceInMinutesPerKilometer(dto.getActivitySummary().getFirst().getMaxPaceInMinutesPerKilometer());
-        model.setMaxRunCadenceInStepsPerMinute(dto.getActivitySummary().getFirst().getMaxRunCadenceInStepsPerMinute());
-        model.setMaxPushCadenceInPushesPerMinute(dto.getActivitySummary().getFirst().getMaxPushCadenceInPushesPerMinute());
-        model.setMaxSpeedInMetersPerSecond(dto.getActivitySummary().getFirst().getMaxSpeedInMetersPerSecond());
-        model.setStartingLatitudeInDegree(dto.getActivitySummary().getFirst().getStartingLatitudeInDegree());
-        model.setStartingLongitudeInDegree(dto.getActivitySummary().getFirst().getStartingLongitudeInDegree());
-        model.setSteps(dto.getActivitySummary().getFirst().getSteps());
-        model.setPushes(dto.getActivitySummary().getFirst().getPushes());
-        model.setTotalElevationGainInMeters(dto.getActivitySummary().getFirst().getTotalElevationGainInMeters());
-        model.setTotalElevationLossInMeters(dto.getActivitySummary().getFirst().getTotalElevationLossInMeters());
-        model.setManual(dto.getActivitySummary().getFirst().getManual());
-        model.setIsWebUpload(dto.getActivitySummary().getFirst().getIsWebUpload());
+        model.setActivityId(dto.getActivityId());
+        model.setSummaryId(dto.getSummaryId());
+        model.setActivityName(dto.getActivityName());
+        model.setActivityType(dto.getActivityType());
+        model.setActivityDescription(dto.getActivityDescription());
+        model.setDurationInSeconds(dto.getDurationInSeconds());
+        model.setStartTimeInSeconds(dto.getStartTimeInSeconds());
+        model.setStartTimeOffsetInSeconds(dto.getStartTimeOffsetInSeconds());
+        model.setAverageBikeCadenceInRoundsPerMinute(dto.getAverageBikeCadenceInRoundsPerMinute());
+        model.setAverageHeartRateInBeatsPerMinute(dto.getAverageHeartRateInBeatsPerMinute());
+        model.setAverageRunCadenceInStepsPerMinute(dto.getAverageRunCadenceInStepsPerMinute());
+        model.setAveragePushCadenceInPushesPerMinute(dto.getAveragePushCadenceInPushesPerMinute());
+        model.setAverageSpeedInMetersPerSecond(dto.getAverageSpeedInMetersPerSecond());
+        model.setActivityType(dto.getActivityType());
+        model.setAverageSwimCadenceInStrokesPerMinute(dto.getAverageSwimCadenceInStrokesPerMinute());
+        model.setAveragePaceInMinutesPerKilometer(dto.getAveragePaceInMinutesPerKilometer());
+        model.setActiveKilocalories(dto.getActiveKilocalories());
+        model.setDistanceInMeters(dto.getDistanceInMeters());
+        model.setDeviceName(dto.getDeviceName());
+        model.setMaxBikeCadenceInRoundsPerMinute(dto.getMaxBikeCadenceInRoundsPerMinute());
+        model.setMaxHeartRateInBeatsPerMinute(dto.getMaxHeartRateInBeatsPerMinute());
+        model.setMaxPaceInMinutesPerKilometer(dto.getMaxPaceInMinutesPerKilometer());
+        model.setMaxRunCadenceInStepsPerMinute(dto.getMaxRunCadenceInStepsPerMinute());
+        model.setMaxPushCadenceInPushesPerMinute(dto.getMaxPushCadenceInPushesPerMinute());
+        model.setMaxSpeedInMetersPerSecond(dto.getMaxSpeedInMetersPerSecond());
+        model.setStartingLatitudeInDegree(dto.getStartingLatitudeInDegree());
+        model.setStartingLongitudeInDegree(dto.getStartingLongitudeInDegree());
+        model.setSteps(dto.getSteps());
+        model.setPushes(dto.getPushes());
+        model.setTotalElevationGainInMeters(dto.getTotalElevationGainInMeters());
+        model.setTotalElevationLossInMeters(dto.getTotalElevationLossInMeters());
+        model.setManual(dto.getManual());
+        model.setIsWebUpload(dto.getIsWebUpload());
 
         // model.setLaps(dto.getActivitySummary().getFirst().getLap);
         // persist the utc timestamp to Local Date type for easier querying
 
-        Instant instant = Instant.ofEpochSecond(dto.getActivitySummary().getFirst().getStartTimeInSeconds());
+        Instant instant = Instant.ofEpochSecond(dto.getStartTimeInSeconds());
         LocalDate calendarDate = instant.atZone(ZoneOffset.UTC).toLocalDate();
         model.setCalendarDate(calendarDate);
         return model;
@@ -111,34 +111,34 @@ public class GarminMapper {
         return model;
     }
 
-    public GarminDailySummary mapDailyPayload(GarminDailySummaryPayload dto, UUID actualizeUserId) {
+    public GarminDailySummary mapDailyPayload(GarminDailySummaryPayload.DailySummary dto, UUID actualizeUserId) {
         GarminDailySummary model = new GarminDailySummary();
-        model.setSummaryId(dto.getDailySummaries().getFirst().getSummaryId());
-        model.setUserId(dto.getDailySummaries().getFirst().getUserId());
+        model.setSummaryId(dto.getSummaryId());
+        model.setUserId(dto.getUserId());
         model.setActualizeUserId(actualizeUserId);
-        model.setCalendarDate(dto.getDailySummaries().getFirst().getCalendarDate());
-        model.setSummaryId(dto.getDailySummaries().getFirst().getSummaryId());
-        model.setSteps(dto.getDailySummaries().getFirst().getSteps());
-        model.setStepsGoal(dto.getDailySummaries().getFirst().getStepsGoal());
-        model.setDistanceInMeters(dto.getDailySummaries().getFirst().getDistanceInMeters());
-        model.setActiveKilocalories(dto.getDailySummaries().getFirst().getActiveKilocalories());
-        model.setBmrKilocalories(dto.getDailySummaries().getFirst().getBmrKilocalories());
-        model.setMinHeartRate(dto.getDailySummaries().getFirst().getMinHeartRate());
-        model.setAverageHeartRate(dto.getDailySummaries().getFirst().getAverageHeartRate());
-        model.setMaxHeartRate(dto.getDailySummaries().getFirst().getMaxHeartRate());
-        model.setRestingHeartRate(dto.getDailySummaries().getFirst().getRestingHeartRate());
-        model.setTimeOffsetHeartRateSamples(dto.getDailySummaries().getFirst().getHeartRateSamples());
-        model.setStressDurationInSeconds(dto.getDailySummaries().getFirst().getStressDuration());
-        model.setLowStressDurationInSeconds(dto.getDailySummaries().getFirst().getLowStressDuration());
-        model.setMediumStressDurationInSeconds(dto.getDailySummaries().getFirst().getMediumStressDuration());
-        model.setHighStressDurationInSeconds(dto.getDailySummaries().getFirst().getHighStressDuration());
-        model.setDurationInSeconds(dto.getDailySummaries().getFirst().getDurationInSeconds());
-        model.setActiveTimeInSeconds(dto.getDailySummaries().getFirst().getActiveTimeInSeconds());
-        model.setMaxStressLevel(dto.getDailySummaries().getFirst().getMaxStressLevel());
-        model.setAverageStressLevel(dto.getDailySummaries().getFirst().getAverageStressLevel());
-        model.setFloorsClimbed(dto.getDailySummaries().getFirst().getFloorsClimbed());
-        model.setModerateIntensityDurationInSeconds(dto.getDailySummaries().getFirst().getModerateIntensityDuration());
-        model.setVigorousIntensityDurationInSeconds(dto.getDailySummaries().getFirst().getVigorousIntensityDuration());
+        model.setCalendarDate(dto.getCalendarDate());
+        model.setSummaryId(dto.getSummaryId());
+        model.setSteps(dto.getSteps());
+        model.setStepsGoal(dto.getStepsGoal());
+        model.setDistanceInMeters(dto.getDistanceInMeters());
+        model.setActiveKilocalories(dto.getActiveKilocalories());
+        model.setBmrKilocalories(dto.getBmrKilocalories());
+        model.setMinHeartRate(dto.getMinHeartRate());
+        model.setAverageHeartRate(dto.getAverageHeartRate());
+        model.setMaxHeartRate(dto.getMaxHeartRate());
+        model.setRestingHeartRate(dto.getRestingHeartRate());
+        model.setTimeOffsetHeartRateSamples(dto.getHeartRateSamples());
+        model.setStressDurationInSeconds(dto.getStressDuration());
+        model.setLowStressDurationInSeconds(dto.getLowStressDuration());
+        model.setMediumStressDurationInSeconds(dto.getMediumStressDuration());
+        model.setHighStressDurationInSeconds(dto.getHighStressDuration());
+        model.setDurationInSeconds(dto.getDurationInSeconds());
+        model.setActiveTimeInSeconds(dto.getActiveTimeInSeconds());
+        model.setMaxStressLevel(dto.getMaxStressLevel());
+        model.setAverageStressLevel(dto.getAverageStressLevel());
+        model.setFloorsClimbed(dto.getFloorsClimbed());
+        model.setModerateIntensityDurationInSeconds(dto.getModerateIntensityDuration());
+        model.setVigorousIntensityDurationInSeconds(dto.getVigorousIntensityDuration());
         return model;
     }
 

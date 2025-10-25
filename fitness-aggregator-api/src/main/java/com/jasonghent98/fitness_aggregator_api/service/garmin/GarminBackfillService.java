@@ -6,7 +6,6 @@ import com.jasonghent98.fitness_aggregator_api.model.sync.UserProviderSyncState;
 import com.jasonghent98.fitness_aggregator_api.repository.garmin.*;
 import com.jasonghent98.fitness_aggregator_api.service.ProviderAccountService;
 import com.jasonghent98.fitness_aggregator_api.service.sync.SyncUserProviderStateService;
-import com.jasonghent98.fitness_aggregator_api.service.sync.SyncDataset;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,11 +73,12 @@ public class GarminBackfillService {
 
     @Transactional
     public void backfillDaily(UUID userId, Short providerId, String provUserId, LocalDate start, LocalDate end) {
+        // upsert a sync state record in db for race conditions
         UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "daily");
         syncState.markBackfillRunning(s);
         try {
-            for (var it : api.fetchDaily(provUserId, start, end)) {
-                try { dailyRepo.save(mapper.toDaily(it, userId)); }
+            for (var obj : api.fetchDaily(userId, start, end)) {
+                try { dailyRepo.save(mapper.mapDailyPayload(obj, userId)); }
                 catch (DataIntegrityViolationException ignoreDup) {}
             }
             syncState.markBackfillSuccess(s, start, end);
@@ -93,9 +93,9 @@ public class GarminBackfillService {
         UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "sleep");
         syncState.markBackfillRunning(s);
         try {
-            for (var it : api.fetchSleep(provUserId, start, end)) {
-                try { sleepRepo.save(mapper.toSleep(it, userId)); }
-                catch (DataIntegrityViolationException ignoreDup) {}
+            for (var it : api.fetchSleep(userId, start, end)) {
+                /*try { sleepRepo.save(mapper.toSleep(it, userId)); }
+                catch (DataIntegrityViolationException ignoreDup) {}*/
             }
             syncState.markBackfillSuccess(s, start, end);
         } catch (Exception ex) {
@@ -109,9 +109,9 @@ public class GarminBackfillService {
         UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "stress");
         syncState.markBackfillRunning(s);
         try {
-            for (var it : api.fetchStress(provUserId, start, end)) {
-                try { stressRepo.save(mapper.toStress(it, userId)); }
-                catch (DataIntegrityViolationException ignoreDup) {}
+            for (var it : api.fetchStress(userId, start, end)) {
+                /*try { stressRepo.save(mapper.toStress(it, userId)); }
+                catch (DataIntegrityViolationException ignoreDup) {}*/
             }
             syncState.markBackfillSuccess(s, start, end);
         } catch (Exception ex) {
@@ -125,9 +125,9 @@ public class GarminBackfillService {
         UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "hrv");
         syncState.markBackfillRunning(s);
         try {
-            for (var it : api.fetchHrv(provUserId, start, end)) {
-                try { hrvRepo.save(mapper.toHrv(it, userId)); }
-                catch (DataIntegrityViolationException ignoreDup) {}
+            for (var it : api.fetchHrv(userId, start, end)) {
+                /*try { hrvRepo.save(mapper.toHrv(it, userId)); }
+                catch (DataIntegrityViolationException ignoreDup) {}*/
             }
             syncState.markBackfillSuccess(s, start, end);
         } catch (Exception ex) {
@@ -141,9 +141,9 @@ public class GarminBackfillService {
         UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "pulse_ox");
         syncState.markBackfillRunning(s);
         try {
-            for (var it : api.fetchPulseOx(provUserId, start, end)) {
-                try { pulseRepo.save(mapper.toPulseOx(it, userId)); }
-                catch (DataIntegrityViolationException ignoreDup) {}
+            for (var it : api.fetchPulseOx(userId, start, end)) {
+                /*try { pulseRepo.save(mapper.toPulseOx(it, userId)); }
+                catch (DataIntegrityViolationException ignoreDup) {}*/
             }
             syncState.markBackfillSuccess(s, start, end);
         } catch (Exception ex) {
@@ -157,9 +157,9 @@ public class GarminBackfillService {
         UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "activity");
         syncState.markBackfillRunning(s);
         try {
-            for (var it : api.fetchActivities(provUserId, start, end)) {
-                try { activityRepo.save(mapper.toActivity(it, userId)); }
-                catch (DataIntegrityViolationException ignoreDup) {}
+            for (var it : api.fetchActivities(userId, start, end)) {
+                /*try { activityRepo.save(mapper.toActivity(it, userId)); }
+                catch (DataIntegrityViolationException ignoreDup) {}*/
             }
             syncState.markBackfillSuccess(s, start, end);
         } catch (Exception ex) {

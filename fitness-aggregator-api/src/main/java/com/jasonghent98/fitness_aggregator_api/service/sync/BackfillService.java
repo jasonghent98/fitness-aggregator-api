@@ -31,7 +31,7 @@ public class BackfillService {
     public void triggerBackfill(UUID userId, Provider provider, String tier) {
         ProviderAccount pa = paRepo.findByUserIdAndProvider(userId, provider).orElseThrow(() -> new IllegalArgumentException("No provider account found"));
 
-        var window = windowService.computeWindow(tier);
+        TierWindowService.DateWindow window = windowService.computeWindow(tier);
 
 
         switch (pa.getProvider().getName().toLowerCase()) {

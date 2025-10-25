@@ -71,8 +71,10 @@ public class GarminWebhookService {
             );
             UUID userId = garminAcc.getUser().getId();
             // persist
-           GarminActivitySummary persist = garminMapper.mapActivityPayload(payload, userId);
-           garminActivityRepo.save(persist);
+            for (GarminActivitySummaryPayload.ActivitySummary d: payload.getActivitySummary()) {
+                GarminActivitySummary persist = garminMapper.mapActivityPayload(d, userId);
+                garminActivityRepo.save(persist);
+            }
 
         } catch (Exception e) {
             log.error("Error persisting Garmin Activity payload", e);
@@ -97,8 +99,10 @@ public class GarminWebhookService {
             );
             UUID userId = garminAcc.getUser().getId();
             // persist
-            GarminDailySummary persist = garminMapper.mapDailyPayload(payload, userId);
-            garminDailyRepo.save(persist);
+            for (GarminDailySummaryPayload.DailySummary d : payload.getDailySummaries()) {
+                GarminDailySummary persist = garminMapper.mapDailyPayload(d, userId);
+                garminDailyRepo.save(persist);
+            }
 
         } catch (Exception e) {
             log.error("Error persisting Garmin Daily payload", e);
