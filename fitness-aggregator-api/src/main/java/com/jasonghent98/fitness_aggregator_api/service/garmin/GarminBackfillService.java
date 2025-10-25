@@ -1,5 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.service.garmin;
 
+import com.jasonghent98.fitness_aggregator_api.dto.garmin.webhook.*;
 import com.jasonghent98.fitness_aggregator_api.model.ProviderAccount;
 import com.jasonghent98.fitness_aggregator_api.model.garmin.*;
 import com.jasonghent98.fitness_aggregator_api.model.sync.UserProviderSyncState;
@@ -31,6 +32,8 @@ public class GarminBackfillService {
     private final GarminHrvRepository hrvRepo;
     private final GarminPulseOxRepository pulseRepo;
     private final GarminActivityRepository activityRepo;
+    // ! avoid db call but make sure this always remains constant
+    private final Short GARMIN_PROVIDER_ID = 1;
 
     public GarminBackfillService(
             GarminApiClient api,
@@ -58,23 +61,18 @@ public class GarminBackfillService {
 
     @Async
     public void backfillAll(UUID actualizeUserId, LocalDate start, LocalDate end) {
-        // Fetch Garmin link for this user
-        ProviderAccount garmin = providerAccounts.getProviderAccountForUserAndProvider("garmin", actualizeUserId);
-        String providerUserId = garmin.getProviderUserId();
-        Short providerId = garmin.getProvider().getId(); // FK to providers table
-
-        backfillDaily(actualizeUserId, providerId, providerUserId, start, end);
-        backfillSleep(actualizeUserId, providerId, providerUserId, start, end);
-        backfillStress(actualizeUserId, providerId, providerUserId, start, end);
-        backfillHrv(actualizeUserId, providerId, providerUserId, start, end);
-        backfillPulseOx(actualizeUserId, providerId, providerUserId, start, end);
-        backfillActivities(actualizeUserId, providerId, providerUserId, start, end);
+        backfillDaily(actualizeUserId, start, end);
+        backfillSleep(actualizeUserId, start, end);
+        backfillStress(actualizeUserId, start, end);
+        backfillHrv(actualizeUserId, start, end);
+        backfillPulseOx(actualizeUserId,  start, end);
+        backfillActivities(actualizeUserId,  start, end);
     }
 
     @Transactional
-    public void backfillDaily(UUID userId, Short providerId, String provUserId, LocalDate start, LocalDate end) {
+    public void backfillDaily(UUID userId, LocalDate start, LocalDate end) {
         // upsert a sync state record in db for race conditions
-        UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "daily");
+        UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "daily");
         syncState.markBackfillRunning(s);
         try {
             for (var obj : api.fetchDaily(userId, start, end)) {
@@ -89,11 +87,11 @@ public class GarminBackfillService {
     }
 
     @Transactional
-    public void backfillSleep(UUID userId, Short providerId, String provUserId, LocalDate start, LocalDate end) {
-        UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "sleep");
+    public void backfillSleep(UUID userId, LocalDate start, LocalDate end) {
+        UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "sleep");
         syncState.markBackfillRunning(s);
         try {
-            for (var it : api.fetchSleep(userId, start, end)) {
+            for (GarminSleepSummaryPayload.SleepSummary d : api.fetchSleep(userId, start, end)) {
                 /*try { sleepRepo.save(mapper.toSleep(it, userId)); }
                 catch (DataIntegrityViolationException ignoreDup) {}*/
             }
@@ -105,11 +103,11 @@ public class GarminBackfillService {
     }
 
     @Transactional
-    public void backfillStress(UUID userId, Short providerId, String provUserId, LocalDate start, LocalDate end) {
-        UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "stress");
+    public void backfillStress(UUID userId, LocalDate start, LocalDate end) {
+        UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "stress");
         syncState.markBackfillRunning(s);
         try {
-            for (var it : api.fetchStress(userId, start, end)) {
+            for (GarminStressSummaryPayload.StressSummary d: api.fetchStress(userId, start, end)) {
                 /*try { stressRepo.save(mapper.toStress(it, userId)); }
                 catch (DataIntegrityViolationException ignoreDup) {}*/
             }
@@ -121,11 +119,11 @@ public class GarminBackfillService {
     }
 
     @Transactional
-    public void backfillHrv(UUID userId, Short providerId, String provUserId, LocalDate start, LocalDate end) {
-        UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "hrv");
+    public void backfillHrv(UUID userId, LocalDate start, LocalDate end) {
+        UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "hrv");
         syncState.markBackfillRunning(s);
         try {
-            for (var it : api.fetchHrv(userId, start, end)) {
+            for (GarminHrvSummaryPayload.HrvSummary it : api.fetchHrv(userId, start, end)) {
                 /*try { hrvRepo.save(mapper.toHrv(it, userId)); }
                 catch (DataIntegrityViolationException ignoreDup) {}*/
             }
@@ -137,11 +135,11 @@ public class GarminBackfillService {
     }
 
     @Transactional
-    public void backfillPulseOx(UUID userId, Short providerId, String provUserId, LocalDate start, LocalDate end) {
-        UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "pulse_ox");
+    public void backfillPulseOx(UUID userId, LocalDate start, LocalDate end) {
+        UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "pulse_ox");
         syncState.markBackfillRunning(s);
         try {
-            for (var it : api.fetchPulseOx(userId, start, end)) {
+            for (GarminPulseOxSummaryPayload.PulseOxSummary d : api.fetchPulseOx(userId, start, end)) {
                 /*try { pulseRepo.save(mapper.toPulseOx(it, userId)); }
                 catch (DataIntegrityViolationException ignoreDup) {}*/
             }
@@ -153,11 +151,11 @@ public class GarminBackfillService {
     }
 
     @Transactional
-    public void backfillActivities(UUID userId, Short providerId, String provUserId, LocalDate start, LocalDate end) {
-        UserProviderSyncState s = syncState.getOrCreate(userId, providerId, "activity");
+    public void backfillActivities(UUID userId, LocalDate start, LocalDate end) {
+        UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "activity");
         syncState.markBackfillRunning(s);
         try {
-            for (var it : api.fetchActivities(userId, start, end)) {
+            for (GarminActivitySummaryPayload.ActivitySummary d : api.fetchActivities(userId, start, end)) {
                 /*try { activityRepo.save(mapper.toActivity(it, userId)); }
                 catch (DataIntegrityViolationException ignoreDup) {}*/
             }
