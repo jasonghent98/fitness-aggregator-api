@@ -13,6 +13,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,14 +34,14 @@ public class GarminApiClient {
             UUID userId, LocalDate start, LocalDate end
     ) {
         String token = getBearer(userId);
-        String url = garminBackfillUrl + "/rest/dailies";
+        EpochWindow epochWindow = toGarminUploadWindow(start, end);
+        String url = garminBackfillUrl + "/rest/dailies?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
         GarminDailySummaryPayload payload = get(
                 url,
                 GarminDailySummaryPayload.class,
                 Map.of(
-                        "uid", userId,
-                        "start", start.toString(),
-                        "end", end.toString()
+                        "start", epochWindow.startSec,
+                        "end", epochWindow.endSec
                 ),
                 token
         );
@@ -53,14 +54,14 @@ public class GarminApiClient {
             UUID userId, LocalDate start, LocalDate end
     ) {
         String token = getBearer(userId);
-        String url = garminBackfillUrl + "/users/{uid}/sleep?start={start}&end={end}";
+        EpochWindow epochWindow = toGarminUploadWindow(start, end);
+        String url = garminBackfillUrl + "/rest/sleeps?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
         GarminSleepSummaryPayload payload = get(
                 url,
                 GarminSleepSummaryPayload.class,
                 Map.of(
-                        "uid", userId,
-                        "start", start.toString(),
-                        "end", end.toString()
+                        "start", epochWindow.startSec,
+                        "end", epochWindow.endSec
                 ),
                 token
         );
@@ -73,14 +74,14 @@ public class GarminApiClient {
             UUID userId, LocalDate start, LocalDate end
     ) {
         String token = getBearer(userId);
-        String url = garminBackfillUrl + "/users/{uid}/stress?start={start}&end={end}";
+        EpochWindow epochWindow = toGarminUploadWindow(start, end);
+        String url = garminBackfillUrl + "/rest/stressDetails?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
         GarminStressSummaryPayload payload = get(
                 url,
                 GarminStressSummaryPayload.class,
                 Map.of(
-                        "uid", userId,
-                        "start", start.toString(),
-                        "end", end.toString()
+                        "start", epochWindow.startSec,
+                        "end", epochWindow.endSec
                 ),
                 token
         );
@@ -93,14 +94,14 @@ public class GarminApiClient {
             UUID userId, LocalDate start, LocalDate end
     ) {
         String token = getBearer(userId);
-        String url = garminBackfillUrl + "/users/{uid}/hrv?start={start}&end={end}";
+        EpochWindow epochWindow = toGarminUploadWindow(start, end);
+        String url = garminBackfillUrl + "/rest/hrv?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
         GarminHrvSummaryPayload payload = get(
                 url,
                 GarminHrvSummaryPayload.class,
                 Map.of(
-                        "uid", userId,
-                        "start", start.toString(),
-                        "end", end.toString()
+                        "start", epochWindow.startSec,
+                        "end", epochWindow.endSec
                 ),
                 token
         );
@@ -113,14 +114,14 @@ public class GarminApiClient {
             UUID userId, LocalDate start, LocalDate end
     ) {
         String token = getBearer(userId);
-        String url = garminBackfillUrl + "/users/{uid}/pulse-ox?start={start}&end={end}";
+        EpochWindow epochWindow = toGarminUploadWindow(start, end);
+        String url = garminBackfillUrl + "/rest/pulseOx?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
         GarminPulseOxSummaryPayload payload = get(
                 url,
                 GarminPulseOxSummaryPayload.class,
                 Map.of(
-                        "uid", userId,
-                        "start", start.toString(),
-                        "end", end.toString()
+                        "start", epochWindow.startSec,
+                        "end", epochWindow.startSec
                 ),
                 token
         );
@@ -133,16 +134,16 @@ public class GarminApiClient {
             UUID userId, LocalDate start, LocalDate end
     ) {
         String token = getBearer(userId);
-        String url = garminBackfillUrl + "/users/{uid}/activities?start={start}&end={end}";
+        EpochWindow epochWindow = toGarminUploadWindow(start, end);
+        String url = garminBackfillUrl + "/users/{uid}/activities?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
 
         // If Garmin paginates activities, swap to a loop over pages here.
         GarminActivitySummaryPayloadWrapper payload = get(
                 url,
                 GarminActivitySummaryPayloadWrapper.class,
                 Map.of(
-                        "uid", userId,
-                        "start", start.toString(),
-                        "end", end.toString()
+                        "start", epochWindow.startSec,
+                        "end", epochWindow.endSec
                 ),
                 token
         );
@@ -218,4 +219,12 @@ public class GarminApiClient {
     public record GarminActivitySummaryPayloadWrapper(
             List<GarminActivitySummaryPayload.ActivitySummary> activityDetails
     ) {}
+
+    public record EpochWindow(long startSec, long endSec) {}
+
+    public static EpochWindow toGarminUploadWindow(LocalDate s, LocalDate e) {
+        long start = s.atStartOfDay(ZoneOffset.UTC).toEpochSecond();
+        long end = e.plusDays(1).atStartOfDay(ZoneOffset.UTC).toEpochSecond();
+        return new EpochWindow(start, end);
+    }
 }

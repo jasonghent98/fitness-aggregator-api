@@ -61,12 +61,14 @@ public class GarminBackfillService {
 
     @Async
     public void backfillAll(UUID actualizeUserId, LocalDate start, LocalDate end) {
+        System.out.println("running GarminBackfillService");
         backfillDaily(actualizeUserId, start, end);
         backfillSleep(actualizeUserId, start, end);
         backfillStress(actualizeUserId, start, end);
         backfillHrv(actualizeUserId, start, end);
         backfillPulseOx(actualizeUserId,  start, end);
         backfillActivities(actualizeUserId,  start, end);
+        System.out.println("finishing GarminBackfillService");
     }
 
     @Transactional
