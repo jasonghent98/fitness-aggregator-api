@@ -30,12 +30,13 @@ public class GarminApiClient {
     @Value("${garmin.BACKFILL_URL:https://apis.garmin.com/wellness-api}")
     private String garminBackfillUrl;
 
+    /** Enqueue garmin daily backfill */
     public List<GarminDailySummaryPayload.DailySummary> fetchDaily(
             UUID userId, LocalDate start, LocalDate end
     ) {
-        String token = getBearer(userId);
+        String userAccessToken = getBearer(userId);
         EpochWindow epochWindow = toGarminUploadWindow(start, end);
-        String url = garminBackfillUrl + "/rest/dailies?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
+        String url = garminBackfillUrl + "/rest/backfill/dailies?summaryStartTimeInSeconds={start}&summaryEndTimeInSeconds={end}";
         GarminDailySummaryPayload payload = get(
                 url,
                 GarminDailySummaryPayload.class,
@@ -43,19 +44,20 @@ public class GarminApiClient {
                         "start", epochWindow.startSec,
                         "end", epochWindow.endSec
                 ),
-                token
+                userAccessToken
         );
         return payload != null && payload.getDailySummaries() != null
                 ? payload.getDailySummaries()
                 : Collections.emptyList();
     }
 
+    /** Enqueue garmin sleep backfill */
     public List<GarminSleepSummaryPayload.SleepSummary> fetchSleep(
             UUID userId, LocalDate start, LocalDate end
     ) {
-        String token = getBearer(userId);
+        String userAccessToken = getBearer(userId);
         EpochWindow epochWindow = toGarminUploadWindow(start, end);
-        String url = garminBackfillUrl + "/rest/sleeps?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
+        String url = garminBackfillUrl + "/rest/backfill/sleeps?summaryStartTimeInSeconds={start}&summaryEndTimeInSeconds={end}";
         GarminSleepSummaryPayload payload = get(
                 url,
                 GarminSleepSummaryPayload.class,
@@ -63,19 +65,20 @@ public class GarminApiClient {
                         "start", epochWindow.startSec,
                         "end", epochWindow.endSec
                 ),
-                token
+                userAccessToken
         );
         return payload != null && payload.getSleepSummaries() != null
                 ? payload.getSleepSummaries()
                 : Collections.emptyList();
     }
 
+    /** Enqueue garmin stress backfill */
     public List<GarminStressSummaryPayload.StressSummary> fetchStress(
             UUID userId, LocalDate start, LocalDate end
     ) {
-        String token = getBearer(userId);
+        String userAccessToken = getBearer(userId);
         EpochWindow epochWindow = toGarminUploadWindow(start, end);
-        String url = garminBackfillUrl + "/rest/stressDetails?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
+        String url = garminBackfillUrl + "/rest/backfill/stressDetails?summaryStartTimeInSeconds={start}&summaryEndTimeInSeconds={end}";
         GarminStressSummaryPayload payload = get(
                 url,
                 GarminStressSummaryPayload.class,
@@ -83,19 +86,20 @@ public class GarminApiClient {
                         "start", epochWindow.startSec,
                         "end", epochWindow.endSec
                 ),
-                token
+                userAccessToken
         );
         return payload != null && payload.getStressSummaries() != null
                 ? payload.getStressSummaries()
                 : Collections.emptyList();
     }
 
+    /** Enqueue garmin hrv backfill */
     public List<GarminHrvSummaryPayload.HrvSummary> fetchHrv(
             UUID userId, LocalDate start, LocalDate end
     ) {
-        String token = getBearer(userId);
+        String userAccessToken = getBearer(userId);
         EpochWindow epochWindow = toGarminUploadWindow(start, end);
-        String url = garminBackfillUrl + "/rest/hrv?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
+        String url = garminBackfillUrl + "/rest/backfill/hrv?summaryStartTimeInSeconds={start}&summaryEndTimeInSeconds={end}";
         GarminHrvSummaryPayload payload = get(
                 url,
                 GarminHrvSummaryPayload.class,
@@ -103,19 +107,20 @@ public class GarminApiClient {
                         "start", epochWindow.startSec,
                         "end", epochWindow.endSec
                 ),
-                token
+                userAccessToken
         );
         return payload != null && payload.getHrvSummaries() != null
                 ? payload.getHrvSummaries()
                 : Collections.emptyList();
     }
 
+    /** Enqueue garmin pulseox backfill */
     public List<GarminPulseOxSummaryPayload.PulseOxSummary> fetchPulseOx(
             UUID userId, LocalDate start, LocalDate end
     ) {
-        String token = getBearer(userId);
+        String userAccessToken = getBearer(userId);
         EpochWindow epochWindow = toGarminUploadWindow(start, end);
-        String url = garminBackfillUrl + "/rest/pulseOx?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
+        String url = garminBackfillUrl + "/rest/backfill/pulseOx?summaryStartTimeInSeconds={start}&summaryEndTimeInSeconds={end}";
         GarminPulseOxSummaryPayload payload = get(
                 url,
                 GarminPulseOxSummaryPayload.class,
@@ -123,21 +128,21 @@ public class GarminApiClient {
                         "start", epochWindow.startSec,
                         "end", epochWindow.startSec
                 ),
-                token
+                userAccessToken
         );
         return payload != null && payload.getPulseOxSummaries() != null
                 ? payload.getPulseOxSummaries()
                 : Collections.emptyList();
     }
 
+    /** Enqueue garmin activities backfill */
     public List<GarminActivitySummaryPayload.ActivitySummary> fetchActivities(
             UUID userId, LocalDate start, LocalDate end
     ) {
-        String token = getBearer(userId);
+        String userAccessToken = getBearer(userId);
         EpochWindow epochWindow = toGarminUploadWindow(start, end);
-        String url = garminBackfillUrl + "/users/{uid}/activities?uploadStartTimeInSeconds={start}&uploadEndTimeInSeconds={end}";
+        String url = garminBackfillUrl + "/rest/backfill/activities?summaryStartTimeInSeconds={start}&summaryEndTimeInSeconds={end}";
 
-        // If Garmin paginates activities, swap to a loop over pages here.
         GarminActivitySummaryPayloadWrapper payload = get(
                 url,
                 GarminActivitySummaryPayloadWrapper.class,
@@ -145,7 +150,7 @@ public class GarminApiClient {
                         "start", epochWindow.startSec,
                         "end", epochWindow.endSec
                 ),
-                token
+                userAccessToken
         );
         return payload != null && payload.activityDetails() != null
                 ? payload.activityDetails()

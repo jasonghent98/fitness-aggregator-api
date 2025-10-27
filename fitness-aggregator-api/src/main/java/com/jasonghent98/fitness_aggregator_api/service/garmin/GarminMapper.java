@@ -62,52 +62,52 @@ public class GarminMapper {
     }
 
 
-    public GarminSleepSummary mapSleepPayload(GarminSleepSummaryPayload dto, UUID actualizeUserId) {
+    public GarminSleepSummary mapSleepPayload(GarminSleepSummaryPayload.SleepSummary dto, UUID actualizeUserId) {
         GarminSleepSummary model = new GarminSleepSummary();
-        model.setUserId(dto.getSleepSummaries().getFirst().getUserId());
+        model.setUserId(dto.getUserId());
         model.setActualizeUserId(actualizeUserId);
-        model.setSummaryId(dto.getSleepSummaries().getFirst().getSummaryId());
-        model.setCalendarDate(dto.getSleepSummaries().getFirst().getCalendarDate());
-        model.setDurationInSeconds(dto.getSleepSummaries().getFirst().getDurationInSeconds());
-        model.setDeepSleepDurationInSeconds(dto.getSleepSummaries().getFirst().getDeepSleepDurationInSeconds());
-        model.setLightSleepDurationInSeconds(dto.getSleepSummaries().getFirst().getLightSleepDurationInSeconds());
-        model.setRemSleepInSeconds(dto.getSleepSummaries().getFirst().getRemSleepInSeconds());
-        model.setAwakeDurationInSeconds(dto.getSleepSummaries().getFirst().getAwakeDurationInSeconds());
-        model.setNaps(dto.getSleepSummaries().getFirst().getNaps());
-        model.setStartTimeInSeconds(dto.getSleepSummaries().getFirst().getStartTimeInSeconds());
-        model.setStartTimeOffsetInSeconds(dto.getSleepSummaries().getFirst().getStartTimeOffsetInSeconds());
-        model.setOverallSleepScore(dto.getSleepSummaries().getFirst().getOverallSleepScore());
-        model.setSleepScores(dto.getSleepSummaries().getFirst().getSleepScores());
+        model.setSummaryId(dto.getSummaryId());
+        model.setCalendarDate(dto.getCalendarDate());
+        model.setDurationInSeconds(dto.getDurationInSeconds());
+        model.setDeepSleepDurationInSeconds(dto.getDeepSleepDurationInSeconds());
+        model.setLightSleepDurationInSeconds(dto.getLightSleepDurationInSeconds());
+        model.setRemSleepInSeconds(dto.getRemSleepInSeconds());
+        model.setAwakeDurationInSeconds(dto.getAwakeDurationInSeconds());
+        model.setNaps(dto.getNaps());
+        model.setStartTimeInSeconds(dto.getStartTimeInSeconds());
+        model.setStartTimeOffsetInSeconds(dto.getStartTimeOffsetInSeconds());
+        model.setOverallSleepScore(dto.getOverallSleepScore());
+        model.setSleepScores(dto.getSleepScores());
         return model;
     }
 
-    public GarminHrvSummary mapHrvPayload(GarminHrvSummaryPayload dto, UUID actualizeUserId) {
+    public GarminHrvSummary mapHrvPayload(GarminHrvSummaryPayload.HrvSummary dto, UUID actualizeUserId) {
         GarminHrvSummary model = new GarminHrvSummary();
-        model.setSummaryId(dto.getHrvSummaries().getFirst().getSummaryId());
-        model.setUserId(dto.getHrvSummaries().getFirst().getUserId());
+        model.setSummaryId(dto.getSummaryId());
+        model.setUserId(dto.getUserId());
         model.setActualizeUserId(actualizeUserId);
-        model.setCalendarDate(dto.getHrvSummaries().getFirst().getCalendarDate());
-        model.setStartTimeInSeconds(dto.getHrvSummaries().getFirst().getStartTimeInSeconds());
-        model.setStartTimeOffsetInSeconds(dto.getHrvSummaries().getFirst().getStartTimeOffsetInSeconds());
-        model.setDurationInSeconds(dto.getHrvSummaries().getFirst().getDurationInSeconds());
-        model.setLastNightAvg(dto.getHrvSummaries().getFirst().getLastNightAvg());
-        model.setLastNight5MinHigh(dto.getHrvSummaries().getFirst().getLastNight5MinHigh());
-        model.setHrvValues(dto.getHrvSummaries().getFirst().getHrvValues());
+        model.setCalendarDate(dto.getCalendarDate());
+        model.setStartTimeInSeconds(dto.getStartTimeInSeconds());
+        model.setStartTimeOffsetInSeconds(dto.getStartTimeOffsetInSeconds());
+        model.setDurationInSeconds(dto.getDurationInSeconds());
+        model.setLastNightAvg(dto.getLastNightAvg());
+        model.setLastNight5MinHigh(dto.getLastNight5MinHigh());
+        model.setHrvValues(dto.getHrvValues());
         return model;
     }
 
-    public GarminStressSummary mapStressPayload(GarminStressSummaryPayload dto, UUID actualizeUserId) {
+    public GarminStressSummary mapStressPayload(GarminStressSummaryPayload.StressSummary dto, UUID actualizeUserId) {
         GarminStressSummary model = new GarminStressSummary();
-        model.setUserId(dto.getStressSummaries().getFirst().getUserId());
+        model.setUserId(dto.getUserId());
         model.setActualizeUserId(actualizeUserId);
-        model.setSummaryId(dto.getStressSummaries().getFirst().getSummaryId());
-        model.setStartTimeInSeconds(dto.getStressSummaries().getFirst().getStartTimeInSeconds());
-        model.setStartTimeOffsetInSeconds(dto.getStressSummaries().getFirst().getStartTimeOffsetInSeconds());
-        model.setDurationInSeconds(dto.getStressSummaries().getFirst().getDurationInSeconds());
-        model.setCalendarDate(dto.getStressSummaries().getFirst().getCalendarDate());
-        model.setTimeOffsetStressLevelValues(dto.getStressSummaries().getFirst().getTimeOffsetStressLevelValues());
-        model.setTimeOffsetBodyBatteryValues(dto.getStressSummaries().getFirst().getTimeOffsetBodyBatteryValues());
-        model.setBodyBatteryActivityEvents(dto.getStressSummaries().getFirst().getBodyBatteryActivityEventList());
+        model.setSummaryId(dto.getSummaryId());
+        model.setStartTimeInSeconds(dto.getStartTimeInSeconds());
+        model.setStartTimeOffsetInSeconds(dto.getStartTimeOffsetInSeconds());
+        model.setDurationInSeconds(dto.getDurationInSeconds());
+        model.setCalendarDate(dto.getCalendarDate());
+        model.setTimeOffsetStressLevelValues(dto.getTimeOffsetStressLevelValues());
+        model.setTimeOffsetBodyBatteryValues(dto.getTimeOffsetBodyBatteryValues());
+        model.setBodyBatteryActivityEvents(dto.getBodyBatteryActivityEventList());
         return model;
     }
 
@@ -142,16 +142,16 @@ public class GarminMapper {
         return model;
     }
 
-    public GarminPulseOxSummary mapPulseOxPayload(GarminPulseOxSummaryPayload dto, UUID actualizeUserId) {
+    public GarminPulseOxSummary mapPulseOxPayload(GarminPulseOxSummaryPayload.PulseOxSummary dto, UUID actualizeUserId) {
         GarminPulseOxSummary model = new GarminPulseOxSummary();
-        model.setSummaryId(dto.getPulseOxSummaries().getFirst().getSummaryId());
-        model.setUserId(dto.getPulseOxSummaries().getFirst().getUserId());
+        model.setSummaryId(dto.getSummaryId());
+        model.setUserId(dto.getUserId());
         model.setActualizeUserId(actualizeUserId);
-        model.setCalendarDate(dto.getPulseOxSummaries().getFirst().getCalendarDate());
-        model.setStartTimeInSeconds(dto.getPulseOxSummaries().getFirst().getStartTimeInSeconds());
-        model.setStartTimeOffsetInSeconds(dto.getPulseOxSummaries().getFirst().getStartTimeOffsetInSeconds());
-        model.setDurationInSeconds(dto.getPulseOxSummaries().getFirst().getDurationInSeconds());
-        model.setTimeOffsetSpo2Values(dto.getPulseOxSummaries().getFirst().getSpo2Values());
+        model.setCalendarDate(dto.getCalendarDate());
+        model.setStartTimeInSeconds(dto.getStartTimeInSeconds());
+        model.setStartTimeOffsetInSeconds(dto.getStartTimeOffsetInSeconds());
+        model.setDurationInSeconds(dto.getDurationInSeconds());
+        model.setTimeOffsetSpo2Values(dto.getSpo2Values());
         return model;
     }
 }

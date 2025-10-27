@@ -71,8 +71,8 @@ public class GarminWebhookService {
             );
             UUID userId = garminAcc.getUser().getId();
             // persist
-            for (GarminActivitySummaryPayload.ActivitySummary d: payload.getActivitySummary()) {
-                GarminActivitySummary persist = garminMapper.mapActivityPayload(d, userId);
+            for (GarminActivitySummaryPayload.ActivitySummary a: payload.getActivitySummary()) {
+                GarminActivitySummary persist = garminMapper.mapActivityPayload(a, userId);
                 garminActivityRepo.save(persist);
             }
 
@@ -127,8 +127,10 @@ public class GarminWebhookService {
             );
             UUID userId = garminAcc.getUser().getId();
             // persist
-            GarminHrvSummary persist = garminMapper.mapHrvPayload(payload, userId);
-            garminHrvRepo.save(persist);
+            for (GarminHrvSummaryPayload.HrvSummary h: payload.getHrvSummaries()) {
+                GarminHrvSummary persist = garminMapper.mapHrvPayload(h, userId);
+                garminHrvRepo.save(persist);
+            }
 
         } catch (Exception e) {
             log.error("Error persisting Garmin HRV payload", e);
@@ -164,8 +166,10 @@ public class GarminWebhookService {
             );
             UUID userId = garminAcc.getUser().getId();
             // persist
-            GarminPulseOxSummary persist = garminMapper.mapPulseOxPayload(payload, userId);
-            garminPulseOxRepo.save(persist);
+            for (GarminPulseOxSummaryPayload.PulseOxSummary p: payload.getPulseOxSummaries()) {
+                GarminPulseOxSummary persist = garminMapper.mapPulseOxPayload(p, userId);
+                garminPulseOxRepo.save(persist);
+            }
 
         } catch (Exception e) {
             log.error("Error persisting Garmin Pulse Ox payload", e);
@@ -189,9 +193,12 @@ public class GarminWebhookService {
                     payload.getSleepSummaries().getFirst().getUserId()
             );
             UUID userId = garminAcc.getUser().getId();
+
             // persist
-            GarminSleepSummary persist = garminMapper.mapSleepPayload(payload, userId);
-            garminSleepRepo.save(persist);
+            for (GarminSleepSummaryPayload.SleepSummary s: payload.getSleepSummaries()) {
+                GarminSleepSummary persist = garminMapper.mapSleepPayload(s, userId);
+                garminSleepRepo.save(persist);
+            }
 
         } catch (Exception e) {
             log.error("Error persisting Garmin Sleep payload", e);
@@ -215,9 +222,12 @@ public class GarminWebhookService {
                     payload.getStressSummaries().getFirst().getUserId()
             );
             UUID userId = garminAcc.getUser().getId();
+
             // persist
-            GarminStressSummary persist = garminMapper.mapStressPayload(payload, userId);
-            garminStressRepo.save(persist);
+            for (GarminStressSummaryPayload.StressSummary s: payload.getStressSummaries()) {
+                GarminStressSummary persist = garminMapper.mapStressPayload(s, userId);
+                garminStressRepo.save(persist);
+            }
 
         } catch (Exception e) {
             log.error("Error persisting Garmin Stress payloads", e);

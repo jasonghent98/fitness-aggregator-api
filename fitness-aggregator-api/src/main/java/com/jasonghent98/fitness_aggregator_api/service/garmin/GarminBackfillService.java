@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -77,10 +78,7 @@ public class GarminBackfillService {
         UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "daily");
         syncState.markBackfillRunning(s);
         try {
-            for (var obj : api.fetchDaily(userId, start, end)) {
-                try { dailyRepo.save(mapper.mapDailyPayload(obj, userId)); }
-                catch (DataIntegrityViolationException ignoreDup) {}
-            }
+            api.fetchDaily(userId, start, end);
             syncState.markBackfillSuccess(s, start, end);
         } catch (Exception ex) {
             log.error("Garmin daily backfill failed", ex);
@@ -93,10 +91,7 @@ public class GarminBackfillService {
         UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "sleep");
         syncState.markBackfillRunning(s);
         try {
-            for (GarminSleepSummaryPayload.SleepSummary d : api.fetchSleep(userId, start, end)) {
-                /*try { sleepRepo.save(mapper.toSleep(it, userId)); }
-                catch (DataIntegrityViolationException ignoreDup) {}*/
-            }
+            api.fetchSleep(userId, start, end);
             syncState.markBackfillSuccess(s, start, end);
         } catch (Exception ex) {
             log.error("Garmin sleep backfill failed", ex);
@@ -109,10 +104,7 @@ public class GarminBackfillService {
         UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "stress");
         syncState.markBackfillRunning(s);
         try {
-            for (GarminStressSummaryPayload.StressSummary d: api.fetchStress(userId, start, end)) {
-                /*try { stressRepo.save(mapper.toStress(it, userId)); }
-                catch (DataIntegrityViolationException ignoreDup) {}*/
-            }
+            api.fetchStress(userId, start, end);
             syncState.markBackfillSuccess(s, start, end);
         } catch (Exception ex) {
             log.error("Garmin stress backfill failed", ex);
@@ -125,10 +117,7 @@ public class GarminBackfillService {
         UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "hrv");
         syncState.markBackfillRunning(s);
         try {
-            for (GarminHrvSummaryPayload.HrvSummary it : api.fetchHrv(userId, start, end)) {
-                /*try { hrvRepo.save(mapper.toHrv(it, userId)); }
-                catch (DataIntegrityViolationException ignoreDup) {}*/
-            }
+            api.fetchHrv(userId, start, end);
             syncState.markBackfillSuccess(s, start, end);
         } catch (Exception ex) {
             log.error("Garmin HRV backfill failed", ex);
@@ -141,10 +130,7 @@ public class GarminBackfillService {
         UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "pulse_ox");
         syncState.markBackfillRunning(s);
         try {
-            for (GarminPulseOxSummaryPayload.PulseOxSummary d : api.fetchPulseOx(userId, start, end)) {
-                /*try { pulseRepo.save(mapper.toPulseOx(it, userId)); }
-                catch (DataIntegrityViolationException ignoreDup) {}*/
-            }
+            api.fetchPulseOx(userId, start, end);
             syncState.markBackfillSuccess(s, start, end);
         } catch (Exception ex) {
             log.error("Garmin PulseOx backfill failed", ex);
@@ -157,10 +143,7 @@ public class GarminBackfillService {
         UserProviderSyncState s = syncState.getOrCreate(userId, GARMIN_PROVIDER_ID, "activity");
         syncState.markBackfillRunning(s);
         try {
-            for (GarminActivitySummaryPayload.ActivitySummary d : api.fetchActivities(userId, start, end)) {
-                /*try { activityRepo.save(mapper.toActivity(it, userId)); }
-                catch (DataIntegrityViolationException ignoreDup) {}*/
-            }
+            api.fetchActivities(userId, start, end);
             syncState.markBackfillSuccess(s, start, end);
         } catch (Exception ex) {
             log.error("Garmin activities backfill failed", ex);
