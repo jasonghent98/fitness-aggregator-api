@@ -38,6 +38,6 @@ public class GarminPulseOxSummary {
     private Integer durationInSeconds;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb", name = "time_offset_spo2_values")
     private Map<String, Integer> timeOffsetSpo2Values;
 }

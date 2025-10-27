@@ -39,6 +39,7 @@ public class GarminHrvSummary {
     private Integer durationInSeconds;
 
     private Integer lastNightAvg;
+    @Column(name="last_night5_min_high")
     private Integer lastNight5MinHigh;
 
     @Type(JsonType.class)
