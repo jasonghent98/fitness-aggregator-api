@@ -37,7 +37,6 @@ public class FitbitWebhookController {
     // Verification handshake (like Strava/Garmin)
     @GetMapping("/verify")
     public ResponseEntity<Void> verifySubscription(@RequestParam(name="verify") String verify) {
-        System.out.println(fitbitConfig.getWebhookVerificationCode() + " from /verify");
         if (!verify.equals(fitbitConfig.getWebhookVerificationCode())) {
             return ResponseEntity.status(404).build();
         }
@@ -48,7 +47,6 @@ public class FitbitWebhookController {
     // Verification handshake (like Strava/Garmin)
     @GetMapping("/callback")
     public ResponseEntity<Void> verifyCallback(@RequestParam(name="code") String code) {
-        System.out.println(code + " from /api/fitbit/webhook/callback");
         return ResponseEntity.status(204).build();
     }
 
