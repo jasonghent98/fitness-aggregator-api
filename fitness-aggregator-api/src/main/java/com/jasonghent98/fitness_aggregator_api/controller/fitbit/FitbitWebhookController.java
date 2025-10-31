@@ -1,6 +1,7 @@
 package com.jasonghent98.fitness_aggregator_api.controller.fitbit;
 
 import com.jasonghent98.fitness_aggregator_api.config.provider.fitbit.FitbitConfig;
+import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.service.fitbit.FitbitIngestionService;
 import com.jasonghent98.fitness_aggregator_api.service.fitbit.FitbitService;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/fitbit/webhook")
@@ -51,10 +53,10 @@ public class FitbitWebhookController {
     }
 
     // Actual push events
-    @PostMapping
+    @PostMapping("/verify")
     public ResponseEntity<Void> receive(@RequestBody String raw) {
         // Fitbit sends event payloads with collectionType (activities, sleep, etc.)
-        // fitbitIngestionService.handleWebhook(raw);
+        fitbitIngestionService.handleWebhook(raw);
         return ResponseEntity.ok().build();
     }
 }

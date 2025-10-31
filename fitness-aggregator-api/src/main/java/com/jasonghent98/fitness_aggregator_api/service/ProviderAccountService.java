@@ -109,6 +109,26 @@ public class ProviderAccountService {
     }
 
     /**
+     * Overloaded method that uses provider user id to gets a valid access token for provideruser+provider + (refreshes if expired)
+     * */
+    @Transactional
+    public String getValidAccessToken(String providerUserId, String providerName) {
+        Provider provider = resolveProvider(providerName);
+
+        ProviderAccount acct = providerAccountRepo.findByProviderAndProviderUserId(provider, providerUserId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "No provider account for provider user=" + providerUserId + " provider=" + provider.getName()));
+
+        if (acct.getExpiresAt() == null || acct.getExpiresAt().isBefore(Instant.now())) {
+            var refresher = refresherRegistry.get(provider.getName());
+            refresher.refresh(acct);
+            providerAccountRepo.save(acct);
+        }
+
+        return acct.getAccessToken();
+    }
+
+    /**
      * Finds and returns provider accounts for the user
      * */
     public List<ProviderAccount> getProviderAccountsForUser(String userId) {
@@ -120,7 +140,7 @@ public class ProviderAccountService {
     /**
      * Finds and returns the provider name or throws if not found
      * */
-    private Provider resolveProvider(String providerName) {
+    public Provider resolveProvider(String providerName) {
         return providerRepo.findByName(providerName)
                 .orElseThrow(() -> new IllegalArgumentException("Provider not found by name: " + providerName));
 

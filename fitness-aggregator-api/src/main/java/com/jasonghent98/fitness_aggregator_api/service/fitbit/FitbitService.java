@@ -1,7 +1,8 @@
 package com.jasonghent98.fitness_aggregator_api.service.fitbit;
 
 import com.jasonghent98.fitness_aggregator_api.config.provider.fitbit.FitbitConfig;
-import com.jasonghent98.fitness_aggregator_api.dto.fitbit.FitbitAuthTokenResponse;
+import com.jasonghent98.fitness_aggregator_api.dto.fitbit.*;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -66,39 +67,51 @@ public class FitbitService {
 
     /** User Profile */
     public String fetchProfile(String accessToken) {
-        return get("https://api.fitbit.com/1/user/-/profile.json", accessToken);
+        return fitbitGet("https://api.fitbit.com/1/user/-/profile.json", accessToken, String.class);
     }
 
     /** Daily Activity Summary (steps, calories, distance, etc.) */
-    public String fetchDailyActivity(String accessToken, LocalDate date) {
-        String url = String.format("https://api.fitbit.com/1/user/-/activities/date/%s.json", date);
-        return get(url, accessToken);
+    public FitbitActivityLog fetchDailyActivity(String accessToken, String userId, LocalDate date) {
+        String url = String.format("https://api.fitbit.com/1/user/%s/activities/date/%s.json", userId, date);
+        return fitbitGet(url, accessToken, FitbitActivityLog.class);
     }
 
     /** Sleep Logs */
-    public String fetchSleep(String accessToken, LocalDate date) {
-        String url = String.format("https://api.fitbit.com/1.2/user/-/sleep/date/%s.json", date);
-        return get(url, accessToken);
+    public FitbitSleepLog fetchDailySleep(String accessToken, String userId, LocalDate date) {
+        String url = String.format("https://api.fitbit.com/1.2/user/%s/sleep/date/%s.json", userId, date);
+        return fitbitGet(url, accessToken, FitbitSleepLog.class);
+    }
+
+    /** Body Logs */
+    public FitbitBodyLog fetchDailyBody(String accessToken, String userId, LocalDate date) {
+        String url = String.format("https://api.fitbit.com/1/user/%s/body/log/weight/date/%s.json", userId, date);
+        return fitbitGet(url, accessToken, FitbitBodyLog.class);
+    }
+
+    /** Food Logs */
+    public FitbitFoodLog fetchDailyFood(String accessToken, String userId, LocalDate date) {
+        String url = String.format("https://api.fitbit.com/1/user/%s/foods/log/date/%s.json", userId, date);
+        return fitbitGet(url, accessToken, FitbitFoodLog.class);
     }
 
     /** Heart Rate Intraday Time Series (1-day) */
-    public String fetchHeartRate(String accessToken, LocalDate date) {
+    public String fetchHeartRate(String accessToken, String userId, LocalDate date) {
         String url = String.format(
                 "https://api.fitbit.com/1/user/-/activities/heart/date/%s/1d/1min.json", date
         );
-        return get(url, accessToken);
+        return fitbitGet(url, accessToken, String.class);
     }
 
     // ---------- Helper ---------- //
 
-    private String get(String url, String accessToken) {
+    private <T> T fitbitGet(String url, String accessToken, Class<T> typeRef) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
-        ResponseEntity<String> resp = restTemplate.exchange(
+        ResponseEntity<T> resp = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
-                String.class
+                typeRef
         );
         return resp.getBody();
     }

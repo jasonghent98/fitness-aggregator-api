@@ -28,6 +28,7 @@ public class SecurityConfig {
                                 "/api/strava/auth/**",
                                 "/api/fitbit/**",
                                 "/api/garmin/**",
+                                "/api/oura/**",
                                 "/api/auth/whoami",
                                 "/api/config",
                                 "/actuator/**",

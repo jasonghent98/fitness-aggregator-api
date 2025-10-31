@@ -11,6 +11,7 @@ import com.jasonghent98.fitness_aggregator_api.repository.ProviderAccountReposit
 import com.jasonghent98.fitness_aggregator_api.repository.ProviderRepository;
 import com.jasonghent98.fitness_aggregator_api.security.JwtService;
 import com.jasonghent98.fitness_aggregator_api.service.ProviderAccountService;
+import com.jasonghent98.fitness_aggregator_api.service.fitbit.FitbitSubscriptionService;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -34,6 +35,7 @@ public class FitbitAuthController {
     private final ProviderAccountService providerAccountService;
     private final ProviderRepository providerRepo;
     private final ProviderAccountRepository providerAccountRepo;
+    FitbitSubscriptionService fitbitSubscriptionService;
     private final JwtService jwtService;
 
     public FitbitAuthController(
@@ -42,7 +44,8 @@ public class FitbitAuthController {
             ProviderAccountService providerAccountService,
             ProviderRepository providerRepo,
             ProviderAccountRepository providerAccountRepo,
-            JwtService jwtService
+            JwtService jwtService,
+            FitbitSubscriptionService fitbitSubscriptionService
     ) {
         this.fitbitConfig = fitbitConfig;
         this.frontendConfig = frontendConfig;
@@ -50,6 +53,7 @@ public class FitbitAuthController {
         this.providerRepo = providerRepo;
         this.providerAccountRepo = providerAccountRepo;
         this.jwtService = jwtService;
+        this.fitbitSubscriptionService = fitbitSubscriptionService;
     }
 
     @GetMapping("/login")
@@ -118,16 +122,11 @@ public class FitbitAuthController {
 
             // 3) Create per-user subscriptions (activities + sleep) and do a small backfill into our system
 
-
-            /*
-            fitbitSubscriptionService.createDefaultSubscriptions(accessToken, new_acc.getUser().getId().toString());
-            fitbitBackfillService.backfillRecent(new_acc.getUser().getId(), fitbitUserId, accessToken);
-
-             */
+            fitbitSubscriptionService.createDefaultSubscriptions(accessToken, fitbitUserId);
 
             // append token as query param
             URI redirect = URI.create(frontendConfig.getFrontendOrigin()
-                    + "/onboarding/connect?provider=fitbit&status=success");
+                    + "/app/onboarding/connect?provider=fitbit&status=success");
 
             return ResponseEntity.status(302)
                     .location(redirect)

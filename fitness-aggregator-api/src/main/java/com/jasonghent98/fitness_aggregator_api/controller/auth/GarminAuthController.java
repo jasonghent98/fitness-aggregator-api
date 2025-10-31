@@ -66,7 +66,7 @@ public class GarminAuthController {
             backfillService.triggerBackfill(UserContext.getUserId(), codeToProviders.get().get("garmin"), "FREE");
 
             // redirect back
-            String url = frontendConfig.getFrontendOrigin() + "/onboarding/connect?provider=garmin&status=success";
+            String url = frontendConfig.getFrontendOrigin() + "/app/onboarding/connect?provider=garmin&status=success";
             return ResponseEntity.status(HttpStatus.FOUND)
                     .location(URI.create(url))
                     .build();

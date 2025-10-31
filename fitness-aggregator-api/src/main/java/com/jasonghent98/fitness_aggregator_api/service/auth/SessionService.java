@@ -144,7 +144,7 @@ public class SessionService {
         String accessJwt = jwtService.mintSession(user.getId());
 
         // Redirect (check if local testing)
-        String next = frontendConfig.getFrontendOrigin() + "/onboarding/connect?status=verified";
+        String next = frontendConfig.getFrontendOrigin() + "/app/onboarding/connect?status=verified";
         String host = req.getServerName(); // e.g. "localhost", "api.dev.actualize.fit"
         boolean isLocal = host.equals("localhost") || host.equals("127.0.0.1");
 

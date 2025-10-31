@@ -1,35 +1,31 @@
+// FitbitSleepSession.java
 package com.jasonghent98.fitness_aggregator_api.model.fitbit;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDate;
+import java.time.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "fitbit_sleep_summaries")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(name="fitbit_sleep_summaries",
+        uniqueConstraints=@UniqueConstraint(name="uq_fitbit_sleep", columnNames={"actualize_user_id","log_id"}),
+        indexes=@Index(name="idx_fitbit_sleep_user_date", columnList="actualize_user_id,date_of_sleep"))
+@Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class FitbitSleepSummary {
+    @Id @GeneratedValue(strategy=GenerationType.AUTO) private UUID id; // internal primary key;
+    @Column(name="actualize_user_id", nullable=false) private UUID actualizeUserId;
+    @Column(name="fitbit_user_id", length=64, nullable=false) private String fitbitUserId;
+    @Column(name="log_id", nullable=false) private Long logId;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
-    @Column(name = "actualize_user_id", nullable = false)
-    private UUID actualizeUserId;
-
-    @Column(name = "provider_user_id", nullable = false)
-    private String providerUserId;
-
-    private LocalDate sleepDate;
-
-    private Integer durationMinutes;
+    @Column(name="date_of_sleep", nullable=false) private LocalDate dateOfSleep;
+    @Column(name="start_time") private OffsetDateTime startTime;
+    @Column(name="end_time") private OffsetDateTime endTime;
+    @Column(name="duration_ms") private Long durationMs;
     private Integer efficiency;
-    private Integer deepMinutes;
-    private Integer remMinutes;
-    private Integer lightMinutes;
-    private Integer wakeMinutes;
+    @Column(name="is_main_sleep") private Boolean isMainSleep;
+
+    @Column(name="levels_json", columnDefinition="jsonb") private String levelsJson;
+
+    @Column(name="created_at", nullable=false) private OffsetDateTime createdAt = OffsetDateTime.now();
+    @Column(name="updated_at", nullable=false) private OffsetDateTime updatedAt = OffsetDateTime.now();
 }

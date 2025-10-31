@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface FitbitBodyRepository extends JpaRepository<FitbitBodySummary, UUID> {
-    List<FitbitBodySummary> findByActualizeUserIdAndLogDateBetween(UUID userId, LocalDate start, LocalDate end);
+    List<FitbitBodySummary> findByActualizeUserIdAndDateBetween(UUID userId, LocalDate start, LocalDate end);
 }

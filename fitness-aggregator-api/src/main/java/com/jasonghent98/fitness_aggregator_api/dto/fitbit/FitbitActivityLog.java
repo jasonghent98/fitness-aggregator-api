@@ -1,3 +1,5 @@
+package com.jasonghent98.fitness_aggregator_api.dto.fitbit;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

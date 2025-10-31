@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface FitbitSleepRepository extends JpaRepository<FitbitSleepSummary, UUID> {
-    List<FitbitSleepSummary> findByActualizeUserIdAndSleepDateBetween(UUID userId, LocalDate start, LocalDate end);
+    List<FitbitSleepSummary> findByActualizeUserIdAndDateOfSleepBetween(UUID userId, LocalDate start, LocalDate end);
 }
