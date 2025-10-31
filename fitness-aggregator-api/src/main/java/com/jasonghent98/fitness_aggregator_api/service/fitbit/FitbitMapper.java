@@ -10,6 +10,8 @@ import com.jasonghent98.fitness_aggregator_api.model.fitbit.FitbitBodySummary;
 import com.jasonghent98.fitness_aggregator_api.model.fitbit.FitbitFoodSummary;
 import com.jasonghent98.fitness_aggregator_api.model.fitbit.FitbitSleepSummary;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +22,7 @@ public class FitbitMapper {
 
     // strict HH:mm:ss (24-hour, zero-padded)
     private static final DateTimeFormatter TIME_HH_MM_SS = DateTimeFormatter.ofPattern("HH:mm:ss");
+    ObjectMapper objectMapper = new ObjectMapper();
 
     FitbitMapper() {}
 
@@ -78,7 +81,7 @@ public class FitbitMapper {
 
         // Keep full levels payload as JSON string (jsonb column)
         try {
-            m.setLevelsJson(dto.getLevels() != null ? dto.getLevels().toString() : null);
+            m.setLevelsJson(dto.getLevels() != null ? objectMapper.readTree(dto.getLevels().toString()) : null);
         } catch (Exception e) {
             m.setLevelsJson(null); // fail soft; payload still usable
 

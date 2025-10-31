@@ -1,8 +1,12 @@
 // FitbitSleepSession.java
 package com.jasonghent98.fitness_aggregator_api.model.fitbit;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.*;
 import java.util.UUID;
 
@@ -24,7 +28,9 @@ public class FitbitSleepSummary {
     private Integer efficiency;
     @Column(name="is_main_sleep") private Boolean isMainSleep;
 
-    @Column(name="levels_json", columnDefinition="jsonb") private String levelsJson;
+    @Column(name="levels_json", columnDefinition="jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private JsonNode levelsJson;
 
     @Column(name="created_at", nullable=false) private OffsetDateTime createdAt = OffsetDateTime.now();
     @Column(name="updated_at", nullable=false) private OffsetDateTime updatedAt = OffsetDateTime.now();
