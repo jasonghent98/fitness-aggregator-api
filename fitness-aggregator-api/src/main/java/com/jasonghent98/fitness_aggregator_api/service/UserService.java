@@ -50,4 +50,26 @@ public class UserService {
         if (e == null) throw new IllegalArgumentException("email is required");
         return e.trim();
     }
+
+    /** Update the user preferences in the user table */
+    @Transactional
+    public User updatePreferences(UUID userId,
+                                  String dashboardPreset,
+                                  String trainingStyle,
+                                  String trainingFocus) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        if (dashboardPreset != null) {
+            user.setDashboardPreset(dashboardPreset.isBlank() ? null : dashboardPreset.trim());
+        }
+        if (trainingStyle != null) {
+            user.setTrainingStyle(trainingStyle.isBlank() ? null : trainingStyle.trim());
+        }
+        if (trainingFocus != null) {
+            user.setTrainingFocus(trainingFocus.isBlank() ? null : trainingFocus.trim());
+        }
+
+        return userRepo.save(user);
+    }
 }
