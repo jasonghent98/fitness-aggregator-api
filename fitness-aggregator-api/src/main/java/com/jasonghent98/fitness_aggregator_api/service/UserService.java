@@ -72,4 +72,9 @@ public class UserService {
 
         return userRepo.save(user);
     }
+
+    /** Returns the user associated with the web req */
+    public User getUser(UUID userId) {
+        return userRepo.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+    }
 }
