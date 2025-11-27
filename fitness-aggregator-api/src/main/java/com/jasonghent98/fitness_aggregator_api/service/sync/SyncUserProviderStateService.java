@@ -1,5 +1,6 @@
 package com.jasonghent98.fitness_aggregator_api.service.sync;
 
+import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.model.sync.UserProviderSyncState;
 import com.jasonghent98.fitness_aggregator_api.repository.sync.UserProviderSyncStateRepository;
 import com.jasonghent98.fitness_aggregator_api.enums.UserProviderSyncBackfillStatus;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -68,5 +70,11 @@ public class SyncUserProviderStateService {
         }
         s.setLastIncrementalReceivedAt(Instant.now());
         repo.save(s);
+    }
+
+    /** Retrieves the sync history for a user's providers */
+    public List<UserProviderSyncState> getProviderSyncStateForUser() {
+        UUID userId = UserContext.getUserId();
+        return repo.findByUserId(userId);
     }
 }

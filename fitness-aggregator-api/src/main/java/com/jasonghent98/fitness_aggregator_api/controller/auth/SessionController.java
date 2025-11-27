@@ -3,6 +3,7 @@ package com.jasonghent98.fitness_aggregator_api.controller.auth;
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.dto.auth.MagicLinkRequest;
 import com.jasonghent98.fitness_aggregator_api.security.JwtService;
+import com.jasonghent98.fitness_aggregator_api.service.UserService;
 import com.jasonghent98.fitness_aggregator_api.service.auth.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +18,18 @@ public class SessionController {
 
     private final SessionService sessionService;
     private JwtService jwtService;
+    private UserService userService;
 
-    public SessionController(SessionService sessionService, JwtService jwtService) {
+    public SessionController(SessionService sessionService, JwtService jwtService, UserService userService) {
         this.sessionService = sessionService;
         this.jwtService = jwtService;
+        this.userService = userService;
     }
 
     @GetMapping("/me")
     public ResponseEntity<?> whoami() {
         UUID userId = UserContext.getUserId();
-        return ResponseEntity.ok(sessionService.me(userId));
+        return ResponseEntity.ok(userService.getUser(userId));
     }
     /** Generate a valid JWT tied to a user for testing purposes: delete once in prod */
     @GetMapping("/generateToken")
