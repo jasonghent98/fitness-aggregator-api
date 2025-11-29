@@ -2,6 +2,7 @@ package com.jasonghent98.fitness_aggregator_api.controller;
 
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.dto.UserPreferencesRequest;
+import com.jasonghent98.fitness_aggregator_api.dto.user.SyncProviders;
 import com.jasonghent98.fitness_aggregator_api.model.Provider;
 import com.jasonghent98.fitness_aggregator_api.model.ProviderAccount;
 import com.jasonghent98.fitness_aggregator_api.model.User;
@@ -61,6 +62,15 @@ public class UserController {
         );
     }
 
+    /** Returns providers accounts for user */
+    @GetMapping("/provider-accounts")
+    private List<ProviderAccount> retrieveProviderAccountsForUser() {
+        String userId = UserContext.getUserId().toString();
+        return providerAccountService.getProviderAccountsForUser(userId);
+    }
+
+    // SYNC
+
     /** Returns sync state for provider accounts for user */
     @GetMapping("/sync-state")
     public List<UserProviderSyncState> getSyncState() {
@@ -69,15 +79,13 @@ public class UserController {
 
     /** Triggers a user sync for the user*/
     @PostMapping("/sync-state")
-    public void triggerSync() {
+    public ResponseEntity<?> triggerSync(@RequestBody SyncProviders syncProviders) {
         AtomicReference<Map<String, Provider>> codeToProviders = providerRegistryService.getCodeToProvidersCache();
-        bs.triggerBackfill(UserContext.getUserId(), codeToProviders.get().get("garmin"), UserContext.getTier());
+        // trigger all provider backfills
+        for (String p: syncProviders.getProviders()) {
+            bs.triggerBackfill(UserContext.getUserId(), codeToProviders.get().get(p), UserContext.getTier());
+        }
+        return ResponseEntity.accepted().build();
     }
 
-    /** Returns providers accounts for user */
-    @GetMapping("/provider-accounts")
-    private List<ProviderAccount> retrieveProviderAccountsForUser() {
-        String userId = UserContext.getUserId().toString();
-        return providerAccountService.getProviderAccountsForUser(userId);
-    }
 }
