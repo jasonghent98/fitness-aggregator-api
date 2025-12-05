@@ -4,6 +4,7 @@ import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.context.UserContextResolver;
 import com.jasonghent98.fitness_aggregator_api.model.garmin.*;
 import com.jasonghent98.fitness_aggregator_api.service.garmin.GarminService;
+import com.jasonghent98.fitness_aggregator_api.util.DateRangeUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,7 +56,7 @@ public class GarminController {
         String subTier = userContextResolver.getSubscriptionTier();
 
         int maxDays = subTier.equalsIgnoreCase("ENHANCED") ? 90 : (subTier.equalsIgnoreCase("ELITE") ? 365 : 30);
-        GarminService.DateRange window = garminService.resolveRange(range, startDate, endDate, maxDays);
+        DateRangeUtil.DateRange window = DateRangeUtil.resolve(range, startDate, endDate, maxDays);
 
         List<GarminSleepSummary> results = garminService.getSleepForUserForGivenRange(userId, window.start(), window.end());
         return ResponseEntity.ok(results);
