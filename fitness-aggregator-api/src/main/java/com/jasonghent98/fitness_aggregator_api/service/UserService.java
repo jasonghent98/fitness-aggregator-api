@@ -5,9 +5,7 @@ import com.jasonghent98.fitness_aggregator_api.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 @Service
 public class UserService {
