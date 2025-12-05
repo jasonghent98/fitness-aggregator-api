@@ -87,5 +87,4 @@ public class UserController {
         }
         return ResponseEntity.accepted().build();
     }
-
 }
