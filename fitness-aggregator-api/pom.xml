@@ -56,12 +56,6 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>com.google.ai.client.generativeai</groupId>
-			<artifactId>google-ai-generativeai</artifactId>
-			<version>0.2.2</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.stripe</groupId>
 			<artifactId>stripe-java</artifactId>
 			<version>30.0.0</version>

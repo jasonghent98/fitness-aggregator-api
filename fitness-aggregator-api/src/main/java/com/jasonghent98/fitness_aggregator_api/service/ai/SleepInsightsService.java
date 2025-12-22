@@ -4,6 +4,7 @@ import com.jasonghent98.fitness_aggregator_api.model.garmin.GarminSleepSummary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,17 +41,61 @@ public class SleepInsightsService {
      */
     private String formatSleepData(List<GarminSleepSummary> sleepData) {
         return sleepData.stream()
-                .map(sleep -> String.format(
-                        "Date: %s, Duration: %.1f hours, Deep: %.0f%%, REM: %.0f%%, Light: %.0f%%, Awake: %.0f%%, Score: %d",
-                        sleep.getCalendarDate(),
-                        sleep.getDurationInSeconds() / 3600.0,
-                        sleep.getDeepSleepSeconds() * 100.0 / sleep.getDurationInSeconds(),
-                        sleep.getRemSleepSeconds() * 100.0 / sleep.getDurationInSeconds(),
-                        sleep.getLightSleepSeconds() * 100.0 / sleep.getDurationInSeconds(),
-                        sleep.getAwakeSleepSeconds() * 100.0 / sleep.getDurationInSeconds(),
-                        sleep.getSleepScores() != null ? sleep.getSleepScores().getOverallSleepScore() : 0
-                ))
+                .map(sleep -> {
+                    Integer duration = sleep.getDurationInSeconds();
+                    Integer deepSleep = sleep.getDeepSleepDurationInSeconds();
+                    Integer remSleep = sleep.getRemSleepInSeconds();
+                    Integer lightSleep = sleep.getLightSleepDurationInSeconds();
+                    Integer awake = sleep.getAwakeDurationInSeconds();
+
+                    // Calculate percentages safely
+                    double deepPercent = (duration != null && duration > 0 && deepSleep != null)
+                            ? (deepSleep * 100.0 / duration) : 0;
+                    double remPercent = (duration != null && duration > 0 && remSleep != null)
+                            ? (remSleep * 100.0 / duration) : 0;
+                    double lightPercent = (duration != null && duration > 0 && lightSleep != null)
+                            ? (lightSleep * 100.0 / duration) : 0;
+                    double awakePercent = (duration != null && duration > 0 && awake != null)
+                            ? (awake * 100.0 / duration) : 0;
+
+                    // Extract overall sleep score
+                    Integer overallScore = extractOverallScore(sleep);
+
+                    return String.format(
+                            "Date: %s, Duration: %.1f hours, Deep: %.0f%%, REM: %.0f%%, Light: %.0f%%, Awake: %.0f%%, Score: %d",
+                            sleep.getCalendarDate(),
+                            duration != null ? duration / 3600.0 : 0,
+                            deepPercent,
+                            remPercent,
+                            lightPercent,
+                            awakePercent,
+                            overallScore
+                    );
+                })
                 .collect(Collectors.joining("\n"));
+    }
+
+    /**
+     * Extract overall sleep score from the sleep scores map
+     */
+    private Integer extractOverallScore(GarminSleepSummary sleep) {
+        // Try sleepScores first
+        if (sleep.getSleepScores() != null && sleep.getSleepScores().containsKey("overallSleepScore")) {
+            Object score = sleep.getSleepScores().get("overallSleepScore");
+            if (score instanceof Integer) {
+                return (Integer) score;
+            }
+        }
+
+        // Try overallSleepScore map
+        if (sleep.getOverallSleepScore() != null && sleep.getOverallSleepScore().containsKey("value")) {
+            Object score = sleep.getOverallSleepScore().get("value");
+            if (score instanceof Integer) {
+                return (Integer) score;
+            }
+        }
+
+        return 0;
     }
 
     /**
