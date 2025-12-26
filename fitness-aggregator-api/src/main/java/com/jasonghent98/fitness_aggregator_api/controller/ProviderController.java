@@ -1,6 +1,7 @@
 package com.jasonghent98.fitness_aggregator_api.controller;
 
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
+import com.jasonghent98.fitness_aggregator_api.context.UserContextResolver;
 import com.jasonghent98.fitness_aggregator_api.model.ProviderAccount;
 import com.jasonghent98.fitness_aggregator_api.service.ProviderAccountService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +20,7 @@ public class ProviderController {
 
     @GetMapping("/provider-accounts")
     private List<ProviderAccount> retrieveProviderAccountsForUser() {
-        String userId = UserContext.getUserId().toString();
-        return providerAccountService.getProviderAccountsForUser(userId);
+        return providerAccountService.getProviderAccountsForUser(UserContext.getUserId());
     }
 
 }

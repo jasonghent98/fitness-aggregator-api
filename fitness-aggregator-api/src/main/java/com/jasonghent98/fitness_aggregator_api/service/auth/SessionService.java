@@ -88,39 +88,33 @@ public class SessionService {
                 "/api/email/verify-email?token=" +
                 URLEncoder.encode(result.token(), StandardCharsets.UTF_8);
 
-        try {
-            emailService.sendEmail(
-                    email,
-                    "Your magic link to log in to Actualize",
-                    "<html>\n" +
-                            "  <body style=\"font-family: Arial, sans-serif; color: #333;\">\n" +
-                            "    <h2>Verify your email to log in</h2>\n" +
-                            "    <p>Hi there,</p>\n" +
-                            "    <p>Click the button below to verify your email and log in to <b>Actualize</b>:</p>\n" +
-                            "    <p style=\"text-align: center;\">\n" +
-                            "      <a href=\"" + link + "\"\n" +
-                            "         style=\"background-color: #2563eb; color: white; padding: 12px 20px; \n" +
-                            "                text-decoration: none; border-radius: 6px; font-weight: bold;\">\n" +
-                            "        Log in to Actualize\n" +
-                            "      </a>\n" +
-                            "    </p>\n" +
-                            "    <p>Or copy and paste this link into your browser:<br>\n" +
-                            "      <a href=\"" + link + "\">" + link + "</a></p>\n" +
-                            "    <p style=\"font-size: 12px; color: #666;\">\n" +
-                            "      This link will expire in 10 minutes. If you didn’t request this, you can safely ignore this email.\n" +
-                            "    </p>\n" +
-                            "    <p>– The Actualize Team</p>\n" +
-                            "  </body>\n" +
-                            "</html>"
-            );
-            log.info("Magic link email successfully sent to {}", email);
-        } catch (Exception e) {
-            log.error("Failed to send magic link email to {}: {}", email, e.getMessage(), e);
-            return ResponseEntity.status(502).body(Map.of(
-                    "ok", false,
-                    "error", "email_send_failed"
-            ));
-        }
+        // Queue email asynchronously - returns immediately
+        emailService.sendEmail(
+                email,
+                "Your magic link to log in to Actualize",
+                "<html>\n" +
+                        "  <body style=\"font-family: Arial, sans-serif; color: #333;\">\n" +
+                        "    <h2>Verify your email to log in</h2>\n" +
+                        "    <p>Hi there,</p>\n" +
+                        "    <p>Click the button below to verify your email and log in to <b>Actualize</b>:</p>\n" +
+                        "    <p style=\"text-align: center;\">\n" +
+                        "      <a href=\"" + link + "\"\n" +
+                        "         style=\"background-color: #2563eb; color: white; padding: 12px 20px; \n" +
+                        "                text-decoration: none; border-radius: 6px; font-weight: bold;\">\n" +
+                        "        Log in to Actualize\n" +
+                        "      </a>\n" +
+                        "    </p>\n" +
+                        "    <p>Or copy and paste this link into your browser:<br>\n" +
+                        "      <a href=\"" + link + "\">" + link + "</a></p>\n" +
+                        "    <p style=\"font-size: 12px; color: #666;\">\n" +
+                        "      This link will expire in 10 minutes. If you didn't request this, you can safely ignore this email.\n" +
+                        "    </p>\n" +
+                        "    <p>– The Actualize Team</p>\n" +
+                        "  </body>\n" +
+                        "</html>"
+        );
+
+        log.info("Magic link email queued for {}", email);
 
         return ResponseEntity.ok(Map.of(
                 "ok", true,

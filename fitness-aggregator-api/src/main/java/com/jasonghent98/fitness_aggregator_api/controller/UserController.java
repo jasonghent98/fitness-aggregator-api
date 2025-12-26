@@ -65,7 +65,7 @@ public class UserController {
     /** Returns providers accounts for user */
     @GetMapping("/provider-accounts")
     private List<ProviderAccount> retrieveProviderAccountsForUser() {
-        String userId = UserContext.getUserId().toString();
+         UUID userId = UserContext.getUserId();
         return providerAccountService.getProviderAccountsForUser(userId);
     }
 

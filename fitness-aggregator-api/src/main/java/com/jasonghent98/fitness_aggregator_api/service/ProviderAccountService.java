@@ -131,8 +131,8 @@ public class ProviderAccountService {
     /**
      * Finds and returns provider accounts for the user
      * */
-    public List<ProviderAccount> getProviderAccountsForUser(String userId) {
-        return providerAccountRepo.findAllByUserId(UUID.fromString(userId))
+    public List<ProviderAccount> getProviderAccountsForUser(UUID userId) {
+        return providerAccountRepo.findAllByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("No provider accounts for userId: " + userId));
 
     }
