@@ -13,5 +13,4 @@ public class JwtConfig {
     private int sessionTtlMinutes = 15;
     private int refreshTtlDays = 60;
     private String issuer;
-
 }
