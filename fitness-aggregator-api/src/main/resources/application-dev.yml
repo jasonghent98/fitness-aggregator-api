@@ -56,3 +56,5 @@ stripe:
     enhanced:
       monthly: ${STRIPE_PRICE_ENHANCED_MONTHLY}
       annual: ${STRIPE_PRICE_ENHANCED_ANNUAL}
+
+GEMINI_API_KEY: ${GEMINI_API_KEY}
