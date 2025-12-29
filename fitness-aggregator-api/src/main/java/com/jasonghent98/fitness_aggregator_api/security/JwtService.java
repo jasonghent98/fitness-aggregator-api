@@ -104,6 +104,8 @@ public class JwtService {
                 .maxAge(Duration.ofMinutes(cfg.getSessionTtlMinutes())); // short-lived token (~15 mins)
         if (isLocal) {
             cookieBuilder.secure(false);
+            // Set domain to localhost (without port) so cookie works across frontend:3000 and backend:8080
+            cookieBuilder.domain("localhost");
         } else {
             cookieBuilder.secure(true);
             cookieBuilder.domain(DOMAIN_FOR_COOKIE);
@@ -122,6 +124,8 @@ public class JwtService {
                 .maxAge(Duration.ofDays(cfg.getRefreshTtlDays()));  // long-lived token (~60 days)
         if (isLocal) {
             cookieBuilder.secure(false);
+            // Set domain to localhost (without port) so cookie works across frontend:3000 and backend:8080
+            cookieBuilder.domain("localhost");
         } else {
             cookieBuilder.secure(true);
             cookieBuilder.domain(DOMAIN_FOR_COOKIE);
