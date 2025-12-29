@@ -5,3 +5,5 @@ spring:
     password: ${TEST_DB_PASSWORD}
   application:
     name: ${TEST_APP_NAME}
+
+GEMINI_API_KEY: ${GEMINI_API_KEY}

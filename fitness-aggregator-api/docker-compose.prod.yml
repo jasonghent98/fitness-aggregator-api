@@ -13,6 +13,7 @@ services:
       DEV_DB_USER: ${PROD_DB_USER}
       DEV_DB_PASSWORD: ${PROD_DB_PASSWORD}
       DEV_APP_NAME: ${PROD_APP_NAME}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
 
   postgres:
     container_name: ${PROD_DB_CONTAINER_NAME}

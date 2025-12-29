@@ -1,11 +1,15 @@
 package com.jasonghent98.fitness_aggregator_api.controller.auth;
 
+import com.jasonghent98.fitness_aggregator_api.config.FrontendConfig;
 import com.jasonghent98.fitness_aggregator_api.config.provider.strava.StravaConfig;
+import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.dto.strava.StravaAuthTokenResponse;
-import com.jasonghent98.fitness_aggregator_api.model.User;
-import com.jasonghent98.fitness_aggregator_api.model.strava.StravaUser;
-import com.jasonghent98.fitness_aggregator_api.repository.UserRepository;
-import com.jasonghent98.fitness_aggregator_api.repository.strava.StravaUserRepository;
+import com.jasonghent98.fitness_aggregator_api.model.Provider;
+import com.jasonghent98.fitness_aggregator_api.model.ProviderAccount;
+import com.jasonghent98.fitness_aggregator_api.repository.ProviderAccountRepository;
+import com.jasonghent98.fitness_aggregator_api.repository.ProviderRepository;
+import com.jasonghent98.fitness_aggregator_api.security.JwtService;
+import com.jasonghent98.fitness_aggregator_api.service.ProviderAccountService;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -18,19 +22,36 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/strava/auth")
 public class StravaAuthController {
     public final StravaConfig stravaConfig;
-    private final UserRepository userRepo;
-    private final StravaUserRepository stravaUserRepo;
+    private final ProviderAccountRepository providerAccountRepo;
+    private final ProviderRepository providerRepo;
+    private final ProviderAccountService providerAccountService;
+    private final FrontendConfig frontendConfig;
+    private final JwtService jwtService;
+   // private final MailerConfig mailerConfig;
 
     /*spring will recognize this is a bean and will handle instantiation and injection*/
-    StravaAuthController (StravaConfig stravaConfig, UserRepository userRepo, StravaUserRepository stravaUserRepo) {
+    StravaAuthController(
+            StravaConfig stravaConfig,
+            FrontendConfig frontendConfig,
+            ProviderAccountRepository providerAccountRepo,
+            ProviderRepository providerRepo,
+            ProviderAccountService providerAccountService,
+            JwtService jwtService
+            // MailerConfig mailerConfig
+    ) {
         this.stravaConfig = stravaConfig;
-        this.userRepo = userRepo;
-        this.stravaUserRepo = stravaUserRepo;
+        this.providerAccountRepo = providerAccountRepo;
+        this.providerRepo = providerRepo;
+        this.providerAccountService = providerAccountService;
+        this.frontendConfig = frontendConfig;
+        this.jwtService = jwtService;
+       // this.mailerConfig = mailerConfig;
     }
 
     @GetMapping("/login")
@@ -51,6 +72,9 @@ public class StravaAuthController {
     @GetMapping("/callback")
     public ResponseEntity<String> handleCallback(@RequestParam("code") String code) {
         RestTemplate restTemplate = new RestTemplate();
+
+        // test email runner
+       // mailerConfig.sendSimple("jasonghent1008@gmail.com", "test ses", "test run from actualize StravaAuthController.java");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -82,42 +106,37 @@ public class StravaAuthController {
 
             // unpack the variables from the strava oauth response
             Long stravaAthleteId = tokenData.getBody().athlete.id;
-            String stravaUsername = tokenData.getBody().athlete.username;
-            String stravaFirstName = tokenData.getBody().athlete.firstName;
-            String stravaLastName = tokenData.getBody().athlete.lastName;
-            Instant now = Instant.now();
+            String accessToken = tokenData.getBody().accessToken;
+            String refreshToken = tokenData.getBody().refreshToken;
+            Instant expiresAt = Instant.ofEpochSecond(tokenData.getBody().expiresAt);
+
 
             // get the associated strava user if exists
-            Optional<StravaUser> existingStravaUserOpt = stravaUserRepo.findByStravaAthleteId(stravaAthleteId);
-
-            // if strava user exists, just update the token; else, create new entry in both users and strava_users tables
+            Optional<Provider> stravaProvider = providerRepo.findByName("strava");
+            Optional<ProviderAccount> existingStravaUserOpt = providerAccountRepo.findByProviderAndProviderUserId(stravaProvider.get(), stravaAthleteId.toString());
+            UUID userId;
             if (existingStravaUserOpt.isPresent()) {
-
-                StravaUser existing = existingStravaUserOpt.get();
-                existing.setAccessToken(tokenData.getBody().accessToken);
-                existing.setRefreshToken(tokenData.getBody().refreshToken);
-                existing.setExpiresAt(Instant.ofEpochSecond(tokenData.getBody().expiresAt));
-                stravaUserRepo.save(existing);
-
+                userId = existingStravaUserOpt.get().getUser().getId();
+            } else if (UserContext.getUserId() != null) {
+                userId = UserContext.getUserId();
             } else {
-
-                // Create User
-                User newUser = new User();
-                newUser.setFullName(stravaFirstName + " " + stravaLastName);
-                newUser.setUsername(stravaUsername);
-                userRepo.save(newUser);
-
-                // Create StravaUser
-                StravaUser newStravaUser = new StravaUser();
-                newStravaUser.setUser(newUser);
-                newStravaUser.setStravaAthleteId(stravaAthleteId);
-                newStravaUser.setAccessToken(tokenData.getBody().accessToken);
-                newStravaUser.setRefreshToken(tokenData.getBody().refreshToken);
-                newStravaUser.setExpiresAt(Instant.ofEpochSecond(tokenData.getBody().expiresAt));
-                stravaUserRepo.save(newStravaUser);
+                userId = null;
             }
 
-            return ResponseEntity.ok("Strava authentication successful");
+            // upsert the strava user (pass in the user id from the token if exists)
+            ProviderAccount new_acc = providerAccountService.upsertProviderAccount(userId, "strava", stravaAthleteId.toString(), accessToken, refreshToken, expiresAt);
+
+
+            // append token as query param
+            URI redirect = URI.create(frontendConfig.getFrontendOrigin()
+                    + "/onboarding/connect?provider=strava&status=success&token=5");
+                    // + URLEncoder.encode(jwt, StandardCharsets.UTF_8));
+
+            return ResponseEntity.status(302)
+                    .location(redirect)
+                    .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                    .build();
+
 
         } catch (Exception e) {
             e.printStackTrace();

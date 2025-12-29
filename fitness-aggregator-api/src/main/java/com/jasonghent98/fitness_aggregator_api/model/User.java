@@ -1,5 +1,4 @@
 package com.jasonghent98.fitness_aggregator_api.model;
-import com.jasonghent98.fitness_aggregator_api.model.strava.StravaUser;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -15,17 +14,26 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
+    @Column(unique = true)
+    private String stripeCustomerId;
 
-    @Column
-    private String fullName;
+    @Column(nullable = false, unique = true, columnDefinition = "citext")
+    private String email;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    private String dashboardPreset;
+
+    private String trainingStyle;
+
+    private String trainingFocus;
+
+    @Column
+    private String subscriptionTier;
 
     // handled before just before writes are persisted to DB vis JPA API
     @PrePersist
@@ -43,7 +51,4 @@ public class User {
     // Relationships
     // Only exists in Java code to make it easier to navigate from User → StravaUser. Does NOT create a column
     // The "user" field in the StravaUser class is managing the relationship
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private StravaUser stravaUser;
-
 }
