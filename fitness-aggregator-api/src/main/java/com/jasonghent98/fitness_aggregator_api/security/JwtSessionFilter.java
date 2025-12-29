@@ -1,11 +1,15 @@
 package com.jasonghent98.fitness_aggregator_api.security;
 
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
+import com.jasonghent98.fitness_aggregator_api.model.auth.UserSession;
+import com.jasonghent98.fitness_aggregator_api.service.auth.SessionService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,10 +23,13 @@ import java.util.UUID;
 @Order(10)
 public class JwtSessionFilter extends OncePerRequestFilter {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtSessionFilter.class);
     private final JwtService jwtService;
+    private final SessionService sessionService;
 
-    public JwtSessionFilter(JwtService jwtService) {
+    public JwtSessionFilter(JwtService jwtService, SessionService sessionService) {
         this.jwtService = jwtService;
+        this.sessionService = sessionService;
     }
 
     @Override
@@ -47,22 +54,75 @@ public class JwtSessionFilter extends OncePerRequestFilter {
             }
 
             // 3) Verify if present
+            Optional<JwtService.SessionInfo> sessionInfo = Optional.empty();
             if (token != null && !token.isBlank()) {
-                try {
+                sessionInfo = jwtService.verifySession(token);
 
-                    jwtService.verifySession(token).ifPresent(session -> {
-                        UserContext.setUserId(session.userId());
-                        UserContext.setTier(session.tier());
-                    });
-
-                } catch (Exception verifyErr) {
-                    // Invalid/expired -> just proceed unauthenticated; endpoint decides response
+                if (sessionInfo.isPresent()) {
+                    UserContext.setUserId(sessionInfo.get().userId());
+                    UserContext.setTier(sessionInfo.get().tier());
+                } else {
+                    // Token is expired or invalid - try to refresh silently
+                    log.debug("Access token expired or invalid, attempting silent refresh");
+                    attemptSilentRefresh(req, res);
                 }
+            } else {
+                // No access token - try to refresh silently if refresh token exists
+                attemptSilentRefresh(req, res);
             }
 
             chain.doFilter(req, res);
         } finally {
             UserContext.clear();
+        }
+    }
+
+    /**
+     * Attempt to refresh the access token using the refresh token from cookies
+     */
+    private void attemptSilentRefresh(HttpServletRequest req, HttpServletResponse res) {
+        try {
+            // Get refresh token from cookies
+            String refreshToken = Optional.ofNullable(req.getCookies())
+                    .flatMap(cookies -> Arrays.stream(cookies)
+                            .filter(c -> JwtService.REFRESH_COOKIE_NAME.equals(c.getName()))
+                            .findFirst())
+                    .map(Cookie::getValue)
+                    .orElse(null);
+
+            if (refreshToken != null && !refreshToken.isBlank()) {
+                // Validate refresh token and get session
+                Optional<UserSession> validSession = sessionService.findValidSessionByRefreshToken(refreshToken);
+
+                if (validSession.isPresent()) {
+                    UserSession session = validSession.get();
+                    UUID userId = session.getUserId();
+
+                    // Mint new access token
+                    String newAccessToken = jwtService.mintSession(userId);
+
+                    // Rotate refresh token for security
+                    String newRefreshToken = sessionService.rotateRefreshToken(session);
+
+                    // Determine if local environment
+                    String host = req.getServerName();
+                    boolean isLocal = host.equals("localhost") || host.equals("127.0.0.1");
+
+                    // Set new cookies in response
+                    res.addHeader("Set-Cookie", jwtService.buildSessionCookie(newAccessToken, isLocal));
+                    res.addHeader("Set-Cookie", jwtService.buildRefreshCookie(newRefreshToken, isLocal));
+
+                    // Set user context for this request
+                    UserContext.setUserId(userId);
+
+                    log.info("Silent token refresh successful for user {}", userId);
+                } else {
+                    log.debug("Refresh token invalid or expired");
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Silent refresh failed: {}", e.getMessage());
+            // Fail silently - user will remain unauthenticated
         }
     }
 
