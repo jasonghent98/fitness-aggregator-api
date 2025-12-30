@@ -101,7 +101,7 @@ public class JwtService {
                 .path("/")
                 .sameSite("Lax")
                 .httpOnly(true)
-                .maxAge(Duration.ofMinutes(cfg.getSessionTtlMinutes())); // short-lived token (~15 mins)
+                .maxAge(Duration.ofDays(cfg.getRefreshTtlDays())); // Cookie persists as long as refresh token (JWT inside expires after 15min)
         if (isLocal) {
             cookieBuilder.secure(false);
             // Set domain to localhost (without port) so cookie works across frontend:3000 and backend:8080
