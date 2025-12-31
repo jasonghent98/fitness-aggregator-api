@@ -12,12 +12,13 @@ import java.util.Map;
 @Service
 public class GeminiService {
 
-    private final String apiKey;
+    @Value("${GEMINI_API_KEY}")
+    private String apiKey;
+
     private final RestTemplate restTemplate;
     private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
-    public GeminiService(@Value("${GEMINI_API_KEY}") String apiKey, RestTemplate restTemplate) {
-        this.apiKey = apiKey;
+    public GeminiService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
