@@ -65,6 +65,19 @@ public class GarminSleepSummary {
     @Column(columnDefinition = "jsonb")
     private List<NapSummary> naps;
 
+    // Helper method to extract sleep score value from the overallSleepScore map
+    // This makes it easier for frontend to access the score
+    @com.fasterxml.jackson.annotation.JsonGetter("sleepScoreValue")
+    public Integer getSleepScoreValue() {
+        if (overallSleepScore != null && overallSleepScore.containsKey("value")) {
+            Object value = overallSleepScore.get("value");
+            if (value instanceof Number) {
+                return ((Number) value).intValue();
+            }
+        }
+        return null;
+    }
+
     @Data
     public static class NapSummary {
         @JsonProperty("napDurationInSeconds")
