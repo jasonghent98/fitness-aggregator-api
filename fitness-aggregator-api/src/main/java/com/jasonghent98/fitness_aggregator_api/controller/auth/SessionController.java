@@ -31,12 +31,6 @@ public class SessionController {
         UUID userId = UserContext.getUserId();
         return ResponseEntity.ok(userService.getUser(userId));
     }
-    /** Generate a valid JWT tied to a user for testing purposes: delete once in prod */
-    @GetMapping("/generateToken")
-    public ResponseEntity<?> getToken() {
-        String token = jwtService.mintSession(UUID.fromString("404ab5d0-4051-4587-9f03-a13ad8463fb4"));
-        return ResponseEntity.ok(Map.of("success", "true", "token", token));
-    }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("X-Refresh-Token") String refreshToken) {
