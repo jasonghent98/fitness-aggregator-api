@@ -134,8 +134,11 @@ public class SessionService {
         // Create session
         String refreshToken = createSessionAndReturnRefreshToken(user.getId());
 
+        // Get user's subscription tier
+        String tier = userService.findTierForUser(user.getId());
+
         // Mint short-lived access JWT
-        String accessJwt = jwtService.mintSession(user.getId());
+        String accessJwt = jwtService.mintSession(user.getId(), tier);
 
         // Redirect (check if local testing)
         String next = frontendConfig.getFrontendOrigin() + "/app/onboarding/connect?status=verified";
@@ -155,7 +158,9 @@ public class SessionService {
     public ResponseEntity<?> refresh(String refreshToken) {
         return findValidSessionByRefreshToken(refreshToken)
                 .map(session -> {
-                    String newAccessToken = jwtService.mintSession(session.getUserId());
+                    UUID userId = session.getUserId();
+                    String tier = userService.findTierForUser(userId);
+                    String newAccessToken = jwtService.mintSession(userId, tier);
                     String newRefreshToken = rotateRefreshToken(session);
                     return ResponseEntity.ok(Map.of(
                             "accessToken", newAccessToken,

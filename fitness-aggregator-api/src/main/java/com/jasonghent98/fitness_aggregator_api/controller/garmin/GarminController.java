@@ -53,12 +53,16 @@ public class GarminController {
 
 
         UUID userId = UserContext.getUserId();
+        System.out.println("[DEBUG] Sleep endpoint - User ID: " + userId);
+        System.out.println("[DEBUG] Sleep endpoint - Range: " + range);
         String subTier = userContextResolver.getSubscriptionTier();
 
         int maxDays = subTier.equalsIgnoreCase("ENHANCED") ? 90 : (subTier.equalsIgnoreCase("ELITE") ? 365 : 30);
         DateRangeUtil.DateRange window = DateRangeUtil.resolve(range, startDate, endDate, maxDays);
+        System.out.println("[DEBUG] Sleep endpoint - Date range: " + window.start() + " to " + window.end());
 
         List<GarminSleepSummary> results = garminService.getSleepForUserForGivenRange(userId, window.start(), window.end());
+        System.out.println("[DEBUG] Sleep endpoint - Results count: " + results.size());
         return ResponseEntity.ok(results);
     }
 

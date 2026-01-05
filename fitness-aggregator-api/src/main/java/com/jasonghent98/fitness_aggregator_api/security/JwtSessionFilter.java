@@ -3,6 +3,7 @@ package com.jasonghent98.fitness_aggregator_api.security;
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.model.auth.UserSession;
 import com.jasonghent98.fitness_aggregator_api.service.auth.SessionService;
+import com.jasonghent98.fitness_aggregator_api.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -26,10 +27,12 @@ public class JwtSessionFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(JwtSessionFilter.class);
     private final JwtService jwtService;
     private final SessionService sessionService;
+    private final UserService userService;
 
-    public JwtSessionFilter(JwtService jwtService, SessionService sessionService) {
+    public JwtSessionFilter(JwtService jwtService, SessionService sessionService, UserService userService) {
         this.jwtService = jwtService;
         this.sessionService = sessionService;
+        this.userService = userService;
     }
 
     @Override
@@ -98,8 +101,11 @@ public class JwtSessionFilter extends OncePerRequestFilter {
                     UserSession session = validSession.get();
                     UUID userId = session.getUserId();
 
-                    // Mint new access token
-                    String newAccessToken = jwtService.mintSession(userId);
+                    // Get user's subscription tier
+                    String tier = userService.findTierForUser(userId);
+
+                    // Mint new access token with tier
+                    String newAccessToken = jwtService.mintSession(userId, tier);
 
                     // Rotate refresh token for security
                     String newRefreshToken = sessionService.rotateRefreshToken(session);
@@ -114,6 +120,7 @@ public class JwtSessionFilter extends OncePerRequestFilter {
 
                     // Set user context for this request
                     UserContext.setUserId(userId);
+                    UserContext.setTier(tier);
 
                     log.info("Silent token refresh successful for user {}", userId);
                 } else {

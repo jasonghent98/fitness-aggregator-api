@@ -37,12 +37,13 @@ public class JwtService {
         this.alg = Algorithm.HMAC256(cfg.getSecret());
     }
 
-    public String mintSession(UUID userId) {
+    public String mintSession(UUID userId, String tier) {
         Instant now = Instant.now();
         Instant exp = now.plus(Duration.ofMinutes(cfg.getSessionTtlMinutes()));
         return JWT.create()
                 .withIssuer(cfg.getIssuer())
                 .withSubject(userId.toString())
+                .withClaim("tier", tier)
                 .withIssuedAt(Date.from(now))
                 .withExpiresAt(Date.from(exp))
                 .sign(alg);
