@@ -201,8 +201,22 @@ public class SessionService {
      * Validate a refresh token and return the session if still valid.
      */
     public Optional<UserSession> findValidSessionByRefreshToken(String refreshToken) {
-        return sessionRepo.findByRefreshTokenAndRevokedAtIsNull(refreshToken)
-                .filter(s -> s.getRefreshTokenExpiresAt().isAfter(Instant.now()));
+        log.debug("Looking up refresh token: {}...", refreshToken.substring(0, Math.min(8, refreshToken.length())));
+
+        Optional<UserSession> session = sessionRepo.findByRefreshTokenAndRevokedAtIsNull(refreshToken);
+
+        if (session.isEmpty()) {
+            log.debug("No session found for refresh token");
+            return Optional.empty();
+        }
+
+        if (session.get().getRefreshTokenExpiresAt().isBefore(Instant.now())) {
+            log.debug("Refresh token found but expired at {}", session.get().getRefreshTokenExpiresAt());
+            return Optional.empty();
+        }
+
+        log.debug("Valid session found for user {}", session.get().getUserId());
+        return session;
     }
 
     /**
@@ -220,8 +234,14 @@ public class SessionService {
      */
     @Transactional
     public String rotateRefreshToken(UserSession session) {
+        String oldToken = session.getRefreshToken();
         String newToken = UUID.randomUUID().toString();
         Instant newExpiry = Instant.now().plus(Duration.ofDays(30));
+
+        log.info("Rotating refresh token for user {} - old: {}..., new: {}...",
+                session.getUserId(),
+                oldToken.substring(0, Math.min(8, oldToken.length())),
+                newToken.substring(0, Math.min(8, newToken.length())));
 
         session.setRefreshToken(newToken);
         session.setRefreshTokenExpiresAt(newExpiry);

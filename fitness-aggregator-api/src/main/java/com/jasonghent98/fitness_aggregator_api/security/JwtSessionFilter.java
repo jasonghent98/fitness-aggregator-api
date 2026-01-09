@@ -93,11 +93,17 @@ public class JwtSessionFilter extends OncePerRequestFilter {
                     .map(Cookie::getValue)
                     .orElse(null);
 
-            if (refreshToken != null && !refreshToken.isBlank()) {
-                // Validate refresh token and get session
-                Optional<UserSession> validSession = sessionService.findValidSessionByRefreshToken(refreshToken);
+            if (refreshToken == null || refreshToken.isBlank()) {
+                log.debug("No refresh token found in cookies");
+                return;
+            }
 
-                if (validSession.isPresent()) {
+            log.debug("Attempting silent refresh with token: {}...", refreshToken.substring(0, Math.min(8, refreshToken.length())));
+
+            // Validate refresh token and get session
+            Optional<UserSession> validSession = sessionService.findValidSessionByRefreshToken(refreshToken);
+
+            if (validSession.isPresent()) {
                     UserSession session = validSession.get();
                     UUID userId = session.getUserId();
 
@@ -122,13 +128,14 @@ public class JwtSessionFilter extends OncePerRequestFilter {
                     UserContext.setUserId(userId);
                     UserContext.setTier(tier);
 
-                    log.info("Silent token refresh successful for user {}", userId);
+                    log.info("Silent token refresh successful for user {} with new tokens", userId);
                 } else {
-                    log.warn("Refresh token invalid or expired - user needs to re-authenticate");
+                    log.warn("Refresh token not found or expired - token: {}...",
+                            refreshToken != null ? refreshToken.substring(0, Math.min(8, refreshToken.length())) : "null");
+                    log.warn("User needs to re-authenticate");
                 }
-            }
         } catch (Exception e) {
-            log.warn("Silent refresh failed: {}", e.getMessage());
+            log.error("Silent refresh failed with exception: {}", e.getMessage(), e);
             // Fail silently - user will remain unauthenticated
         }
     }
