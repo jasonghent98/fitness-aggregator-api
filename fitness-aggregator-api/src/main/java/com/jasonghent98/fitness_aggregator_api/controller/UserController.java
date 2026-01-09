@@ -15,6 +15,7 @@ import com.jasonghent98.fitness_aggregator_api.service.sync.SyncUserProviderStat
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -73,8 +74,30 @@ public class UserController {
 
     /** Returns sync state for provider accounts for user */
     @GetMapping("/sync-state")
-    public List<UserProviderSyncState> getSyncState() {
-        return svc.getProviderSyncStateForUser();
+    public ResponseEntity<?> getSyncState() {
+        List<UserProviderSyncState> syncStates = svc.getProviderSyncStateForUser();
+
+        // Calculate the most recent sync time across all providers and datasets
+        Instant lastGlobalSync = syncStates.stream()
+                .map(state -> {
+                    // Prefer backfillFinishedAt, fallback to lastIncrementalReceivedAt, then updatedAt
+                    if (state.getBackfillFinishedAt() != null) {
+                        return state.getBackfillFinishedAt();
+                    } else if (state.getLastIncrementalReceivedAt() != null) {
+                        return state.getLastIncrementalReceivedAt();
+                    } else if (state.getUpdatedAt() != null) {
+                        return state.getUpdatedAt();
+                    }
+                    return null;
+                })
+                .filter(java.util.Objects::nonNull)
+                .max(Instant::compareTo)
+                .orElse(null);
+
+        return ResponseEntity.ok(Map.of(
+                "syncStates", syncStates,
+                "lastGlobalSync", lastGlobalSync != null ? lastGlobalSync.toString() : null
+        ));
     }
 
     /** Triggers a user sync for the user*/
