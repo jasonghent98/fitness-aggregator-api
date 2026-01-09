@@ -80,11 +80,43 @@ public class UserController {
     /** Triggers a user sync for the user*/
     @PostMapping("/sync-state")
     public ResponseEntity<?> triggerSync(@RequestBody SyncProviders syncProviders) {
-        AtomicReference<Map<String, Provider>> codeToProviders = providerRegistryService.getCodeToProvidersCache();
-        // trigger all provider backfills
-        for (String p: syncProviders.getProviders()) {
-            bs.triggerBackfill(UserContext.getUserId(), codeToProviders.get().get(p), UserContext.getTier());
+        UUID userId = UserContext.getUserId();
+        String tier = UserContext.getTier();
+
+        // Validate user context
+        if (userId == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "User not authenticated"));
         }
-        return ResponseEntity.accepted().build();
+
+        // Get tier from user if not in context (fallback)
+        if (tier == null || tier.isBlank()) {
+            User user = userService.getUser(userId);
+            tier = user.getSubscriptionTier() != null ? user.getSubscriptionTier() : "FREE";
+        }
+
+        AtomicReference<Map<String, Provider>> codeToProviders = providerRegistryService.getCodeToProvidersCache();
+
+        // Validate providers
+        if (syncProviders == null || syncProviders.getProviders() == null || syncProviders.getProviders().length == 0) {
+            return ResponseEntity.badRequest().body(Map.of("error", "No providers specified"));
+        }
+
+        // trigger all provider backfills
+        for (String providerCode: syncProviders.getProviders()) {
+            Provider provider = codeToProviders.get().get(providerCode);
+            if (provider == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid provider: " + providerCode));
+            }
+
+            try {
+                bs.triggerBackfill(userId, provider, tier);
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Provider not connected: " + providerCode));
+            } catch (Exception e) {
+                return ResponseEntity.status(500).body(Map.of("error", "Sync failed for " + providerCode + ": " + e.getMessage()));
+            }
+        }
+
+        return ResponseEntity.accepted().body(Map.of("status", "sync_initiated", "providers", syncProviders.getProviders()));
     }
 }
