@@ -80,7 +80,7 @@ public class JwtService {
             return Optional.of(new SessionInfo(userId, tier));
 
         } catch (TokenExpiredException e) {
-            log.warn("JWT expired at {}", e.getExpiredOn());
+            log.debug("JWT expired at {} (silent refresh will handle)", e.getExpiredOn());
         } catch (InvalidClaimException e) {
             log.warn("Invalid claim: {}", e.getMessage());
         } catch (SignatureVerificationException e) {

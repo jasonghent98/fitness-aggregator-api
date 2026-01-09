@@ -66,7 +66,7 @@ public class JwtSessionFilter extends OncePerRequestFilter {
                     UserContext.setTier(sessionInfo.get().tier());
                 } else {
                     // Token is expired or invalid - try to refresh silently
-                    log.debug("Access token expired or invalid, attempting silent refresh");
+                    log.info("Access token expired or invalid, attempting silent refresh");
                     attemptSilentRefresh(req, res);
                 }
             } else {
@@ -124,7 +124,7 @@ public class JwtSessionFilter extends OncePerRequestFilter {
 
                     log.info("Silent token refresh successful for user {}", userId);
                 } else {
-                    log.debug("Refresh token invalid or expired");
+                    log.warn("Refresh token invalid or expired - user needs to re-authenticate");
                 }
             }
         } catch (Exception e) {
