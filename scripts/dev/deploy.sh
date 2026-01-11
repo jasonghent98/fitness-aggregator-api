@@ -41,6 +41,12 @@ DEPLOY_CMD=( gcloud run deploy "${SERVICE}"
   --service-account "${RUNTIME_SA}"
   --env-vars-file "${ENV_FILE}"
   --platform managed
+  --memory 512Mi
+  --cpu 1
+  --timeout 60s
+  --max-instances 10
+  --min-instances 0
+  --concurrency 5
 )
 [[ -n "${CONN}" ]] && DEPLOY_CMD+=( --add-cloudsql-instances "${CONN}" )
 

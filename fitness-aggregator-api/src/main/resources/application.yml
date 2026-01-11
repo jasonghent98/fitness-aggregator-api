@@ -4,6 +4,14 @@ server:
 spring:
   profiles:
     active: dev
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 10000
+      idle-timeout: 300000
+      max-lifetime: 600000
+      leak-detection-threshold: 60000
   jpa:
     hibernate:
       ddl-auto: none
@@ -11,6 +19,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   mail:
     port: 587

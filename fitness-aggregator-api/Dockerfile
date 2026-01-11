@@ -13,5 +13,15 @@ ENV PORT=8080
 # Expose the port (optional, Cloud Run sets it automatically)
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the application with JVM memory tuning
+# Cloud Run default is 512Mi, we use 80% for heap (384m)
+# Remaining 128m for native memory (threads, direct buffers, etc)
+ENTRYPOINT ["java", \
+    "-Xms384m", \
+    "-Xmx384m", \
+    "-XX:+UseG1GC", \
+    "-XX:MaxGCPauseMillis=100", \
+    "-XX:+UseStringDeduplication", \
+    "-XX:+ExitOnOutOfMemoryError", \
+    "-Djava.security.egd=file:/dev/./urandom", \
+    "-jar", "app.jar"]
