@@ -35,11 +35,16 @@ public class UserService {
 
     /**
      * Resolves the subscription tier for a given user.
-     * Falls back to "FREE" if no tier is stored.
+     * Falls back to "FREE" if no tier is stored or user not found.
+     * Never returns null.
      */
     public String findTierForUser(UUID userId) {
+        if (userId == null) {
+            return "FREE";
+        }
         return userRepo.findById(userId)
                 .map(User::getSubscriptionTier)
+                .filter(tier -> tier != null && !tier.isBlank())
                 .orElse("FREE");
     }
 

@@ -65,9 +65,11 @@ public class SessionService {
         if (userId == null) {
             return Map.of("authenticated", false);
         }
-        // get the user metadata (tier)
+        // get the user metadata (tier) - guaranteed non-null by findTierForUser
         String subTier = userService.findTierForUser(userId);
-        return Map.of("authenticated", true, "userId", userId.toString(), "subscriptionTier", subTier);
+        // Use explicit null check as extra safety for Map.of()
+        String safeTier = (subTier != null) ? subTier : "FREE";
+        return Map.of("authenticated", true, "userId", userId.toString(), "subscriptionTier", safeTier);
     }
 
     /** Logout and revoke session by refresh token */
