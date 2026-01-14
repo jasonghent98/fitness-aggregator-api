@@ -2,12 +2,16 @@ package com.jasonghent98.fitness_aggregator_api.controller.ai;
 
 import com.jasonghent98.fitness_aggregator_api.context.UserContext;
 import com.jasonghent98.fitness_aggregator_api.context.UserContextResolver;
+import com.jasonghent98.fitness_aggregator_api.model.ai.AiInsightCache;
 import com.jasonghent98.fitness_aggregator_api.model.garmin.GarminDailySummary;
 import com.jasonghent98.fitness_aggregator_api.model.garmin.GarminHrvSummary;
 import com.jasonghent98.fitness_aggregator_api.model.garmin.GarminSleepSummary;
+import com.jasonghent98.fitness_aggregator_api.repository.ai.AiInsightCacheRepository;
 import com.jasonghent98.fitness_aggregator_api.service.ai.*;
 import com.jasonghent98.fitness_aggregator_api.service.garmin.GarminService;
 import com.jasonghent98.fitness_aggregator_api.util.DateRangeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +19,14 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/ai")
 public class AiInsightsController {
+
+    private static final Logger log = LoggerFactory.getLogger(AiInsightsController.class);
 
     private final SleepInsightsService sleepInsightsService;
     private final StepsInsightsService stepsInsightsService;
@@ -28,6 +35,7 @@ public class AiInsightsController {
     private final HrvInsightsService hrvInsightsService;
     private final GarminService garminService;
     private final UserContextResolver userContextResolver;
+    private final AiInsightCacheRepository cacheRepository;
 
     public AiInsightsController(
             SleepInsightsService sleepInsightsService,
@@ -36,7 +44,8 @@ public class AiInsightsController {
             HeartRateInsightsService heartRateInsightsService,
             HrvInsightsService hrvInsightsService,
             GarminService garminService,
-            UserContextResolver userContextResolver
+            UserContextResolver userContextResolver,
+            AiInsightCacheRepository cacheRepository
     ) {
         this.sleepInsightsService = sleepInsightsService;
         this.stepsInsightsService = stepsInsightsService;
@@ -45,6 +54,7 @@ public class AiInsightsController {
         this.hrvInsightsService = hrvInsightsService;
         this.garminService = garminService;
         this.userContextResolver = userContextResolver;
+        this.cacheRepository = cacheRepository;
     }
 
     /**
@@ -52,6 +62,8 @@ public class AiInsightsController {
      * GET /api/ai/sleep-insights?range=7d
      * or
      * GET /api/ai/sleep-insights?startDate=2024-01-01&endDate=2024-01-07
+     *
+     * Caches insights per user per day to avoid redundant LLM calls.
      */
     @GetMapping("/sleep-insights")
     public ResponseEntity<Map<String, String>> getSleepInsights(
@@ -62,6 +74,25 @@ public class AiInsightsController {
         // Get user context
         UUID userId = UserContext.getUserId();
         String subTier = userContextResolver.getSubscriptionTier();
+        LocalDate today = LocalDate.now();
+
+        // Check cache first - one insight per user per day
+        Optional<AiInsightCache> cachedInsight = cacheRepository.findByUserIdAndMetricTypeAndCacheDate(
+                userId, "sleep", today
+        );
+
+        if (cachedInsight.isPresent()) {
+            log.info("[AI Cache] CACHE HIT - Returning cached sleep insight for user {} (cached at {})",
+                    userId, cachedInsight.get().getCreatedAt());
+
+            Map<String, String> response = new HashMap<>();
+            response.put("insight", cachedInsight.get().getInsight());
+            response.put("cached", "true");
+            response.put("cachedAt", cachedInsight.get().getCreatedAt().toString());
+            return ResponseEntity.ok(response);
+        }
+
+        log.info("[AI Cache] CACHE MISS - Generating new sleep insight for user {}", userId);
 
         // Determine date range
         int maxDays = subTier.equalsIgnoreCase("ENHANCED") ? 90 : (subTier.equalsIgnoreCase("ELITE") ? 365 : 30);
@@ -77,12 +108,28 @@ public class AiInsightsController {
         // Generate AI insights
         String insight = sleepInsightsService.generateSleepInsights(sleepData);
 
+        // Cache the insight for today
+        try {
+            AiInsightCache cache = AiInsightCache.builder()
+                    .userId(userId)
+                    .metricType("sleep")
+                    .cacheDate(today)
+                    .insight(insight)
+                    .build();
+            cacheRepository.save(cache);
+            log.info("[AI Cache] Saved new sleep insight to cache for user {}", userId);
+        } catch (Exception e) {
+            // Don't fail the request if caching fails
+            log.warn("[AI Cache] Failed to save insight to cache: {}", e.getMessage());
+        }
+
         // Return response
         Map<String, String> response = new HashMap<>();
         response.put("insight", insight);
         response.put("dataPoints", String.valueOf(sleepData.size()));
         response.put("startDate", window.start().toString());
         response.put("endDate", window.end().toString());
+        response.put("cached", "false");
 
         return ResponseEntity.ok(response);
     }
