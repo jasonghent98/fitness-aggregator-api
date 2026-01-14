@@ -13,13 +13,14 @@ ENV PORT=8080
 # Expose the port (optional, Cloud Run sets it automatically)
 EXPOSE 8080
 
-# Run the application with aggressive memory tuning for 512Mi container
-# Heap: 300m, Metaspace: 80m, leaving ~130m for threads/native
+# Run the application with memory tuning for 512Mi container
+# Heap: 220m, Metaspace: 128m, CodeCache: 48m = ~396m managed
+# Leaves ~116m for threads, native buffers, etc.
 ENTRYPOINT ["java", \
-    "-Xms256m", \
-    "-Xmx300m", \
-    "-XX:MaxMetaspaceSize=80m", \
-    "-XX:ReservedCodeCacheSize=64m", \
+    "-Xms180m", \
+    "-Xmx220m", \
+    "-XX:MaxMetaspaceSize=128m", \
+    "-XX:ReservedCodeCacheSize=48m", \
     "-XX:+UseSerialGC", \
     "-Xss256k", \
     "-XX:+ExitOnOutOfMemoryError", \
