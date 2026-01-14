@@ -28,7 +28,7 @@ public class UserSession {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "refresh_token", nullable = false, unique = true, length = 255)
+    @Column(name = "refresh_token", nullable = false, unique = true, length = 512)
     private String refreshToken;
 
     @Column(name = "refresh_token_expires_at", nullable = false)
