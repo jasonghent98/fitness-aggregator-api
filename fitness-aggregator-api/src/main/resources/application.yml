@@ -4,10 +4,12 @@ server:
 spring:
   profiles:
     active: dev
+  main:
+    lazy-initialization: true
   datasource:
     hikari:
-      maximum-pool-size: 5
-      minimum-idle: 2
+      maximum-pool-size: 3
+      minimum-idle: 1
       connection-timeout: 10000
       idle-timeout: 300000
       max-lifetime: 600000
@@ -15,16 +17,19 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
+    open-in-view: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         jdbc:
           batch_size: 20
           fetch_size: 50
         order_inserts: true
         order_updates: true
         generate_statistics: false
+        query.plan_cache_max_size: 64
+        query.plan_parameter_metadata_max_size: 32
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   mail:
     port: 587

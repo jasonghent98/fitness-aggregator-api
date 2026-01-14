@@ -13,15 +13,18 @@ ENV PORT=8080
 # Expose the port (optional, Cloud Run sets it automatically)
 EXPOSE 8080
 
-# Run the application with JVM memory tuning
-# Cloud Run default is 512Mi, we use 80% for heap (384m)
-# Remaining 128m for native memory (threads, direct buffers, etc)
+# Run the application with aggressive memory tuning for 512Mi container
+# Heap: 300m, Metaspace: 80m, leaving ~130m for threads/native
 ENTRYPOINT ["java", \
-    "-Xms384m", \
-    "-Xmx384m", \
-    "-XX:+UseG1GC", \
-    "-XX:MaxGCPauseMillis=100", \
-    "-XX:+UseStringDeduplication", \
+    "-Xms256m", \
+    "-Xmx300m", \
+    "-XX:MaxMetaspaceSize=80m", \
+    "-XX:ReservedCodeCacheSize=64m", \
+    "-XX:+UseSerialGC", \
+    "-Xss256k", \
     "-XX:+ExitOnOutOfMemoryError", \
+    "-XX:+UnlockExperimentalVMOptions", \
+    "-XX:+UseContainerSupport", \
     "-Djava.security.egd=file:/dev/./urandom", \
+    "-Dspring.main.lazy-initialization=true", \
     "-jar", "app.jar"]
