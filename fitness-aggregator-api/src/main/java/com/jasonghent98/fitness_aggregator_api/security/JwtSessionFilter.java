@@ -67,11 +67,11 @@ public class JwtSessionFilter extends OncePerRequestFilter {
                 } else {
                     // Token is expired or invalid - try to refresh silently
                     log.info("Access token expired or invalid, attempting silent refresh");
-                    attemptSilentRefresh(req, res);
+                    attemptSilentRefresh(req, res, token);
                 }
             } else {
                 // No access token - try to refresh silently if refresh token exists
-                attemptSilentRefresh(req, res);
+                attemptSilentRefresh(req, res, null);
             }
 
             chain.doFilter(req, res);
@@ -81,9 +81,12 @@ public class JwtSessionFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Attempt to refresh the access token using the refresh token from cookies
+     * Attempt to refresh the access token using the refresh token from cookies.
+     * Falls back to looking up by user_id if the refresh token doesn't match.
+     *
+     * @param expiredAccessToken The expired access token (may be null) - used to extract user_id for fallback
      */
-    private void attemptSilentRefresh(HttpServletRequest req, HttpServletResponse res) {
+    private void attemptSilentRefresh(HttpServletRequest req, HttpServletResponse res, String expiredAccessToken) {
         try {
             // Get refresh token from cookies
             String refreshToken = Optional.ofNullable(req.getCookies())
@@ -94,48 +97,62 @@ public class JwtSessionFilter extends OncePerRequestFilter {
                     .orElse(null);
 
             if (refreshToken == null || refreshToken.isBlank()) {
-                log.debug("No refresh token found in cookies");
+                log.info("[JwtSessionFilter] No refresh token found in cookies");
                 return;
             }
 
-            log.debug("Attempting silent refresh with token: {}...", refreshToken.substring(0, Math.min(8, refreshToken.length())));
+            log.info("[JwtSessionFilter] Attempting silent refresh with token (length={}): {}...",
+                    refreshToken.length(),
+                    refreshToken.substring(0, Math.min(8, refreshToken.length())));
 
-            // Validate refresh token and get session
+            // First, try to validate refresh token directly
             Optional<UserSession> validSession = sessionService.findValidSessionByRefreshToken(refreshToken);
 
-            if (validSession.isPresent()) {
-                    UserSession session = validSession.get();
-                    UUID userId = session.getUserId();
+            // If refresh token lookup failed, try fallback using user_id from expired access token
+            if (validSession.isEmpty() && expiredAccessToken != null) {
+                log.info("[JwtSessionFilter] Refresh token not found, trying fallback with user_id from expired access token");
 
-                    // Get user's subscription tier
-                    String tier = userService.findTierForUser(userId);
-
-                    // Mint new access token with tier
-                    String newAccessToken = jwtService.mintSession(userId, tier);
-
-                    // Rotate refresh token for security
-                    String newRefreshToken = sessionService.rotateRefreshToken(session);
-
-                    // Determine if local environment
-                    String host = req.getServerName();
-                    boolean isLocal = host.equals("localhost") || host.equals("127.0.0.1");
-
-                    // Set new cookies in response
-                    res.addHeader("Set-Cookie", jwtService.buildSessionCookie(newAccessToken, isLocal));
-                    res.addHeader("Set-Cookie", jwtService.buildRefreshCookie(newRefreshToken, isLocal));
-
-                    // Set user context for this request
-                    UserContext.setUserId(userId);
-                    UserContext.setTier(tier);
-
-                    log.info("Silent token refresh successful for user {} with new tokens", userId);
+                Optional<UUID> userIdOpt = jwtService.extractUserIdFromExpiredToken(expiredAccessToken);
+                if (userIdOpt.isPresent()) {
+                    UUID userId = userIdOpt.get();
+                    log.info("[JwtSessionFilter] Extracted user_id={}, looking up their most recent valid session", userId);
+                    validSession = sessionService.findMostRecentValidSessionForUser(userId);
                 } else {
-                    log.warn("Refresh token not found or expired - token: {}...",
-                            refreshToken != null ? refreshToken.substring(0, Math.min(8, refreshToken.length())) : "null");
-                    log.warn("User needs to re-authenticate");
+                    log.info("[JwtSessionFilter] Could not extract user_id from expired access token");
                 }
+            }
+
+            if (validSession.isPresent()) {
+                UserSession session = validSession.get();
+                UUID userId = session.getUserId();
+
+                // Get user's subscription tier
+                String tier = userService.findTierForUser(userId);
+
+                // Mint new access token with tier
+                String newAccessToken = jwtService.mintSession(userId, tier);
+
+                // Rotate refresh token for security
+                String newRefreshToken = sessionService.rotateRefreshToken(session);
+
+                // Determine if local environment
+                String host = req.getServerName();
+                boolean isLocal = host.equals("localhost") || host.equals("127.0.0.1");
+
+                // Set new cookies in response
+                res.addHeader("Set-Cookie", jwtService.buildSessionCookie(newAccessToken, isLocal));
+                res.addHeader("Set-Cookie", jwtService.buildRefreshCookie(newRefreshToken, isLocal));
+
+                // Set user context for this request
+                UserContext.setUserId(userId);
+                UserContext.setTier(tier);
+
+                log.info("[JwtSessionFilter] Silent token refresh successful for user {} with new tokens", userId);
+            } else {
+                log.warn("[JwtSessionFilter] No valid session found - user needs to re-authenticate");
+            }
         } catch (Exception e) {
-            log.error("Silent refresh failed with exception: {}", e.getMessage(), e);
+            log.error("[JwtSessionFilter] Silent refresh failed with exception: {}", e.getMessage(), e);
             // Fail silently - user will remain unauthenticated
         }
     }

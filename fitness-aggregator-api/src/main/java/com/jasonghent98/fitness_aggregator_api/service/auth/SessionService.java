@@ -21,6 +21,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -203,22 +204,61 @@ public class SessionService {
      * Validate a refresh token and return the session if still valid.
      */
     public Optional<UserSession> findValidSessionByRefreshToken(String refreshToken) {
-        log.debug("Looking up refresh token: {}...", refreshToken.substring(0, Math.min(8, refreshToken.length())));
+        log.info("[SessionService] Looking up refresh token (length={}): {}...",
+                refreshToken.length(),
+                refreshToken.substring(0, Math.min(8, refreshToken.length())));
 
         Optional<UserSession> session = sessionRepo.findByRefreshTokenAndRevokedAtIsNull(refreshToken);
 
         if (session.isEmpty()) {
-            log.debug("No session found for refresh token");
+            log.info("[SessionService] No session found for refresh token in DB (token not found or revoked)");
             return Optional.empty();
         }
 
-        if (session.get().getRefreshTokenExpiresAt().isBefore(Instant.now())) {
-            log.debug("Refresh token found but expired at {}", session.get().getRefreshTokenExpiresAt());
+        UserSession s = session.get();
+        log.info("[SessionService] Session found - userId={}, expiresAt={}, revokedAt={}",
+                s.getUserId(), s.getRefreshTokenExpiresAt(), s.getRevokedAt());
+
+        if (s.getRefreshTokenExpiresAt().isBefore(Instant.now())) {
+            log.info("[SessionService] Refresh token found but EXPIRED at {}", s.getRefreshTokenExpiresAt());
             return Optional.empty();
         }
 
-        log.debug("Valid session found for user {}", session.get().getUserId());
+        log.info("[SessionService] Valid session found for user {}", s.getUserId());
         return session;
+    }
+
+    /**
+     * Find the most recent valid (non-expired, non-revoked) session for a user.
+     * Used as a fallback when the refresh token doesn't match but we have a valid user_id
+     * from an expired access token.
+     */
+    public Optional<UserSession> findMostRecentValidSessionForUser(UUID userId) {
+        log.info("[SessionService] Looking up most recent valid session for user {}", userId);
+
+        List<UserSession> sessions = sessionRepo.findByUserIdAndRevokedAtIsNull(userId);
+
+        if (sessions.isEmpty()) {
+            log.info("[SessionService] No active sessions found for user {}", userId);
+            return Optional.empty();
+        }
+
+        log.info("[SessionService] Found {} active session(s) for user {}", sessions.size(), userId);
+
+        // Find the most recent non-expired session
+        Instant now = Instant.now();
+        Optional<UserSession> validSession = sessions.stream()
+                .filter(s -> s.getRefreshTokenExpiresAt().isAfter(now))
+                .max((a, b) -> a.getRefreshTokenExpiresAt().compareTo(b.getRefreshTokenExpiresAt()));
+
+        if (validSession.isPresent()) {
+            UserSession s = validSession.get();
+            log.info("[SessionService] Found valid session for user {} - expiresAt={}", userId, s.getRefreshTokenExpiresAt());
+        } else {
+            log.info("[SessionService] All sessions for user {} are expired", userId);
+        }
+
+        return validSession;
     }
 
     /**

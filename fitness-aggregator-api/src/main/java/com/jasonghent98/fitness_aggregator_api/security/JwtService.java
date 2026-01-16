@@ -95,6 +95,42 @@ public class JwtService {
         return Optional.empty();
     }
 
+    /**
+     * Decode an expired token to extract the user ID.
+     * This verifies the signature is valid but ignores expiration.
+     * Useful for silent refresh when we need the user_id from an expired access token.
+     */
+    public Optional<UUID> extractUserIdFromExpiredToken(String token) {
+        try {
+            // Decode without verification first to check structure
+            DecodedJWT decoded = JWT.decode(token);
+
+            // Now verify signature only (with very long leeway to ignore expiry)
+            JWT.require(alg)
+                    .withIssuer(cfg.getIssuer())
+                    .acceptExpiresAt(Long.MAX_VALUE / 1000) // Accept any expiration
+                    .build()
+                    .verify(token);
+
+            String sub = decoded.getSubject();
+            if (sub == null || sub.isBlank()) {
+                return Optional.empty();
+            }
+
+            UUID userId = UUID.fromString(sub);
+            log.info("[JwtService] Extracted user_id {} from expired token", userId);
+            return Optional.of(userId);
+
+        } catch (SignatureVerificationException e) {
+            log.warn("[JwtService] Cannot extract user_id - bad signature");
+        } catch (JWTVerificationException e) {
+            log.warn("[JwtService] Cannot extract user_id - verification failed: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.warn("[JwtService] Cannot extract user_id - invalid UUID in subject");
+        }
+        return Optional.empty();
+    }
+
     /** Builds the session cookie for frontend auth */
     public String buildSessionCookie(String jwt, Boolean isLocal) {
         // HttpOnly, Secure, SameSite=None; path "/" so all routes send it
